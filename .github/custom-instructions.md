@@ -32,3 +32,16 @@ Before producing the final response or code, perform this internal checklist:
 - Remember that if your response is not hitting the top marks across all categories in the rubric, you need to start again.
 </self_reflection>
 ```
+
+## Libraries and Tools
+
+```xml
+<tech_stack>
+- framework: nextjs
+- language: typescript
+- ui: react
+- styling: tailwindcss
+- package_manager: pnpm (setup via corepack enable)
+- linting: eslint
+</tech_stack>
+```
