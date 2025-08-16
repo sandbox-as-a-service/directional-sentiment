@@ -1,0 +1,9 @@
+{
+  "bracketSpacing": false,
+  "printWidth": 110,
+  "semi": false,
+  "importOrder": ["^@/(.*)$", "^[./]"],
+  "importOrderSortSpecifiers": true,
+  "importOrderSeparation": true,
+  "plugins": ["prettier-plugin-tailwindcss", "@trivago/prettier-plugin-sort-imports"]
+}
