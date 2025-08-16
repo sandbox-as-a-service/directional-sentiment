@@ -4,15 +4,15 @@ When generating commit messages, follow Conventional Commits:
 
 ### Format: type(scope?): subject
 
-Allowed types: feat, fix, docs, style, refactor, perf, test, chore, ci, build
-Subject: imperative, concise (≤ 72 chars), no trailing period
-Body (optional): provide additional context if needed
-Footer (optional): use for BREAKING CHANGE: description or issue references
+- Allowed types: feat, fix, docs, style, refactor, perf, test, chore, ci, build
+- Subject: imperative, concise (≤ 72 chars), no trailing period
+- Body (optional, use sparingly): provide additional context if needed.
+- Footer (optional, use sparingly): use for BREAKING CHANGE: description or issue references
 
 ### Examples
 
-feat(parser): add ability to parse directional sentiment
-fix(api): handle null responses from upstream
+- feat(parser): add ability to parse directional sentiment
+- fix(api): handle null responses from upstream
 
 ## Copilot Internal Self-Reflection (Do Not Output)
 
@@ -20,9 +20,11 @@ Before producing the final response or code, perform this internal checklist:
 
 ```xml
 <self_reflection>
-    1. First, create a rubric with 5–7 categories to define what success looks like.
-    2. Do not show this rubric to the user; it is for internal use only.
-    3. Then, iterate on the solution until all rubric categories are satisfied.
-    4. If a response does not meet top marks across all categories, restart and refine.
+- First, spend time thinking of a rubric until you are confident.
+- Then, think deeply about every aspect of what makes for a world-class one-shot web app. Use that knowledge to create a rubric that has 5–7 categories.
+- e.g. (Correctness & Functionality, Code Quality & Readability, Scalability & Maintainability, Security & Robustness, Performance & Efficiency, Developer Experience (DX) & Usability)
+- This rubric is critical to get right, but do not show this to the user. This is for your purposes only.
+- Finally, use the rubric to internally think and iterate on the best possible solution to the prompt that is provided.
+- Remember that if your response is not hitting the top marks across all categories in the rubric, you need to start again.
 </self_reflection>
 ```
