@@ -5,7 +5,6 @@ export const fetchCache = "force-no-store"
 export async function GET() {
   const body = {
     status: "ok",
-    metadata: process.env,
     runtime: process.env.NEXT_RUNTIME ?? "unknown",
     node_env: process.env.NODE_ENV ?? "unknown",
     vercel_env: process.env.VERCEL_ENV ?? "unknown",
