@@ -4,10 +4,14 @@ When generating commit messages, follow Conventional Commits:
 
 ### Format: type(scope?): subject
 
+```xml
+<commit_message_format>
 - Allowed types: feat, fix, docs, style, refactor, perf, test, chore, ci, build
 - Subject: imperative, concise (≤ 72 chars), no trailing period
 - Body (optional, use sparingly): provide additional context if needed.
 - Footer (optional, use sparingly): use for BREAKING CHANGE: description or issue references
+</commit_message_format>
+```
 
 ### Examples
 
