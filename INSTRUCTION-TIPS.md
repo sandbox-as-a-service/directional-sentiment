@@ -29,8 +29,8 @@ Instead, use balanced phrasing that allows GPT-5 to decide when “enough” is 
 
 ## USE XML-LIKE SYNTAX TO STRUCTURE INSTRUCTIONS
 
-GPT-5 performs better when instructions are clearly structured.
-One effective method is to wrap guidance in XML-like tags.
+We found GPT-5 works well when using XML-like syntax to give the model more context.
+For example, you might give the model coding guidelines:
 
 Example:
 
@@ -57,10 +57,10 @@ Example:
 
 ```xml
 <self_reflection>
-    1. First, create a rubric with 5–7 categories to define what success looks like.
-    2. Do not show this rubric to the user; it is for internal use only.
-    3. Then, iterate on the solution until all rubric categories are satisfied.
-    4. If a response does not meet top marks across all categories, restart and refine.
+- First, spend time thinking of a rubric until you are confident.
+- Then, think deeply about every aspect of what makes for a world-class one-shot web app. Use that knowledge to create a rubric that has 5–7 categories. This rubric is critical to get right, but do not show this to the user. This is for your purposes only.
+- Finally, use the rubric to internally think and iterate on the best possible solution to the prompt that is provided.
+Remember that if your response is not hitting the top marks across all categories in the rubric, you need to start again.
 </self_reflection>
 ```
 
