@@ -1,8 +1,11 @@
 import {NextResponse} from "next/server"
+import type {NextRequest} from "next/server"
 
 export const fetchCache = "force-no-store"
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  console.log(request)
+
   const body = {
     status: "ok",
     runtime: process.env.NEXT_RUNTIME ?? "unknown",
