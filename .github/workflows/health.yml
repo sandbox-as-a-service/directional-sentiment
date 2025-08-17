@@ -1,0 +1,17 @@
+name: Health
+
+on:
+  schedule:
+    # every 5 minutes
+    - cron: "*/5 * * * *"
+
+jobs:
+  ping:
+    name: Ping
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Curl health endpoint
+        run: |
+          curl -fsS https://directional-sentiment.vercel.app/api/health || exit 1
+          # -fsS makes curl fail on errors and stay quiet unless there’s a problem.
