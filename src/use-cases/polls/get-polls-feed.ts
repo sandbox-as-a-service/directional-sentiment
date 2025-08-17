@@ -6,7 +6,7 @@ export type GetPollsFeedOptions = {limit?: number; cursor?: string}
 
 // Port (tiny): what data the use case needs, nothing more
 export interface PollFeedSource {
-  page(input: {limitPlusOne: number; cursor?: string}): Promise<Array<{pollId: string; createdAt: string}>>
+  page(input: {limitPlusOne: number; cursor?: string}): Promise<Array<PollFeedItem>>
 }
 
 // Use case: caps limit, slices, computes nextCursor. No Supabase here.
@@ -22,7 +22,7 @@ export async function getPollsFeed(args: {
   const slice = hasMore ? rows.slice(0, limit) : rows
 
   return {
-    items: slice.map(({pollId, createdAt}) => ({pollId, createdAt})),
+    items: slice,
     nextCursor: hasMore ? slice[slice.length - 1].createdAt : undefined,
   }
 }
