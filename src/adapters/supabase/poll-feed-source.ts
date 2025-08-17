@@ -13,10 +13,16 @@ export function makeSupabasePollFeedSource(sb: SupabaseClient): PollFeedSource {
         .order("id", {ascending: false}) // uuid tiebreaker
         .limit(limitPlusOne) // ask one extra → caller detects hasNext
 
-      if (cursor) q = q.lt("created_at", cursor) // keyset: strictly older than cursor
+      if (cursor) {
+        q = q.lt("created_at", cursor)
+      } // keyset: strictly older than cursor
 
       const {data, error} = await q
-      if (error) throw new Error("supabase_query_failed")
+
+      if (error) {
+        console.error(error)
+        throw new Error("supabase_query_failed")
+      }
 
       const rows = data ?? []
       return rows.map((r) => ({pollId: r.id, createdAt: r.created_at})) // rename here
