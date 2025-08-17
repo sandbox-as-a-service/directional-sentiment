@@ -1,6 +1,6 @@
 name: Health
 
-permissions: {}
+permissions: {} # none
 
 on:
   schedule:
