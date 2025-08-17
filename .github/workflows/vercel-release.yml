@@ -1,0 +1,19 @@
+name: Vercel Release
+
+on:
+  deployment_status:
+
+permissions: {} # no token perms
+
+jobs:
+  vercel-release:
+    name: Vercel Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Event info
+        run: |
+          echo "Deployment event received!"
+          echo "Environment: ${{ github.event.deployment.environment }}"
+          echo "State: ${{ github.event.deployment_status.state }}"
+          echo "URL: ${{ github.event.deployment_status.environment_url }}"
