@@ -20,8 +20,7 @@ export function makeSupabasePollFeedSource(sb: SupabaseClient): PollFeedSource {
       const {data, error} = await q
 
       if (error) {
-        console.error(error)
-        throw new Error("supabase_query_failed")
+        throw new Error("supabase_query_failed", {cause: JSON.stringify(error)})
       }
 
       const rows = data ?? []
