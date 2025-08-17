@@ -1,7 +1,6 @@
 name: Health
 
-permissions:
-  contents: none
+permissions: {}
 
 on:
   schedule:
