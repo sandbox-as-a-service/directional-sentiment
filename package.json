@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test-api": "cd collections && bru run"
   },
   "dependencies": {
     "next": "15.4.6",
@@ -21,6 +22,7 @@
     "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@usebruno/cli": "^2.9.1",
     "eslint": "^9",
     "eslint-config-next": "15.4.6",
     "eslint-config-prettier": "^10.1.8",

@@ -24,14 +24,14 @@ jobs:
           node-version: "22"
           cache: "pnpm"
 
-      - name: Install Bruno CLI
-        run: pnpm add -g @usebruno/cli
+      - name: Install dependencies
+        run: pnpm install
 
       - name: Run API Tests
-        run: bru run --env production --reporter-html results.html
+        run: pnpm test-api --env production --reporter-html results.html
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: api-test-results
           path: results.html
