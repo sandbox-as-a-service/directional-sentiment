@@ -1,5 +1,8 @@
 name: Health
 
+permissions:
+  contents: none
+
 on:
   schedule:
     # every 5 minutes
