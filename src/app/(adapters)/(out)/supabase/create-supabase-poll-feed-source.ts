@@ -1,6 +1,6 @@
 import type {SupabaseClient} from "@supabase/supabase-js"
 
-import type {PollFeedSource} from "@/app/_core/ports/out/poll-feed-source"
+import type {PollFeedSource} from "@/app/_domain/ports/out/poll-feed-source"
 
 // Talks Supabase; returns the tiny shape the use case expects.
 export function createSupabasePollFeedSource(sb: SupabaseClient): PollFeedSource {

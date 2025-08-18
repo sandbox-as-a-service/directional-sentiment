@@ -5,7 +5,7 @@ import {createMemoryPollFeedSource} from "@/app/(adapters)/(out)/memory/create-m
 import {pollFeedFixture} from "@/app/(adapters)/(out)/memory/fixtures/poll-feed"
 import {createSupabasePollFeedSource} from "@/app/(adapters)/(out)/supabase/create-supabase-poll-feed-source"
 import {createClient} from "@/app/(adapters)/(out)/supabase/server"
-import {getPollFeed} from "@/app/_core/use-cases/polls/get-poll-feed"
+import {getPollFeed} from "@/app/_domain/use-cases/polls/get-poll-feed"
 
 const QuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(20),

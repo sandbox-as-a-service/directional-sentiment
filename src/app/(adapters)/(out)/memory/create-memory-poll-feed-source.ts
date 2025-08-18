@@ -1,5 +1,5 @@
-import type {PollFeedItem} from "@/app/_core/entities/poll"
-import type {PollFeedSource} from "@/app/_core/ports/out/poll-feed-source"
+import type {PollFeedItem} from "@/app/_domain/entities/poll"
+import type {PollFeedSource} from "@/app/_domain/ports/out/poll-feed-source"
 
 export function createMemoryPollFeedSource(items: PollFeedItem[]): PollFeedSource {
   // Keep a sorted copy so paging is predictable
