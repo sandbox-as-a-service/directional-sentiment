@@ -5,12 +5,12 @@ import type {PollFeedSource} from "@/app/_core/ports/out/poll-feed-source"
 // Talks Supabase; returns the tiny shape the use case expects.
 export function createSupabasePollFeedSource(sb: SupabaseClient): PollFeedSource {
   return {
-    async page({limitPlusOne, cursor}) {
+    async page({limit, cursor}) {
       let q = sb
         .from("polls")
         .select("id,created_at")
         .order("created_at", {ascending: false}) // newest first
-        .limit(limitPlusOne) // ask one extra → caller detects hasNext
+        .limit(limit) // ask one extra → caller detects hasNext
 
       if (cursor) {
         q = q.lt("created_at", cursor)

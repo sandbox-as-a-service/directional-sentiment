@@ -8,7 +8,7 @@ export async function getPollFeed(args: {
 }): Promise<PollFeedPage> {
   const {source, options} = args
   const limit = Math.min(options.limit ?? 20, 50)
-  const rows = await source.page({limitPlusOne: limit + 1, cursor: options.cursor})
+  const rows = await source.page({limit: limit + 1, cursor: options.cursor})
 
   const hasMore = rows.length > limit
   const slice = hasMore ? rows.slice(0, limit) : rows
