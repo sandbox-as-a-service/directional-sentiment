@@ -3,7 +3,7 @@ import type {SupabaseClient} from "@supabase/supabase-js"
 import type {PollFeedSource} from "@/app/_core/ports/out/poll-feed-source"
 
 // Talks Supabase; returns the tiny shape the use case expects.
-export function createPollFeedSource(sb: SupabaseClient): PollFeedSource {
+export function createSupabasePollFeedSource(sb: SupabaseClient): PollFeedSource {
   return {
     async page({limitPlusOne, cursor}) {
       let q = sb

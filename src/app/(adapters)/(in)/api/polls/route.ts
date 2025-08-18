@@ -1,13 +1,18 @@
 import {type NextRequest, NextResponse} from "next/server"
 
-import {createPollFeedSource} from "@/app/(adapters)/(out)/supabase/create-poll-feed-source"
+import {createMemoryPollFeedSource} from "@/app/(adapters)/(out)/memory/create-memory-poll-feed-source"
+import {pollFeedFixture} from "@/app/(adapters)/(out)/memory/fixtures/poll-feed"
+import {createSupabasePollFeedSource} from "@/app/(adapters)/(out)/supabase/create-supabase-poll-feed-source"
 import {createClient} from "@/app/(adapters)/(out)/supabase/server"
 import {getPollFeed} from "@/app/_core/use-cases/polls/get-poll-feed"
 
 export async function GET(req: NextRequest) {
   try {
-    const sb = await createClient() // request-scoped (auth/cookies)
-    const source = createPollFeedSource(sb) // adapter does id → pollId
+    const useMemory = process.env.USE_MEMORY === "1"
+
+    const source = useMemory
+      ? createMemoryPollFeedSource(pollFeedFixture)
+      : createSupabasePollFeedSource(await createClient()) // request-scoped (auth/cookies)
 
     const url = new URL(req.url)
     const limit = Number(url.searchParams.get("limit") ?? 20)
