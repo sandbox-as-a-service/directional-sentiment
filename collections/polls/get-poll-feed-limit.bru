@@ -1,0 +1,18 @@
+meta {
+  name: get-poll-feed-limit
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{URL}}/api/polls?limit=2
+  auth: inherit
+}
+
+params:query {
+  limit: 2
+}
+
+settings {
+  encodeUrl: true
+}
