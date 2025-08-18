@@ -1,13 +1,5 @@
-// Domain DTOs (vendor-agnostic)
-export type PollFeedItem = {pollId: string; createdAt: string}
-export type PollFeedPage = {items: PollFeedItem[]; nextCursor?: string}
-
-export type GetPollsFeedOptions = {limit?: number; cursor?: string}
-
-// Port (tiny): what data the use case needs, nothing more
-export interface PollFeedSource {
-  page(input: {limitPlusOne: number; cursor?: string}): Promise<Array<PollFeedItem>>
-}
+import type {GetPollsFeedOptions, PollFeedPage} from "@/app/_core/entities/poll"
+import type {PollFeedSource} from "@/app/_core/ports/out/poll-feed-source"
 
 // Use case: caps limit, slices, computes nextCursor. No Supabase here.
 export async function getPollsFeed(args: {

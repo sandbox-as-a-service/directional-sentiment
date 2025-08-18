@@ -1,16 +1,15 @@
 import type {SupabaseClient} from "@supabase/supabase-js"
 
-import type {PollFeedSource} from "@/use-cases/polls/get-polls-feed"
+import type {PollFeedSource} from "@/app/_core/ports/out/poll-feed-source"
 
 // Talks Supabase; returns the tiny shape the use case expects.
-export function makeSupabasePollFeedSource(sb: SupabaseClient): PollFeedSource {
+export function createPollFeedSource(sb: SupabaseClient): PollFeedSource {
   return {
     async page({limitPlusOne, cursor}) {
       let q = sb
         .from("polls")
         .select("id,created_at")
         .order("created_at", {ascending: false}) // newest first
-        .order("id", {ascending: false}) // uuid tiebreaker
         .limit(limitPlusOne) // ask one extra → caller detects hasNext
 
       if (cursor) {

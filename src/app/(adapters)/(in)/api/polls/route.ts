@@ -1,13 +1,13 @@
 import {type NextRequest, NextResponse} from "next/server"
 
-import {makeSupabasePollFeedSource} from "@/adapters/supabase/poll-feed-source"
-import {createClient} from "@/adapters/supabase/server"
-import {getPollsFeed} from "@/use-cases/polls/get-polls-feed"
+import {createPollFeedSource} from "@/app/(adapters)/(out)/supabase/create-poll-feed-source"
+import {createClient} from "@/app/(adapters)/(out)/supabase/server"
+import {getPollsFeed} from "@/app/_core/use-cases/polls/get-polls-feed"
 
 export async function GET(req: NextRequest) {
   try {
     const sb = await createClient() // request-scoped (auth/cookies)
-    const source = makeSupabasePollFeedSource(sb) // adapter does id → pollId
+    const source = createPollFeedSource(sb) // adapter does id → pollId
 
     const url = new URL(req.url)
     const limit = Number(url.searchParams.get("limit") ?? 20)
