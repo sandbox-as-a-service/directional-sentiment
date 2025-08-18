@@ -1,4 +1,4 @@
-import type {PollFeedItem} from "@/app/_core/entities/poll"
+import type {PollFeedItem} from "@/app/_domain/entities/poll"
 
 // Port (tiny): what data the use case needs, nothing more
 export interface PollFeedSource {

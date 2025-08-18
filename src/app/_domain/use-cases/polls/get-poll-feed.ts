@@ -1,5 +1,5 @@
-import type {GetPollFeedOptions, PollFeedPage} from "@/app/_core/entities/poll"
-import type {PollFeedSource} from "@/app/_core/ports/out/poll-feed-source"
+import type {GetPollFeedOptions, PollFeedPage} from "@/app/_domain/entities/poll"
+import type {PollFeedSource} from "@/app/_domain/ports/out/poll-feed-source"
 
 // Use case: caps limit, slices, computes nextCursor. No Supabase here.
 export async function getPollFeed(args: {
