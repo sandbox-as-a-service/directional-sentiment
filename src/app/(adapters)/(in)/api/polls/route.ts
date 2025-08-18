@@ -1,10 +1,12 @@
 import {type NextRequest, NextResponse} from "next/server"
+import {inspect} from "node:util"
 import {z} from "zod"
 
 import {createMemoryPollFeedSource} from "@/app/(adapters)/(out)/memory/create-memory-poll-feed-source"
 import {pollFeedFixture} from "@/app/(adapters)/(out)/memory/fixtures/poll-feed"
 import {createSupabasePollFeedSource} from "@/app/(adapters)/(out)/supabase/create-supabase-poll-feed-source"
 import {createClient} from "@/app/(adapters)/(out)/supabase/server"
+import type {GetPollFeedOptions} from "@/app/_domain/ports/in/get-poll-feed"
 import {getPollFeed} from "@/app/_domain/use-cases/polls/get-poll-feed"
 
 const QuerySchema = z.object({
@@ -37,7 +39,7 @@ export async function GET(req: NextRequest) {
     }
 
     const {limit, cursor} = parsed.value
-    const options = {limit, cursor}
+    const options: GetPollFeedOptions = {limit, cursor}
 
     const useMemory = process.env.USE_MEMORY === "1"
     const source = useMemory
@@ -47,7 +49,9 @@ export async function GET(req: NextRequest) {
     const data = await getPollFeed({source, options})
     return NextResponse.json(data, {status: 200})
   } catch (e) {
-    console.error(e)
+    e instanceof Error
+      ? console.error(inspect({name: e.name, msg: e.message, cause: e.cause}))
+      : console.error("Unknown Error:", e)
     return NextResponse.json({error: "internal_error"}, {status: 500})
   }
 }
