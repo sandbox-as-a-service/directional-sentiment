@@ -1,4 +1,4 @@
-import type {PollFeedItem} from "@/app/_domain/entities/poll"
+import type {PollFeedItem} from "@/app/_domain/use-cases/polls/dto/poll"
 
 export const pollFeedFixture: PollFeedItem[] = [
   {pollId: "p3", createdAt: "2025-08-18T15:30:00Z"},
