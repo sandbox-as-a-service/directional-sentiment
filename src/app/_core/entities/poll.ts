@@ -2,4 +2,4 @@
 export type PollFeedItem = {pollId: string; createdAt: string}
 export type PollFeedPage = {items: PollFeedItem[]; nextCursor?: string}
 
-export type GetPollsFeedOptions = {limit?: number; cursor?: string}
+export type GetPollFeedOptions = {limit?: number; cursor?: string}

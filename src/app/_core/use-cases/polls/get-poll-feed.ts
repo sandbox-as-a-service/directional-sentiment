@@ -1,10 +1,10 @@
-import type {GetPollsFeedOptions, PollFeedPage} from "@/app/_core/entities/poll"
+import type {GetPollFeedOptions, PollFeedPage} from "@/app/_core/entities/poll"
 import type {PollFeedSource} from "@/app/_core/ports/out/poll-feed-source"
 
 // Use case: caps limit, slices, computes nextCursor. No Supabase here.
-export async function getPollsFeed(args: {
+export async function getPollFeed(args: {
   source: PollFeedSource
-  options: GetPollsFeedOptions
+  options: GetPollFeedOptions
 }): Promise<PollFeedPage> {
   const {source, options} = args
   const limit = Math.min(options.limit ?? 20, 50)

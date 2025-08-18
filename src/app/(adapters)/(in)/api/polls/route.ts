@@ -2,7 +2,7 @@ import {type NextRequest, NextResponse} from "next/server"
 
 import {createPollFeedSource} from "@/app/(adapters)/(out)/supabase/create-poll-feed-source"
 import {createClient} from "@/app/(adapters)/(out)/supabase/server"
-import {getPollsFeed} from "@/app/_core/use-cases/polls/get-polls-feed"
+import {getPollFeed} from "@/app/_core/use-cases/polls/get-poll-feed"
 
 export async function GET(req: NextRequest) {
   try {
@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     const cursor = url.searchParams.get("cursor") ?? undefined
     const options = {limit, cursor}
 
-    const data = await getPollsFeed({source, options})
+    const data = await getPollFeed({source, options})
     return NextResponse.json(data, {status: 200})
   } catch (e) {
     console.error(e)
