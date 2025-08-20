@@ -6,6 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "typegen": "next typegen",
     "lint": "eslint .",
     "format": "prettier --write .",
     "test-api": "cd collections && bru run"
