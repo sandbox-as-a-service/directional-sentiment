@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
     if (e instanceof Error) {
       console.error(inspect({name: e.name, msg: e.message, cause: e.cause}, {depth: Infinity}))
     } else {
-      console.error(inspect({name: "Unknown Error", msg: e}, {depth: Infinity}))
+      console.error(inspect({name: "UnknownError", msg: e}, {depth: Infinity}))
     }
     return NextResponse.json({error: "internal_error"}, {status: 500})
   }

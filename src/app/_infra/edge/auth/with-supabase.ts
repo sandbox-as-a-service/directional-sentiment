@@ -5,6 +5,8 @@ import {env} from "@/app/_config/env"
 import type {Middleware} from "@/app/_infra/edge/compose"
 
 export const withSupabase: Middleware = async (req: NextRequest, res: NextResponse) => {
+  console.info("Running withSupabase Middleware")
+
   // carry forward anything earlier middlewares already set
   let out = res
 
@@ -36,13 +38,21 @@ export const withSupabase: Middleware = async (req: NextRequest, res: NextRespon
     })
 
     // Per Supabase guidance: call immediately after client creation refreshing the auth token
-    await supabase.auth.getUser()
+    const {error} = await supabase.auth.getUser()
+
+    if (error) {
+      console.warn("withSupabase Middleware:", error.message)
+    }
 
     // no redirect/deny here → pass-through (status 200), composer keeps going
     return out
-  } catch (err) {
-    // fail-open: if Supabase throws, don't break requests
-    console.error("[withSupabaseSession] error:", err)
-    return out
+  } catch (e) {
+    // fail-closed: if Supabase throws, break requests
+    if (e instanceof Error) {
+      console.error({name: e.name, msg: e.message})
+    } else {
+      console.error({name: "UnknownError", msg: e})
+    }
+    return NextResponse.json({message: "internal_error"}, {status: 503})
   }
 }

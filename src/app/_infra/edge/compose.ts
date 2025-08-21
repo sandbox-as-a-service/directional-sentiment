@@ -5,6 +5,7 @@ import {type NextRequest, NextResponse} from "next/server"
 export type Middleware = (req: NextRequest, res: NextResponse) => Promise<NextResponse> | NextResponse
 
 export async function compose(req: NextRequest, steps: Middleware[]): Promise<NextResponse> {
+  console.info("Middleware Chain Start:", req.nextUrl.href)
   // Start with a pass-through response bound to this request.
   // Middlewares can replace `current` (e.g., to mutate cookies) or return a terminal response.
   let current = NextResponse.next({request: req})
@@ -19,5 +20,7 @@ export async function compose(req: NextRequest, steps: Middleware[]): Promise<Ne
   }
 
   // No middleware stopped the chain → return the final pass-through response.
+  console.info("Middleware Chain End:", req.nextUrl.href)
+
   return current
 }
