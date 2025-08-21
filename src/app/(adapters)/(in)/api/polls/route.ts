@@ -6,6 +6,7 @@ import {createMemoryPollFeedSource} from "@/app/(adapters)/(out)/memory/create-m
 import {pollFeedFixture} from "@/app/(adapters)/(out)/memory/fixtures/poll-feed"
 import {createSupabasePollFeedSource} from "@/app/(adapters)/(out)/supabase/create-supabase-poll-feed-source"
 import {createClient} from "@/app/(adapters)/(out)/supabase/server"
+import {env} from "@/app/_config/env"
 import type {GetPollFeedOptions} from "@/app/_domain/ports/in/get-poll-feed"
 import {getPollFeed} from "@/app/_domain/use-cases/polls/get-poll-feed"
 
@@ -41,7 +42,7 @@ export async function GET(req: NextRequest) {
     const {limit, cursor} = parsed.value
     const options: GetPollFeedOptions = {limit, cursor}
 
-    const useMemory = process.env.USE_MEMORY === "1"
+    const useMemory = env.USE_MEMORY === "1"
     const source = useMemory
       ? createMemoryPollFeedSource(pollFeedFixture)
       : createSupabasePollFeedSource(await createClient()) // request-scoped
