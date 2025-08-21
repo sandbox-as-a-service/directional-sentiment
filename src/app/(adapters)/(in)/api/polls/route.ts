@@ -11,7 +11,7 @@ import {getPollFeed} from "@/app/_domain/use-cases/polls/get-poll-feed"
 
 const QuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(20),
-  // require timezone (offset: true) to keep lexicographic order safe
+  // require timezone to keep lexicographic order safe
   cursor: z.iso.datetime().optional(),
 })
 
