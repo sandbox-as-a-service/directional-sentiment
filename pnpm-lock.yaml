@@ -30,6 +30,9 @@ importers:
       '@eslint/eslintrc':
         specifier: ^3
         version: 3.3.1
+      '@next/eslint-plugin-next':
+        specifier: ^15.5.0
+        version: 15.5.0
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.1.12
@@ -57,6 +60,9 @@ importers:
       eslint-config-prettier:
         specifier: ^10.1.8
         version: 10.1.8(eslint@9.33.0(jiti@2.5.1))
+      eslint-plugin-react-hooks:
+        specifier: ^5.2.0
+        version: 5.2.0(eslint@9.33.0(jiti@2.5.1))
       prettier:
         specifier: 3.6.2
         version: 3.6.2
@@ -5141,7 +5147,7 @@ snapshots:
       '@usebruno/lang': 0.27.0
       '@usebruno/requests': 0.7.0(debug@4.4.1)
       '@usebruno/vm2': 3.9.19
-      aws4-axios: 3.4.0(axios@1.11.0)
+      aws4-axios: 3.4.0(axios@1.11.0(debug@4.4.1))
       axios: 1.11.0(debug@4.4.1)
       axios-ntlm: 1.4.4(debug@4.4.1)
       chai: 4.5.0
@@ -5380,7 +5386,7 @@ snapshots:
 
   aws-sign2@0.7.0: {}
 
-  aws4-axios@3.4.0(axios@1.11.0):
+  aws4-axios@3.4.0(axios@1.11.0(debug@4.4.1)):
     dependencies:
       '@aws-sdk/client-sts': 3.864.0
       aws4: 1.13.2
