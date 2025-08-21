@@ -22,7 +22,7 @@ function parseQuery(url: URL) {
 
   if (!res.success) {
     // Log EVERYTHING for debugging (server-only)
-    console.warn(inspect({name: "ZodError", issues: res.error.issues}, {colors: true, depth: Infinity}))
+    console.warn(inspect({name: "ZodError", msg: res.error.issues}, {depth: Infinity}))
 
     // Issues safe to expose to the client
     const issues = res.error.issues.map(({path, message}) => ({
@@ -57,14 +57,14 @@ export async function GET(req: NextRequest) {
     // Keep this for truly unexpected failures
     if (e instanceof ZodError) {
       // Defensive: if validation ever bubbles up here, still make it 400
-      console.warn(inspect({name: "ZodError", issues: e.issues}, {colors: true, depth: Infinity}))
+      console.warn(inspect({name: "ZodError", issues: e.issues}, {depth: Infinity}))
       return NextResponse.json({error: "bad_request", issues: e.issues}, {status: 400})
     }
 
     if (e instanceof Error) {
-      console.error(inspect({name: e.name, msg: e.message, cause: e.cause}, {colors: true, depth: Infinity}))
+      console.error(inspect({name: e.name, msg: e.message, cause: e.cause}, {depth: Infinity}))
     } else {
-      console.error(inspect({name: "Unknown Error", msg: e}, {colors: true, depth: Infinity}))
+      console.error(inspect({name: "Unknown Error", msg: e}, {depth: Infinity}))
     }
     return NextResponse.json({error: "internal_error"}, {status: 500})
   }
