@@ -56,9 +56,3 @@ catch (e) {
   return NextResponse.json({error: "internal_error"}, {status: 500})
 }
 ```
-
-## Debugging
-
-- Use `node:util.inspect` for detailed error logging
-- Environment switching helps isolate data layer issues
-- Bruno tests provide integration test coverage

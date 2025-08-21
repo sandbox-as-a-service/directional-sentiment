@@ -11,6 +11,12 @@ src/app/
 │   │   ├── in/        # Use case contracts (what the domain offers)
 │   │   └── out/       # Data source contracts (what the domain needs)
 │   └── use-cases/     # Business logic implementation
+├── _infra/            # Infrastructure concerns (cross-cutting)
+│   └── edge/          # Edge middleware components
+│       ├── compose.ts # Middleware composition utility
+│       ├── auth/      # Authentication middleware
+│       ├── cors/      # CORS handling middleware
+│       └── rate-limit/ # Rate limiting middleware
 ├── (adapters)/
 │   ├── (in)/          # Inbound adapters (API routes, Server Actions)
 │   └── (out)/         # Outbound adapters (databases, external APIs)
@@ -57,3 +63,50 @@ const source = useMemory
 ```
 
 This allows seamless switching between in-memory fixtures (testing) and real data sources (production).
+
+## Middleware Infrastructure
+
+The `_infra/edge/` directory contains composable middleware for cross-cutting concerns that run at the edge (Next.js middleware).
+
+### Composition Pattern
+
+```typescript
+// src/middleware.ts
+import {withSupabase} from "@/app/_infra/edge/auth/with-supabase"
+import {compose} from "@/app/_infra/edge/compose"
+import {withCors} from "@/app/_infra/edge/cors/with-cors"
+import {withRateLimit} from "@/app/_infra/edge/rate-limit/with-rate-limit"
+
+export default function middleware(req: NextRequest) {
+  return compose(req, [withCors, withRateLimit, withSupabase])
+}
+```
+
+### Middleware Contract
+
+Each middleware follows a strict contract:
+
+```typescript
+export type Middleware = (req: NextRequest, res: NextResponse) => Promise<NextResponse> | NextResponse
+```
+
+**Rules:**
+
+- **MUST return a NextResponse** - never void or undefined
+- **Status 200 = pass-through** - continue to next middleware
+- **Non-200 status = terminal** - stop chain and return immediately
+- **Preserve context** - carry forward cookies/headers from previous middleware
+
+### Available Middleware
+
+- **`withCors`** - Handles CORS headers and preflight requests
+- **`withRateLimit`** - Rate limiting (fail-open for resilience)
+- **`withSupabase`** - Supabase auth session management and cookie handling
+
+### Execution Flow
+
+1. **Chain starts** with `NextResponse.next({request: req})`
+2. **Each middleware** receives current request and response
+3. **Pass-through** (status 200) continues to next middleware
+4. **Terminal response** (non-200) stops chain immediately
+5. **Final response** returned to client
