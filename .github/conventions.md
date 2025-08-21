@@ -55,6 +55,7 @@ export function createSomethingSource(config: Config): SomethingSource {
 - Use `type` for unions and primitives, `interface` for object shapes
 - Prefix interfaces with purpose: `PollFeedSource`, `GetPollFeedOptions`
 - Export types from dedicated `dto/` folders in domain layer
+- Use `import type` rather than `import` when importing types and interfaces
 
 ## Error Handling
 

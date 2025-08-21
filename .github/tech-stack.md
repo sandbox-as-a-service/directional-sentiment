@@ -5,7 +5,7 @@
 - **Framework**: Next.js 15 with App Router and Turbopack
 - **Language**: TypeScript 5
 - **Package Manager**: pnpm (specified in packageManager field)
-- **Runtime**: Node.js with React 19
+- **Runtime**: Node.js 22 with React 19
 
 ## Database & Validation
 
@@ -78,10 +78,3 @@ if (error) {
 
 - Uses Tailwind CSS v4 with `@tailwindcss/postcss`
 - Prettier plugin for class sorting: `prettier-plugin-tailwindcss`
-
-## Version Constraints
-
-- Node.js: Compatible with React 19 requirements
-- TypeScript: v5+ for latest language features
-- Next.js: v15+ for App Router stability
-- Zod: v4+ for performance improvements

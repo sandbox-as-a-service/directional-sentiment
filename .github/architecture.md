@@ -12,9 +12,9 @@ src/app/
 │   │   └── out/       # Data source contracts (what the domain needs)
 │   └── use-cases/     # Business logic implementation
 ├── (adapters)/
-│   ├── (in)/          # Inbound adapters (API routes, UI)
+│   ├── (in)/          # Inbound adapters (API routes, Server Actions)
 │   └── (out)/         # Outbound adapters (databases, external APIs)
-└── (public)/          # UI components and assets
+└── (public)/          # UI pages, components and assets
 ```
 
 ## Domain Layer Rules

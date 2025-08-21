@@ -5,9 +5,9 @@
 ```bash
 pnpm dev --turbopack        # Development server with Turbopack
 pnpm test-api              # Run Bruno API tests
-pnpm typegen               # Generate Next.js types
+pnpm typegen               # Generate Next.js route types (runs automatically on pnpm dev and pnpm build)
 pnpm build                 # Production build
-pnpm lint                  # ESLint check
+pnpm lint                  # ESLint check (runs automatically on pnpm build)
 pnpm format                # Prettier formatting
 ```
 
