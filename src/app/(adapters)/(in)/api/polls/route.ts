@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     const parsed = parseQuery(url)
 
     if (!parsed.ok) {
-      console.error(parsed.issues)
+      console.warn(parsed.issues)
       return NextResponse.json({error: "bad_request", issues: parsed.issues}, {status: 400})
     }
 
