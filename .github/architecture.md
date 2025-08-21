@@ -15,7 +15,6 @@ src/app/
 │   └── edge/          # Edge middleware components
 │       ├── compose.ts # Middleware composition utility
 │       ├── auth/      # Authentication middleware
-│       ├── cors/      # CORS handling middleware
 │       └── rate-limit/ # Rate limiting middleware
 ├── (adapters)/
 │   ├── (in)/          # Inbound adapters (API routes, Server Actions)
@@ -74,11 +73,10 @@ The `_infra/edge/` directory contains composable middleware for cross-cutting co
 // src/middleware.ts
 import {withSupabase} from "@/app/_infra/edge/auth/with-supabase"
 import {compose} from "@/app/_infra/edge/compose"
-import {withCors} from "@/app/_infra/edge/cors/with-cors"
 import {withRateLimit} from "@/app/_infra/edge/rate-limit/with-rate-limit"
 
 export default function middleware(req: NextRequest) {
-  return compose(req, [withCors, withRateLimit, withSupabase])
+  return compose(req, [withRateLimit, withSupabase])
 }
 ```
 
@@ -99,7 +97,6 @@ export type Middleware = (req: NextRequest, res: NextResponse) => Promise<NextRe
 
 ### Available Middleware
 
-- **`withCors`** - Handles CORS headers and preflight requests
 - **`withRateLimit`** - Rate limiting (fail-open for resilience)
 - **`withSupabase`** - Supabase auth session management and cookie handling
 
