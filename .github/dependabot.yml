@@ -22,3 +22,4 @@ updates:
         patterns:
           - "next"
           - "eslint-config-next"
+          - "@next/eslint-plugin-next"
