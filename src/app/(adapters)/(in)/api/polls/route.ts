@@ -50,11 +50,7 @@ export async function GET(req: NextRequest) {
     const data = await getPollFeed({source, options})
     return NextResponse.json(data, {status: 200})
   } catch (e) {
-    if (e instanceof Error) {
-      console.error(inspect({name: e.name, msg: e.message, cause: e.cause}))
-    } else {
-      console.error("Unknown Error:", e)
-    }
+    console.error(e)
     return NextResponse.json({error: "internal_error"}, {status: 500})
   }
 }
