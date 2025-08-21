@@ -1,6 +1,6 @@
 import {type NextRequest, NextResponse} from "next/server"
 import {inspect} from "node:util"
-import {z} from "zod"
+import {ZodError, z} from "zod"
 
 import {createMemoryPollFeedSource} from "@/app/(adapters)/(out)/memory/create-memory-poll-feed-source"
 import {pollFeedFixture} from "@/app/(adapters)/(out)/memory/fixtures/poll-feed"
@@ -21,6 +21,10 @@ function parseQuery(url: URL) {
   const res = QuerySchema.safeParse(raw)
 
   if (!res.success) {
+    // Log EVERYTHING for debugging (server-only)
+    console.warn(inspect({name: "ZodError", issues: res.error.issues}, {colors: true, depth: Infinity}))
+
+    // Issues safe to expose to the client
     const issues = res.error.issues.map(({path, message}) => ({
       message,
       path: path.join("."),
@@ -36,7 +40,6 @@ export async function GET(req: NextRequest) {
     const parsed = parseQuery(url)
 
     if (!parsed.ok) {
-      console.warn(parsed.issues)
       return NextResponse.json({error: "bad_request", issues: parsed.issues}, {status: 400})
     }
 
@@ -51,7 +54,18 @@ export async function GET(req: NextRequest) {
     const data = await getPollFeed({source, options})
     return NextResponse.json(data, {status: 200})
   } catch (e) {
-    console.error(e)
+    // Keep this for truly unexpected failures
+    if (e instanceof ZodError) {
+      // Defensive: if validation ever bubbles up here, still make it 400
+      console.warn(inspect({name: "ZodError", issues: e.issues}, {colors: true, depth: Infinity}))
+      return NextResponse.json({error: "bad_request", issues: e.issues}, {status: 400})
+    }
+
+    if (e instanceof Error) {
+      console.error(inspect({name: e.name, msg: e.message, cause: e.cause}, {colors: true, depth: Infinity}))
+    } else {
+      console.error(inspect({name: "Unknown Error", msg: e}, {colors: true, depth: Infinity}))
+    }
     return NextResponse.json({error: "internal_error"}, {status: 500})
   }
 }
