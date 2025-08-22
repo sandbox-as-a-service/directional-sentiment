@@ -1,13 +1,13 @@
 import {type NextRequest, NextResponse} from "next/server"
-import {inspect} from "node:util"
-import {ZodError, z} from "zod"
+import {z} from "zod"
 
 import {createMemoryPollFeedSource} from "@/app/(adapters)/(out)/memory/create-memory-poll-feed-source"
-import {pollFeedFixture} from "@/app/(adapters)/(out)/memory/fixtures/poll-feed"
+import {memoryPollFeed} from "@/app/(adapters)/(out)/memory/fixtures/poll-feed"
 import {createSupabasePollFeedSource} from "@/app/(adapters)/(out)/supabase/create-supabase-poll-feed-source"
 import {createClient} from "@/app/(adapters)/(out)/supabase/server"
 import {env} from "@/app/_config/env"
-import type {GetPollFeedOptions} from "@/app/_domain/ports/in/get-poll-feed"
+import type {GetPollFeedInput} from "@/app/_domain/ports/in/get-poll-feed"
+import type {PollFeedSource} from "@/app/_domain/ports/out/poll-feed-source"
 import {getPollFeed} from "@/app/_domain/use-cases/polls/get-poll-feed"
 
 const QuerySchema = z.object({
@@ -16,56 +16,44 @@ const QuerySchema = z.object({
   cursor: z.iso.datetime().optional(),
 })
 
-function parseQuery(url: URL) {
-  const raw = Object.fromEntries(url.searchParams.entries())
-  const res = QuerySchema.safeParse(raw)
-
-  if (!res.success) {
-    // Log EVERYTHING for debugging (server-only)
-    console.warn(inspect({name: "ZodError", msg: res.error.issues}, {depth: Infinity}))
-
-    // Issues safe to expose to the client
-    const issues = res.error.issues.map(({path, message}) => ({
-      message,
-      path: path.join("."),
-    }))
-    return {ok: false as const, issues}
-  }
-  return {ok: true as const, value: res.data}
-}
-
 export async function GET(req: NextRequest) {
   try {
-    const url = new URL(req.url)
-    const parsed = parseQuery(url)
+    const queries = Object.fromEntries(req.nextUrl.searchParams.entries())
+    const parsed = QuerySchema.safeParse(queries)
 
-    if (!parsed.ok) {
-      return NextResponse.json({error: "bad_request", issues: parsed.issues}, {status: 400})
+    if (!parsed.success) {
+      console.warn(parsed.error.issues)
+      return NextResponse.json({error: "bad_request", message: parsed.error.message}, {status: 400})
     }
 
-    const {limit, cursor} = parsed.value
-    const options: GetPollFeedOptions = {limit, cursor}
+    const {limit, cursor} = parsed.data
+    const input: GetPollFeedInput = {limit, cursor}
 
-    const useMemory = env.USE_MEMORY === "1"
-    const source = useMemory
-      ? createMemoryPollFeedSource(pollFeedFixture)
-      : createSupabasePollFeedSource(await createClient()) // request-scoped
-
-    const data = await getPollFeed({source, options})
-    return NextResponse.json(data, {status: 200})
-  } catch (e) {
-    // Keep this for truly unexpected failures
-    if (e instanceof ZodError) {
-      // Defensive: if validation ever bubbles up here, still make it 400
-      console.warn(inspect({name: "ZodError", issues: e.issues}, {depth: Infinity}))
-      return NextResponse.json({error: "bad_request", issues: e.issues}, {status: 400})
-    }
-
-    if (e instanceof Error) {
-      console.error(inspect({name: e.name, msg: e.message, cause: e.cause}, {depth: Infinity}))
+    let source: {poll: PollFeedSource}
+    if (env.USE_MEMORY === "1") {
+      source = {
+        poll: createMemoryPollFeedSource(memoryPollFeed),
+      }
     } else {
-      console.error(inspect({name: "UnknownError", msg: e}, {depth: Infinity}))
+      const supabase = await createClient()
+      source = {
+        poll: createSupabasePollFeedSource(supabase),
+      }
     }
-    return NextResponse.json({error: "internal_error"}, {status: 500})
+
+    const data = await getPollFeed({poll: source.poll, input})
+
+    console.info("🎉")
+    return NextResponse.json(data, {status: 200, headers: {"Cache-Control": "no-store"}})
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e)
+    const cause = e instanceof Error ? e.cause : undefined
+    console.error(message, cause)
+
+    if (message.startsWith("supabase")) {
+      return NextResponse.json({error: "service_unavailable"}, {status: 503})
+    }
+
+    return NextResponse.json({error: "internal_server_error"}, {status: 500})
   }
 }

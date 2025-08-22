@@ -27,7 +27,7 @@ docs(readme): update setup instructions
 - **Files**: kebab-case (`get-poll-feed.ts`)
 - **Directories**: Next.js route groups `(adapters)`, `(in)`, `(out)`, `(public)`
 - **Functions**: camelCase factory functions (`createSupabasePollFeedSource`)
-- **Types**: PascalCase with descriptive suffixes (`PollFeedSource`, `GetPollFeedOptions`)
+- **Types**: PascalCase with descriptive suffixes (`PollFeedSource`, `GetPollFeedInput`)
 - **Constants**: SCREAMING_SNAKE_CASE for module-level constants
 
 ## File Organization
@@ -52,24 +52,63 @@ export function createSomethingSource(config: Config): SomethingSource {
 
 ## TypeScript Patterns
 
-- Use `type` for unions and primitives, `interface` for object shapes
-- Prefix interfaces with purpose: `PollFeedSource`, `GetPollFeedOptions`
+- Use `type` for unions and primitives, `type` for object shapes
+- Prefix interfaces with purpose: `PollFeedSource`, `GetPollFeedInput`
 - Export types from dedicated `dto/` folders in domain layer
 - Use `import type` rather than `import` when importing types and interfaces
 
 ## Error Handling
 
-```typescript
-// Structured error creation
-throw new Error("supabase_query_failed", {cause: originalError})
+### Domain Error Patterns
 
-// Zod validation errors
+```typescript
+// Semantic domain errors (thrown from use cases)
+throw new Error("not_found") // → 404
+throw new Error("poll_closed") // → 409
+throw new Error("option_mismatch") // → 422
+throw new Error("supabase_query_failed", {cause: originalError}) // → 503
+```
+
+### Adapter Error Mapping
+
+```typescript
+// In API routes - map domain errors to HTTP responses
+catch (e) {
+  const message = e instanceof Error ? e.message : String(e)
+  const cause = e instanceof Error ? e.cause : undefined
+  console.error(message, cause)
+
+  if (message === "not_found") {
+    return NextResponse.json({error: "not_found"}, {status: 404})
+  }
+  // ... other mappings
+}
+```
+
+### Validation Error Handling
+
+```typescript
+// Zod validation with structured logging
 const result = Schema.safeParse(data)
 if (!result.success) {
-  const issues = result.error.issues.map(({path, message}) => ({
-    message,
-    path: path.join(".")
-  }))
-  return {ok: false, issues}
+  console.warn(result.error.issues) // Log validation details
+  return NextResponse.json({
+    error: "bad_request",
+    message: result.error.message
+  }, {status: 400})
 }
+```
+
+### Logging Conventions
+
+```typescript
+// Success operations
+console.info("🎉") // Use emoji for quick visual parsing
+
+// Validation failures
+console.warn(parsed.error.issues)
+console.warn(error.message, error.cause) // Auth/service warnings
+
+// Unhandled exceptions
+console.error(message, cause) // Always include cause when available
 ```
