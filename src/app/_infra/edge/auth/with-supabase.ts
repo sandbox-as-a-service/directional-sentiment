@@ -39,7 +39,7 @@ export const withSupabase: Middleware = async (req: NextRequest, res: NextRespon
     const {error} = await supabase.auth.getUser()
 
     if (error) {
-      console.warn("withSupabase Middleware:", error.message)
+      console.warn(error.message)
     }
 
     // no redirect/deny here → pass-through (status 200), composer keeps going
