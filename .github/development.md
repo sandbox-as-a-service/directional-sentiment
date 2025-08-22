@@ -36,23 +36,57 @@ collections/
 ├── environments/        # Environment variables
 │   ├── localhost.bru
 │   └── production.bru
+├── health/             # Health check tests
+│   ├── folder.bru      # Folder metadata
+│   └── health.bru      # Health endpoint test
 └── polls/              # Test suites by feature
     ├── folder.bru      # Folder metadata
     ├── get-poll-feed.bru
-    └── get-poll-feed-limit.bru
+    ├── get-poll-feed-limit.bru
+    ├── get-poll-feed-limit-cursor.bru
+    ├── get-poll-feed-limit-cursor-invalid.bru
+    ├── get-poll-feed-limit-invalid.bru
+    ├── get-poll-results.bru
+    └── cast-vote.bru
 ```
 
 ## Error Handling Pattern
 
-API routes use structured error logging:
+API routes use structured error logging with semantic domain error mapping:
 
 ```typescript
-catch (e) {
-  if (e instanceof Error) {
-    console.error(inspect({name: e.name, msg: e.message, cause: e.cause}))
-  } else {
-    console.error("Unknown Error:", e)
+try {
+  await useCaseFunction(input)
+  console.info("🎉") // Success indicator
+  return NextResponse.json(result, {status: 200})
+} catch (e) {
+  const message = e instanceof Error ? e.message : String(e)
+  const cause = e instanceof Error ? e.cause : undefined
+  console.error(message, cause)
+
+  // Map domain errors to HTTP status codes
+  if (message === "not_found") {
+    return NextResponse.json({error: "not_found"}, {status: 404})
+  }
+  if (message === "poll_closed") {
+    return NextResponse.json({error: "poll_closed"}, {status: 409})
+  }
+  if (message === "option_mismatch") {
+    return NextResponse.json({error: "option_mismatch"}, {status: 422})
+  }
+  if (message.startsWith("supabase")) {
+    return NextResponse.json({error: "service_unavailable"}, {status: 503})
   }
   return NextResponse.json({error: "internal_server_error"}, {status: 500})
+}
+```
+
+### Validation Error Logging
+
+```typescript
+const parsed = Schema.safeParse(input)
+if (!parsed.success) {
+  console.warn(parsed.error.issues) // Log validation details
+  return NextResponse.json({error: "bad_request", message: parsed.error.message}, {status: 400})
 }
 ```
