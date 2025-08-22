@@ -1,7 +1,10 @@
-export type GetPollResultsItem = {optionId: string; count: number; pct: number}
+import type {PollResultsItem, PollStatus} from "@/app/_domain/use-cases/polls/dto/poll"
+
 export type GetPollResultsResult = {
-  items: Array<GetPollResultsItem>
+  items: PollResultsItem[]
   total: number
-  status: "draft" | "open" | "closed"
+  status: PollStatus
   updatedAt: string
 }
+// (optional) if you ever add inputs
+export type GetPollResultsInput = Record<string, never>

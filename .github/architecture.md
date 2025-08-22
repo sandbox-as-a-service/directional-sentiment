@@ -32,8 +32,8 @@ src/app/
 ## Adapter Pattern Example
 
 ```typescript
-// Domain port (interface)
-export interface PollFeedSource {
+// Domain port (type)
+export type PollFeedSource {
   page(input: {limit: number; cursor?: string}): Promise<Array<PollFeedItem>>
 }
 
