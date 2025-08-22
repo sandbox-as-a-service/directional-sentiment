@@ -44,7 +44,7 @@ export async function POST(req: NextRequest, ctx: RouteContext<"/api/polls/[slug
       source = {
         polls: createMemoryPollsSource({
           polls: memoryPolls,
-          input: memoryOptions,
+          options: memoryOptions,
         }),
         votes: createMemoryVotesSource(),
       }
