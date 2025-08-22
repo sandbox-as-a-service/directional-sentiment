@@ -1,8 +1,8 @@
 import {randomUUID} from "node:crypto"
 
-import type {VotesPort} from "@/app/_domain/ports/out/votes-source"
+import type {VotesSource} from "@/app/_domain/ports/out/votes-source"
 
-export function createMemoryVotesPort(): VotesPort {
+export function createMemoryVotesSource(): VotesSource {
   const votes: Array<{
     id: string
     pollId: string

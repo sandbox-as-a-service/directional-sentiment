@@ -1,11 +1,11 @@
 import type {GetPollResultsResult} from "@/app/_domain/ports/in/get-poll-results"
 import type {PollsSource} from "@/app/_domain/ports/out/polls-source"
-import type {VotesPort} from "@/app/_domain/ports/out/votes-source"
+import type {VotesSource} from "@/app/_domain/ports/out/votes-source"
 
 // Use case: snapshot of "current vote" tallies (latest-per-user)
 export async function getPollResults(args: {
   polls: PollsSource
-  votes: VotesPort
+  votes: VotesSource
   slug: string
 }): Promise<GetPollResultsResult> {
   const {polls, votes, slug} = args

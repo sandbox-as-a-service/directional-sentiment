@@ -27,7 +27,7 @@ docs(readme): update setup instructions
 - **Files**: kebab-case (`get-poll-feed.ts`)
 - **Directories**: Next.js route groups `(adapters)`, `(in)`, `(out)`, `(public)`
 - **Functions**: camelCase factory functions (`createSupabasePollFeedSource`)
-- **Types**: PascalCase with descriptive suffixes (`PollFeedSource`, `GetPollFeedOptions`)
+- **Types**: PascalCase with descriptive suffixes (`PollFeedSource`, `GetPollFeedInput`)
 - **Constants**: SCREAMING_SNAKE_CASE for module-level constants
 
 ## File Organization
@@ -53,7 +53,7 @@ export function createSomethingSource(config: Config): SomethingSource {
 ## TypeScript Patterns
 
 - Use `type` for unions and primitives, `interface` for object shapes
-- Prefix interfaces with purpose: `PollFeedSource`, `GetPollFeedOptions`
+- Prefix interfaces with purpose: `PollFeedSource`, `GetPollFeedInput`
 - Export types from dedicated `dto/` folders in domain layer
 - Use `import type` rather than `import` when importing types and interfaces
 

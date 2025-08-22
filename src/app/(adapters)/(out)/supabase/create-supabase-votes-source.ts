@@ -1,8 +1,8 @@
 import type {SupabaseClient} from "@supabase/supabase-js"
 
-import type {VotesPort} from "@/app/_domain/ports/out/votes-source"
+import type {VotesSource} from "@/app/_domain/ports/out/votes-source"
 
-export function createSupabaseVotesPort(sb: SupabaseClient): VotesPort {
+export function createSupabaseVotesSource(sb: SupabaseClient): VotesSource {
   return {
     async append({pollId, optionId, userId, idempotencyKey}) {
       const {error} = await sb.from("vote").insert({
