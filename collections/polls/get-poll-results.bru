@@ -1,0 +1,15 @@
+meta {
+  name: get-poll-results
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{URL}}/api/polls/11111111-1111-1111-1111-111111111111/results
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}
