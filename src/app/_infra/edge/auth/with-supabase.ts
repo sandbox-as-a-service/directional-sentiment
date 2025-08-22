@@ -1,6 +1,7 @@
 import {createServerClient} from "@supabase/ssr"
 import {type NextRequest, NextResponse} from "next/server"
 
+import {env} from "@/app/_config/env"
 import type {Middleware} from "@/app/_infra/edge/compose"
 
 export const withSupabase: Middleware = async (req: NextRequest, res: NextResponse) => {
@@ -10,35 +11,31 @@ export const withSupabase: Middleware = async (req: NextRequest, res: NextRespon
   let out = res
 
   try {
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!, // Can't use Zod in the Edge environment
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          // Supabase reads cookies from the incoming request
-          getAll() {
-            return req.cookies.getAll()
-          },
-          // Supabase asks us to write updates here
-          setAll(cookiesToSet) {
-            // 1) guide pattern: write to the *request* cookies
-            cookiesToSet.forEach(({name, value}) => req.cookies.set(name, value))
+    const supabase = createServerClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_ANON_KEY, {
+      cookies: {
+        // Supabase reads cookies from the incoming request
+        getAll() {
+          return req.cookies.getAll()
+        },
+        // Supabase asks us to write updates here
+        setAll(cookiesToSet) {
+          // 1) guide pattern: write to the *request* cookies
+          cookiesToSet.forEach(({name, value}) => req.cookies.set(name, value))
 
-            // 2) rebuild a fresh pass-through response bound to this request
-            const next = NextResponse.next({request: req})
+          // 2) rebuild a fresh pass-through response bound to this request
+          const next = NextResponse.next({request: req})
 
-            // 3) PRESERVE earlier middleware cookies
-            out.cookies.getAll().forEach(({name, value}) => next.cookies.set(name, value))
+          // 3) PRESERVE earlier middleware cookies
+          out.cookies.getAll().forEach(({name, value}) => next.cookies.set(name, value))
 
-            // 4) mirror Supabase-updated cookies onto the response (guide-style)
-            cookiesToSet.forEach(({name, value, options}) => next.cookies.set(name, value, options))
+          // 4) mirror Supabase-updated cookies onto the response (guide-style)
+          cookiesToSet.forEach(({name, value, options}) => next.cookies.set(name, value, options))
 
-            // 5) hand forward
-            out = next
-          },
+          // 5) hand forward
+          out = next
         },
       },
-    )
+    })
 
     // Per Supabase guidance: call immediately after client creation refreshing the auth token
     const {error} = await supabase.auth.getUser()
