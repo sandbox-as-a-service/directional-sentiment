@@ -5,8 +5,6 @@ import {env} from "@/app/_config/env"
 import type {Middleware} from "@/app/_infra/edge/compose"
 
 export const withSupabase: Middleware = async (req: NextRequest, res: NextResponse) => {
-  console.info("Running withSupabase Middleware")
-
   // carry forward anything earlier middlewares already set
   let out = res
 
@@ -48,11 +46,9 @@ export const withSupabase: Middleware = async (req: NextRequest, res: NextRespon
     return out
   } catch (e) {
     // fail-closed: if Supabase throws, break requests
-    if (e instanceof Error) {
-      console.error({name: e.name, msg: e.message})
-    } else {
-      console.error({name: "UnknownError", msg: e})
-    }
-    return NextResponse.json({message: "internal_server_error"}, {status: 503})
+    const message = e instanceof Error ? e.message : String(e)
+    console.error(message)
+
+    return NextResponse.json({message: "service_unavailable"}, {status: 503})
   }
 }
