@@ -2,7 +2,7 @@ import {type NextRequest, NextResponse} from "next/server"
 import {z} from "zod"
 
 import {createMemoryPollFeedSource} from "@/app/(adapters)/(out)/memory/create-memory-poll-feed-source"
-import {pollFeedFixture} from "@/app/(adapters)/(out)/memory/fixtures/poll-feed"
+import {memoryPollFeed} from "@/app/(adapters)/(out)/memory/fixtures/poll-feed"
 import {createSupabasePollFeedSource} from "@/app/(adapters)/(out)/supabase/create-supabase-poll-feed-source"
 import {createClient} from "@/app/(adapters)/(out)/supabase/server"
 import {env} from "@/app/_config/env"
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
     let source: {poll: PollFeedSource}
     if (env.USE_MEMORY === "1") {
       source = {
-        poll: createMemoryPollFeedSource(pollFeedFixture),
+        poll: createMemoryPollFeedSource(memoryPollFeed),
       }
     } else {
       const supabase = await createClient()

@@ -358,7 +358,7 @@ Seamless switching between test fixtures and production data:
 ```typescript
 const useMemory = env.USE_MEMORY === "1"
 const source = useMemory
-  ? createMemoryPollFeedSource(pollFeedFixture)
+  ? createMemoryPollFeedSource(memoryPollFeed)
   : createSupabasePollFeedSource(await createClient())
 ```
 

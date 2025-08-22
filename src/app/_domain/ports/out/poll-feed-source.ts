@@ -1,7 +1,12 @@
 import type {PollFeedItem} from "../../use-cases/polls/dto/poll"
 
+// These inputs are independant of GetPollFeedInput. They can be different shapes.
+export type PollFeedPageInput = {
+  limit: number
+  cursor?: string
+}
+
 // Port (tiny): what data the use case needs, nothing more
 export type PollFeedSource = {
-  // These inputs are independant of GetPollFeedInput
-  page(input: {limit: number; cursor?: string}): Promise<Array<PollFeedItem>>
+  page(input: PollFeedPageInput): Promise<Array<PollFeedItem>>
 }
