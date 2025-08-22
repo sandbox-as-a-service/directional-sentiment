@@ -50,6 +50,10 @@ export async function GET(req: NextRequest) {
     const cause = e instanceof Error ? e.cause : undefined
     console.error(message, cause)
 
-    return NextResponse.json({error: "internal_error"}, {status: 500})
+    if (message.startsWith("supabase")) {
+      return NextResponse.json({error: "service_unavailable"}, {status: 503})
+    }
+
+    return NextResponse.json({error: "internal_server_error"}, {status: 500})
   }
 }

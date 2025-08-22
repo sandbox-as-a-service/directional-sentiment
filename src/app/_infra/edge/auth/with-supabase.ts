@@ -53,6 +53,6 @@ export const withSupabase: Middleware = async (req: NextRequest, res: NextRespon
     } else {
       console.error({name: "UnknownError", msg: e})
     }
-    return NextResponse.json({message: "internal_error"}, {status: 503})
+    return NextResponse.json({message: "internal_server_error"}, {status: 503})
   }
 }

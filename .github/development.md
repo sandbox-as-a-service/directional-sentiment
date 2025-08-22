@@ -53,6 +53,6 @@ catch (e) {
   } else {
     console.error("Unknown Error:", e)
   }
-  return NextResponse.json({error: "internal_error"}, {status: 500})
+  return NextResponse.json({error: "internal_server_error"}, {status: 500})
 }
 ```

@@ -11,9 +11,11 @@ export async function castVote(args: {
   const {polls, votes, input} = args
 
   const poll = await polls.findBySlug(input.slug)
+
   if (!poll) {
     throw new Error("not_found")
   }
+
   if (poll.status !== "open") {
     throw new Error("poll_closed")
   }
@@ -26,7 +28,9 @@ export async function castVote(args: {
 
   if (input.idempotencyKey) {
     const used = await votes.wasUsed(input.userId, input.idempotencyKey)
-    if (used) return // idempotent no-op
+    if (used) {
+      return // idempotent no-op
+    }
   }
 
   await votes.append({
