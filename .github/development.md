@@ -6,7 +6,7 @@
 pnpm dev --turbopack        # Development server with Turbopack
 pnpm test:unit:jest         # Run Jest unit tests
 pnpm test:unit:jest:watch   # Run Jest unit tests in watch mode
-pnpm test:unit:jest:ci      # Run Jest unit tests with coverage
+pnpm test:unit:jest:cov      # Run Jest unit tests with coverage
 pnpm test:api:bruno         # Run Bruno API tests
 pnpm test:api:bruno:local   # Run Bruno API tests against localhost
 pnpm test:api:bruno:prod    # Run Bruno API tests against production

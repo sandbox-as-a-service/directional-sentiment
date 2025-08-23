@@ -36,4 +36,4 @@ jobs:
         run: pnpm build
 
       - name: Run Jest Unit Tests
-        run: pnpm test:unit:jest:ci
+        run: pnpm test:unit:jest:cov

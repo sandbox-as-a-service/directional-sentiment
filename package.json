@@ -14,7 +14,7 @@
     "test:api:bruno:prod": "cd collections && bru run --env production",
     "test:unit:jest": "jest",
     "test:unit:jest:watch": "jest --watch",
-    "test:unit:jest:ci": "jest --coverage"
+    "test:unit:jest:cov": "jest --coverage"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
