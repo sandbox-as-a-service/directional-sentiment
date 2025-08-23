@@ -38,3 +38,14 @@ Domain (`_domain/`) → Use Cases → Ports → Adapters (`(adapters)/`)
 - **Styling**: Tailwind CSS
 - **Package Manager**: pnpm (specified in packageManager field)
 - **Testing**: Bruno for API testing, in-memory fixtures for unit testing
+
+## General Guidelines
+
+**Best Practice vs Technical Possibility:**
+When providing solutions, clearly distinguish between what's technically possible and what's considered best practice or industry standard. Always explain the trade-offs and recommend the approach that aligns with established conventions and maintainability.
+
+Examples:
+
+- ✅ "You could commit API keys directly to the codebase, but it's not secure best practice. Use environment variables instead."
+- ✅ "While `any` type works technically, it defeats TypeScript's purpose. Use proper typing for better code safety."
+- ✅ "Direct database queries in components are possible, but violate separation of concerns. Use the established adapter pattern."
