@@ -195,16 +195,3 @@ create index if not exists idx_vote_latest_per_user on public.vote (poll_id, use
 -- Cover composite FK (poll_id, option_id) → poll_option(poll_id, id)
 -- Helps parent deletes/updates and any lookups/join checks involving both columns
 create index if not exists idx_vote_poll_option on public.vote (poll_id, option_id);
-
--- =============================================================================
--- OPTIONALS (commented out for MVP; keep as reference)
--- =============================================================================
--- -- If you later enable RLS, you can keep raw votes private and let the server compute tallies.
--- -- Example skeleton (do not enable until you’re ready):
--- -- alter table public.vote enable row level security;
--- -- create policy "insert-own-vote" on public.vote
--- --   for insert to authenticated
--- --   with check (auth.uid() = user_id);
--- -- create policy "no-select-votes" on public.vote
--- --   for select to authenticated
--- --   using (false); -- block direct reads; app exposes /results instead
