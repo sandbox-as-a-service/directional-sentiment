@@ -1,9 +1,7 @@
 import {type NextRequest, NextResponse} from "next/server"
 import {z} from "zod"
 
-import {createMemoryPollsSource} from "@/app/(adapters)/(out)/memory/create-memory-polls-source"
-import {createMemoryVotesSource} from "@/app/(adapters)/(out)/memory/create-memory-votes-source"
-import {memoryOptions, memoryPolls} from "@/app/(adapters)/(out)/memory/fixtures/polls"
+import {composeMemorySource} from "@/app/(adapters)/(out)/memory/compose-memory-sources"
 import {createSupabasePollsSource} from "@/app/(adapters)/(out)/supabase/create-supabase-polls-source"
 import {createSupabaseVotesSource} from "@/app/(adapters)/(out)/supabase/create-supabase-votes-source"
 import {createClient} from "@/app/(adapters)/(out)/supabase/server"
@@ -41,13 +39,7 @@ export async function POST(req: NextRequest, ctx: RouteContext<"/api/polls/[slug
 
     if (env.USE_MEMORY === "1") {
       userId = req.headers.get("x-user-id")
-      source = {
-        polls: createMemoryPollsSource({
-          polls: memoryPolls,
-          options: memoryOptions,
-        }),
-        votes: createMemoryVotesSource(),
-      }
+      source = composeMemorySource()
     } else {
       const supabase = await createClient()
       const {data, error} = await supabase.auth.getUser()
@@ -79,7 +71,7 @@ export async function POST(req: NextRequest, ctx: RouteContext<"/api/polls/[slug
     })
 
     console.info("🎉")
-    return NextResponse.json(null, {status: 204})
+    return new NextResponse(null, {status: 204})
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e)
     const cause = e instanceof Error ? e.cause : undefined

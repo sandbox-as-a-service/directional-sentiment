@@ -1,9 +1,7 @@
 import {type NextRequest, NextResponse} from "next/server"
 import z from "zod"
 
-import {createMemoryPollsSource} from "@/app/(adapters)/(out)/memory/create-memory-polls-source"
-import {createMemoryVotesSource} from "@/app/(adapters)/(out)/memory/create-memory-votes-source"
-import {memoryOptions, memoryPolls} from "@/app/(adapters)/(out)/memory/fixtures/polls"
+import {composeMemorySource} from "@/app/(adapters)/(out)/memory/compose-memory-sources"
 import {createSupabasePollsSource} from "@/app/(adapters)/(out)/supabase/create-supabase-polls-source"
 import {createSupabaseVotesSource} from "@/app/(adapters)/(out)/supabase/create-supabase-votes-source"
 import {createClient} from "@/app/(adapters)/(out)/supabase/server"
@@ -26,13 +24,7 @@ export async function GET(_req: NextRequest, ctx: RouteContext<"/api/polls/[slug
 
     let source: {polls: PollsSource; votes: VotesSource}
     if (env.USE_MEMORY === "1") {
-      source = {
-        polls: createMemoryPollsSource({
-          polls: memoryPolls,
-          options: memoryOptions,
-        }),
-        votes: createMemoryVotesSource(),
-      }
+      source = composeMemorySource()
     } else {
       const supabase = await createClient()
       source = {

@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{URL}}/api/polls/best-bj-flavor/votes
+  url: {{URL}}/api/polls/ketchup-on-steak/votes
   body: json
   auth: inherit
 }
@@ -16,7 +16,8 @@ headers {
 
 body:json {
   {
-    "optionId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+    "optionId": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+    "idempotencyKey": "1"
   }
 }
 
