@@ -1,6 +1,6 @@
 import type {PollFeedItem} from "../../use-cases/polls/dto/poll"
 
-// These inputs are independant of GetPollFeedInput. They can be different shapes.
+// These inputs are independent of GetPollFeedInput. They can be different shapes.
 export type PollFeedPageInput = {
   limit: number
   cursor?: string

@@ -11,8 +11,11 @@ import type {PollFeedSource} from "@/app/_domain/ports/out/poll-feed-source"
 import {getPollFeed} from "@/app/_domain/use-cases/polls/get-poll-feed"
 
 const QuerySchema = z.object({
-  limit: z.coerce.number().int().min(1).max(50).default(20),
-  // require timezone to keep lexicographic order safe
+  // Pass through undefined so domain can apply its own default.
+  // Keep min/max so bad values 0 or 999 get a 400 before hitting the domain.
+  limit: z.coerce.number().int().min(1).max(50).optional(),
+  // Require timezone to keep keyset pagination lexicographically safe.
+  // ISO datetime helper; default disallows offsets, accepts "Z"
   cursor: z.iso.datetime().optional(),
 })
 
