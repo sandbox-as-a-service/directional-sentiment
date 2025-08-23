@@ -33,3 +33,8 @@ updates:
         patterns:
           - "jest"
           - "@jest/*"
+
+      supabase-stack:
+        patterns:
+          - "@supabase/*"
+          - "supabase"
