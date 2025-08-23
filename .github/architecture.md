@@ -182,6 +182,16 @@ The domain layer uses semantic error messages that adapters translate to HTTP st
 "*"                → 500 Internal Server Error
 ```
 
+### Domain Error Patterns
+
+```typescript
+// Semantic domain errors (thrown from use cases)
+throw new Error("not_found") // → 404
+throw new Error("poll_closed") // → 409
+throw new Error("option_mismatch") // → 422
+throw new Error("supabase_query_failed", {cause: originalError}) // → 503
+```
+
 ### Error Flow Pattern
 
 1. **Use case** validates business rules and throws semantic errors

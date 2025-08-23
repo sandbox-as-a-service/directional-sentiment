@@ -35,7 +35,7 @@ docs(readme): update setup instructions
   - ✅ `currentPoll`, `selectedOption`
   - ❌ `x`, `y`,
 
-## File Organization
+## Import Organization
 
 ```typescript
 // Import order (automatically enforced by @trivago/prettier-plugin-sort-imports)
@@ -44,8 +44,16 @@ import {external} from "external-package"
 import {internal} from "@/app/internal"
 
 import type {Type} from "./types"
+```
 
-// Factory function pattern
+**Note**: Import ordering is automatically handled by `@trivago/prettier-plugin-sort-imports` - no manual sorting required.
+
+## Code Structure Patterns
+
+### Factory Function Pattern
+
+```typescript
+// Factory function pattern for creating adapters
 export function createSomethingSource(config: Config): SomethingSource {
   return {
     async operation() {
@@ -54,8 +62,6 @@ export function createSomethingSource(config: Config): SomethingSource {
   }
 }
 ```
-
-**Note**: Import ordering is automatically handled by `@trivago/prettier-plugin-sort-imports` - no manual sorting required.
 
 ## TypeScript Patterns
 
@@ -70,31 +76,64 @@ export function createSomethingSource(config: Config): SomethingSource {
   - ✅ `items.filter(predicate).find(condition)`
   - ❌ Manual loop with break/continue statements
 
-## Error Handling
+## Validation & Data Patterns
 
-### Domain Error Patterns
+### Zod Schema Patterns
 
 ```typescript
-// Semantic domain errors (thrown from use cases)
-throw new Error("not_found") // → 404
-throw new Error("poll_closed") // → 409
-throw new Error("option_mismatch") // → 422
-throw new Error("supabase_query_failed", {cause: originalError}) // → 503
+const QuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+  cursor: z.iso.datetime().optional(), // ISO with timezone
+})
 ```
+
+### Supabase Query Patterns
+
+```typescript
+// Server-side (request-scoped)
+const client = await createClient()
+
+// Query pattern with error handling
+const {data, error} = await client
+  .from("table")
+  .select("fields")
+  .order("created_at", {ascending: false})
+  .limit(limit)
+
+if (error) {
+  throw new Error("supabase_query_failed", {cause: error})
+}
+```
+
+## Error Handling Conventions
 
 ### Adapter Error Mapping
 
 ```typescript
 // In API routes - map domain errors to HTTP responses
-catch (e) {
+try {
+  await useCaseFunction(input)
+  console.info("🎉") // Success indicator
+  return NextResponse.json(result, {status: 200})
+} catch (e) {
   const message = e instanceof Error ? e.message : String(e)
   const cause = e instanceof Error ? e.cause : undefined
   console.error(message, cause)
 
+  // Map domain errors to HTTP status codes
   if (message === "not_found") {
     return NextResponse.json({error: "not_found"}, {status: 404})
   }
-  // ... other mappings
+  if (message === "poll_closed") {
+    return NextResponse.json({error: "poll_closed"}, {status: 409})
+  }
+  if (message === "option_mismatch") {
+    return NextResponse.json({error: "option_mismatch"}, {status: 422})
+  }
+  if (message.startsWith("supabase")) {
+    return NextResponse.json({error: "service_unavailable"}, {status: 503})
+  }
+  return NextResponse.json({error: "internal_server_error"}, {status: 500})
 }
 ```
 
@@ -103,27 +142,11 @@ catch (e) {
 ```typescript
 // Zod validation with structured logging
 const result = Schema.safeParse(data)
-if (!result.success) {
-  console.warn(result.error.issues)
-  return NextResponse.json(
-    {error: "bad_request", message: z.treeifyError(result.error).properties},
-    {status: 400},
-  )
+if (!parsed.success) {
+  const message = z.treeifyError(parsed.error).properties
+  console.warn(message)
+  return NextResponse.json({error: "bad_request", message}, {status: 400})
 }
-```
-
-### Logging Conventions
-
-```typescript
-// Success operations
-console.info("🎉") // Use emoji for quick visual parsing (might change before the launch)
-
-// Validation failures
-console.warn(z.treeifyError(paramsParsed.error).properties) // Zod validation errors
-console.warn(error.message, error.cause) // Auth/service warnings
-
-// Unhandled exceptions
-console.error(message, cause) // Always include cause when available
 ```
 
 ## Logging Conventions
