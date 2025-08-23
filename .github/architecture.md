@@ -223,77 +223,6 @@ createMemoryPollFeedSource(fixture) // for testing
 createSupabasePollFeedSource(client) // for production
 ```
 
-### Authentication & Environment Switching
-
-```typescript
-// In API routes - conditional adapter selection
-let userId: string | null = null
-let source: {polls: PollsSource; votes: VotesSource}
-
-if (env.USE_MEMORY === "1") {
-  // Test environment - use shared singleton for state consistency
-  userId = req.headers.get("x-user-id")
-  source = composeMemorySource() // Singleton ensures vote persistence across routes
-} else {
-  // Production environment - use Supabase
-  const supabase = await createClient()
-  const {data, error} = await supabase.auth.getUser()
-  if (error) console.warn(error.message, error.cause)
-
-  userId = data?.user?.id ?? null
-  source = {
-    polls: createSupabasePollsSource(supabase),
-    votes: createSupabaseVotesSource(supabase),
-  }
-}
-```
-
-### Memory Source Composition
-
-The `compose-memory-sources.ts` provides a singleton pattern for in-memory testing that maintains state consistency across different API routes:
-
-```typescript
-// Singleton instance shared across all route handlers (per Node.js process)
-// This ensures votes cast in one route are visible in other routes
-let memorySource: ReturnType<typeof source>
-
-export function composeMemorySource() {
-  if (!memorySource) {
-    memorySource = source()
-  }
-  return memorySource
-}
-```
-
-**Key Benefits:**
-
-- **State Persistence**: Votes cast via `POST /api/polls/:slug/votes` are immediately visible in `GET /api/polls/:slug/results`
-- **Cross-Route Consistency**: All routes share the same in-memory data instance within a Node.js process
-- **Test Reliability**: Enables realistic end-to-end testing workflows without external dependencies
-- **Singleton Pattern**: Prevents creating multiple disconnected memory instances that would lose data
-
-## Logging & Observability
-
-### Structured Logging Pattern
-
-```typescript
-// Success logging
-console.info("🎉") // Use emoji for quick visual parsing
-
-// Error logging with context
-console.error(message, cause) // Always include cause when available
-
-// Warning for validation issues
-console.warn(z.treeifyError(paramsParsed.error).properties) // Log validation details
-console.warn(error.message, error.cause) // Log auth/service warnings
-```
-
-### Log Levels by Use Case
-
-- **`console.info`**: Successful operations, business events
-- **`console.warn`**: Validation failures, recoverable errors
-- **`console.error`**: Unhandled exceptions, service failures
-
 ## Data Flow
 
 ### Request Processing Pipeline
@@ -308,68 +237,9 @@ console.warn(error.message, error.cause) // Log auth/service warnings
 8. **Response Formatting** adapter transforms to HTTP response
 9. **Error Mapping** domain errors translated to appropriate HTTP status codes
 
-### Example: Cast Vote Flow
-
-```typescript
-POST /api/polls/poll-123/votes
-Body: {optionId: "option-a", idempotencyKey: "unique-key"}
-
-→ Validate params/body with Zod
-→ Extract userId from auth or headers
-→ Create polls/votes adapters (memory or Supabase)
-→ Call castVote use case with dependencies
-  ↳ Verify poll exists and is open
-  ↳ Verify option belongs to poll
-  ↳ Check idempotency key hasn't been used
-  ↳ Append vote to storage
-→ Return 204 No Content on success
-→ Map domain errors to HTTP status (404, 409, 422, etc.)
-```
-
 ## Middleware Infrastructure
 
-The `_infra/edge/` directory contains composable middleware for cross-cutting concerns that run at the edge (Next.js middleware).
-
-### Composition Pattern
-
-```typescript
-// src/middleware.ts
-import {withSupabase} from "@/app/_infra/edge/auth/with-supabase"
-import {compose} from "@/app/_infra/edge/compose"
-import {withRateLimit} from "@/app/_infra/edge/rate-limit/with-rate-limit"
-
-export default function middleware(req: NextRequest) {
-  return compose(req, [withRateLimit, withSupabase])
-}
-```
-
-### Middleware Contract
-
-Each middleware follows a strict contract:
-
-```typescript
-export type Middleware = (req: NextRequest, res: NextResponse) => Promise<NextResponse> | NextResponse
-```
-
-**Rules:**
-
-- **MUST return a NextResponse** - never void or undefined
-- **Status 200 = pass-through** - continue to next middleware
-- **Non-200 status = terminal** - stop chain and return immediately
-- **Preserve context** - carry forward cookies/headers from previous middleware
-
-### Available Middleware
-
-- **`withRateLimit`** - Rate limiting (fail-open for resilience)
-- **`withSupabase`** - Supabase auth session management and cookie handling
-
-### Execution Flow
-
-1. **Chain starts** with `NextResponse.next({request: req})`
-2. **Each middleware** receives current request and response
-3. **Pass-through** (status 200) continues to next middleware
-4. **Terminal response** (non-200) stops chain immediately
-5. **Final response** returned to client
+The `_infra/edge/` directory contains composable middleware for cross-cutting concerns that run at the edge (Next.js middleware). Middleware components can be composed together to handle authentication, rate limiting, and other edge concerns before requests reach the application routes.
 
 ## Key Architectural Patterns
 

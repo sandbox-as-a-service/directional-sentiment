@@ -125,3 +125,25 @@ console.warn(error.message, error.cause) // Auth/service warnings
 // Unhandled exceptions
 console.error(message, cause) // Always include cause when available
 ```
+
+## Logging Conventions
+
+### Structured Logging Pattern
+
+```typescript
+// Success operations
+console.info("🎉") // Use emoji for quick visual parsing (might change before the launch)
+
+// Validation failures
+console.warn(z.treeifyError(paramsParsed.error).properties) // Zod validation errors
+console.warn(error.message, error.cause) // Auth/service warnings
+
+// Unhandled exceptions
+console.error(message, cause) // Always include cause when available
+```
+
+### Log Levels by Use Case
+
+- **`console.info`**: Successful operations, business events
+- **`console.warn`**: Validation failures, recoverable errors
+- **`console.error`**: Unhandled exceptions, service failures
