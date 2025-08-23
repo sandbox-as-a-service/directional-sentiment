@@ -55,32 +55,61 @@ src/app/
 
 ## Use Cases & Domain Logic
 
-The domain layer implements three core use cases for the directional sentiment polling system:
+The domain layer implements three core use cases for the directional sentiment polling system. Each use case includes comprehensive documentation above the function signature with purpose, business logic, source contracts, and error handling details.
 
 ### 1. Poll Feed (`get-poll-feed.ts`)
 
-- **Purpose**: Paginated listing of available polls
-- **Input**: Limit and optional cursor for pagination
-- **Output**: Array of poll items with metadata
-- **Business Rules**: Enforces pagination limits, cursor validation
+**Domain use case**: keyset-paginate the poll feed with a hard cap.
+
+- **Domain Logic**:
+  - Enforces a max page size
+  - Uses the "fetch N+1" trick to learn if there's another page
+  - Emits a `nextCursor` (createdAt of the last returned item) when more pages exist
+
+- **Source Contracts**:
+  - Results come sorted by createdAt DESC (newest first) or a stable order compatible with `cursor`
+  - `cursor` is an ISO datetime (TZ-aware) that the adapter knows how to use for keyset pagination
 
 ### 2. Cast Vote (`cast-vote.ts`)
 
-- **Purpose**: Record user votes with validation and idempotency
-- **Input**: Poll slug, option ID, user ID, optional idempotency key
-- **Output**: Void (success) or throws domain error
-- **Business Rules**:
-  - Poll must exist and be in "open" status
-  - Option must belong to the poll
-  - Idempotency key prevents duplicate votes
-  - Append-only vote storage
+**Domain use case**: validate poll & option, ensure idempotency, append-only write.
+
+- **Domain Logic**:
+  - Lookup poll by slug and ensure it's open
+  - Validate that the chosen option belongs to the poll
+  - If an idempotencyKey is provided and already used by this user, act as a no-op
+  - Append a new vote event (no overwrites here; readers compute "latest vote wins")
+
+- **Source Contracts**:
+  - `PollsSource.findBySlug(slug)` → returns the poll or null/undefined if not found
+  - `PollsSource.listOptions(pollId)` → returns all options for the poll
+  - `VotesSource.wasUsed(userId, key)` → boolean, scoped per user+key
+  - `VotesSource.append(event)` → persists a vote event (append-only)
+
+- **Domain Errors**:
+  - `"not_found"` → poll slug doesn't exist
+  - `"poll_closed"` → poll.status !== "open"
+  - `"option_mismatch"` → optionId not part of the poll's options
 
 ### 3. Get Poll Results (`get-poll-results.ts`)
 
-- **Purpose**: Retrieve vote tallies and poll statistics
-- **Input**: Poll slug
-- **Output**: Vote counts, percentages, poll status, timestamps
-- **Business Rules**: Real-time vote tallying, percentage calculations
+**Domain use case**: snapshot of "current" vote tallies (latest-per-user).
+
+- **Domain Logic**:
+  - Resolve poll by slug (id + status only)
+  - Ask VotesSource for per-option tallies of current votes
+  - Sum totals and compute percentages to 1 decimal place (guard /0)
+
+- **Source Contracts**:
+  - `PollsSource.findBySlug(slug)` → `{ pollId, status } | null`
+  - `VotesSource.tallyCurrent(pollId)` → `Array<{ optionId: string; count: number }>` where `count` is the number of unique users whose latest vote targets that option
+
+- **Domain Errors**:
+  - `"not_found"` → poll slug doesn't exist
+
+- **Implementation Notes**:
+  - Percentages may not sum to exactly 100.0 due to rounding
+  - If you need zero-count options included, merge with `PollsSource.listOptions()` and fill missing tallies with `{ count: 0 }` before computing percentages
 
 ## Port Contracts
 

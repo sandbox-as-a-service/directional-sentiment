@@ -9,7 +9,9 @@
     "typegen": "next typegen",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "test-api": "cd collections && bru run"
+    "test-api": "cd collections && bru run",
+    "test": "jest",
+    "test-watch": "jest --watch"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
@@ -21,6 +23,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
+    "@jest/globals": "^30.0.5",
     "@next/eslint-plugin-next": "^15.5.0",
     "@tailwindcss/postcss": "^4.1.12",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
@@ -32,9 +35,11 @@
     "eslint-config-next": "15.5.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "jest": "^30.0.5",
     "prettier": "3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "tailwindcss": "^4.1.12",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
   },
   "packageManager": "pnpm@10.15.0+sha512.486ebc259d3e999a4e8691ce03b5cac4a71cbeca39372a9b762cb500cfdf0873e2cb16abe3d951b1ee2cf012503f027b98b6584e4df22524e0c7450d9ec7aa7b"

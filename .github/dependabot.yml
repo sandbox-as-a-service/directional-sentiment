@@ -28,3 +28,8 @@ updates:
         patterns:
           - "@tailwindcss/*"
           - "tailwindcss"
+
+      jest-stack:
+        patterns:
+          - "jest"
+          - "@jest/*"
