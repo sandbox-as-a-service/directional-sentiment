@@ -11,8 +11,6 @@
 -- 0) Ensure extension for UUID generation exists (safe if it already does)
 create extension if not exists "pgcrypto";
 
-comment on extension pgcrypto is 'Provides gen_random_uuid() used for UUID primary keys';
-
 -- Remove pg_graphql (will drop its member objects)
 drop extension if exists pg_graphql;
 
@@ -27,8 +25,6 @@ begin
 exception 
   when duplicate_object then null; 
 end $$;
-
-comment on type poll_status is 'Lifecycle state for a poll: draft (hidden), open (votable), closed (results only)';
 
 -- 2) POLL TABLE
 --    One row per poll. Lifecycle timestamps support your Open/Close/Feature commands.
@@ -81,8 +77,6 @@ comment on column public.poll.updated_at is 'Last update time (maintained by tri
 --   LIMIT :n
 create index if not exists idx_poll_created_desc on public.poll (created_at desc, id desc);
 
-comment on index idx_poll_created_desc is 'Keyset pagination index for newest-first poll feed (created_at DESC, id DESC)';
-
 -- Trigger to auto-update updated_at on every update
 -- Lock down search_path for the trigger function to avoid name resolution surprises
 create or replace function public.set_updated_at () returns trigger language plpgsql
@@ -95,15 +89,11 @@ begin
 end
 $$;
 
-comment on function public.set_updated_at () is 'Before-update trigger function that refreshes updated_at';
-
 drop trigger if exists trg_poll_updated_at on public.poll;
 
 create trigger trg_poll_updated_at before
 update on public.poll for each row
 execute function public.set_updated_at ();
-
-comment on trigger trg_poll_updated_at on public.poll is 'Maintains updated_at timestamp on UPDATE of poll';
 
 -- 3) POLL OPTION TABLE
 --    One row per option label within a poll (e.g., "Yes", "No").
@@ -133,18 +123,12 @@ comment on column public.poll_option.created_at is 'Creation time for ordering/d
 -- Prevent duplicate labels within the same poll (allows "Yes"/"No" reuse across polls)
 create unique index if not exists uq_poll_option_label on public.poll_option (poll_id, label);
 
-comment on index uq_poll_option_label is 'Prevents duplicate option labels within the same poll';
-
 -- Support a composite FK from vote to (poll_id, option_id) pair:
 -- This index guarantees (poll_id, id) is unique so other tables can safely reference it.
 create unique index if not exists uq_poll_option_pair on public.poll_option (poll_id, id);
 
-comment on index uq_poll_option_pair is 'Ensures (poll_id, option_id) uniqueness for composite FK usage';
-
 -- Convenience index for frequent "all options for poll" lookups
 create index if not exists idx_poll_option_poll on public.poll_option (poll_id);
-
-comment on index idx_poll_option_poll is 'Speeds up listing options for a given poll';
 
 -- 4) VOTE TABLE (append-only)
 --    We never UPDATE a vote; every change inserts a new row.
@@ -187,12 +171,6 @@ comment on column public.vote.voted_at is 'Event time of the vote; used for late
 
 comment on column public.vote.idempotency_key is 'Optional client-provided idempotency key (scoped per user)';
 
-comment on constraint fk_vote_poll on public.vote is 'FK to poll (cascade delete)';
-
-comment on constraint fk_vote_option_pair on public.vote is 'Composite FK enforcing option belongs to the same poll';
-
-comment on constraint fk_vote_user on public.vote is 'FK to Supabase auth.users (cascade delete)';
-
 -- User-scoped idempotency:
 -- Unique *only when idempotency_key is present* (NULLs are ignored by this partial index),
 -- so users can have multiple rows with NULL key, but not duplicate non-NULL keys.
@@ -200,37 +178,27 @@ create unique index if not exists uq_vote_user_idempotency on public.vote (user_
 where
   idempotency_key is not null;
 
-comment on index uq_vote_user_idempotency is 'Partial unique index: prevents duplicate non-NULL idempotency keys per user';
-
 -- Helpful indexes for queries & tallying
 -- All votes for a poll
 create index if not exists idx_vote_poll on public.vote (poll_id);
 
-comment on index idx_vote_poll is 'Speeds up fetching all votes for a poll';
-
 -- All votes for a given option
 create index if not exists idx_vote_option on public.vote (option_id);
 
-comment on index idx_vote_option is 'Speeds up fetching all votes for a specific option';
-
 -- Latest vote per (poll, user) lookups
 create index if not exists idx_vote_poll_user on public.vote (poll_id, user_id);
-
-comment on index idx_vote_poll_user is 'Supports per-user vote lookups within a poll';
 
 -- Fast "current vote per user" (latest wins):
 -- Order by voted_at DESC, id DESC to break ties deterministically.
 create index if not exists idx_vote_latest_per_user on public.vote (poll_id, user_id, voted_at desc, id desc);
 
-comment on index idx_vote_latest_per_user is 'Latest-wins ordering to compute current vote per (poll, user) efficiently';
+-- Cover composite FK (poll_id, option_id) → poll_option(poll_id, id)
+-- Helps parent deletes/updates and any lookups/join checks involving both columns
+create index if not exists idx_vote_poll_option on public.vote (poll_id, option_id);
 
 -- =============================================================================
 -- OPTIONALS (commented out for MVP; keep as reference)
 -- =============================================================================
--- -- If you ever want case-insensitive unique labels per poll (e.g., "Yes" and "yes" considered same):
--- -- Requires citext or a functional unique index:
--- -- create extension if not exists citext;
--- -- create unique index uq_poll_option_label_ci on public.poll_option (poll_id, lower(label));
 -- -- If you later enable RLS, you can keep raw votes private and let the server compute tallies.
 -- -- Example skeleton (do not enable until you’re ready):
 -- -- alter table public.vote enable row level security;
