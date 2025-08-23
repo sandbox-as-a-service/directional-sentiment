@@ -104,11 +104,11 @@ catch (e) {
 // Zod validation with structured logging
 const result = Schema.safeParse(data)
 if (!result.success) {
-  console.warn(result.error.issues) // Log validation details
-  return NextResponse.json({
-    error: "bad_request",
-    message: result.error.message // Only expose a basic message for security purposes
-  }, {status: 400})
+  console.warn(result.error.issues)
+  return NextResponse.json(
+    {error: "bad_request", message: z.treeifyError(result.error).properties},
+    {status: 400},
+  )
 }
 ```
 
@@ -119,7 +119,7 @@ if (!result.success) {
 console.info("🎉") // Use emoji for quick visual parsing (might change before the launch)
 
 // Validation failures
-console.warn(parsed.error.issues) // only exposed to the server (not browser)
+console.warn(z.treeifyError(paramsParsed.error).properties) // Zod validation errors
 console.warn(error.message, error.cause) // Auth/service warnings
 
 // Unhandled exceptions

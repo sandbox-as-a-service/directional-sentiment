@@ -284,7 +284,7 @@ console.info("🎉") // Use emoji for quick visual parsing
 console.error(message, cause) // Always include cause when available
 
 // Warning for validation issues
-console.warn(parsed.error.issues) // Log validation details
+console.warn(z.treeifyError(paramsParsed.error).properties) // Log validation details
 console.warn(error.message, error.cause) // Log auth/service warnings
 ```
 

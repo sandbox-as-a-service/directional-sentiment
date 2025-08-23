@@ -387,8 +387,9 @@ try {
 
 ```typescript
 const parsed = Schema.safeParse(input)
-if (!parsed.success) {
-  console.warn(parsed.error.issues) // Log validation details
-  return NextResponse.json({error: "bad_request", message: parsed.error.message}, {status: 400})
+if (!paramsParsed.success) {
+  const message = z.treeifyError(paramsParsed.error).properties
+  console.warn(message)
+  return NextResponse.json({error: "bad_request", message}, {status: 400})
 }
 ```
