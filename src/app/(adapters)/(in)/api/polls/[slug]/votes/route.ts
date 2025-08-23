@@ -48,7 +48,7 @@ export async function POST(req: NextRequest, ctx: RouteContext<"/api/polls/[slug
       const supabase = await createClient()
       const {data, error} = await supabase.auth.getUser()
       if (error) {
-        console.warn(error.message, error.cause)
+        console.warn(error.message, error.cause ?? "")
       }
       userId = data?.user?.id ?? null
       source = {
@@ -78,8 +78,8 @@ export async function POST(req: NextRequest, ctx: RouteContext<"/api/polls/[slug
     return new NextResponse(null, {status: 204})
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e)
-    const cause = e instanceof Error ? e.cause : undefined
-    console.error(message, cause ?? "")
+    const cause = e instanceof Error ? (e.cause ?? "") : ""
+    console.error(message, cause)
 
     if (message === "not_found") {
       return NextResponse.json({error: "not_found"}, {status: 404})

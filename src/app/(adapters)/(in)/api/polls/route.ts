@@ -51,8 +51,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(data, {status: 200, headers: {"Cache-Control": "no-store"}})
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e)
-    const cause = e instanceof Error ? e.cause : undefined
-    console.error(message, cause ?? "")
+    const cause = e instanceof Error ? (e.cause ?? "") : ""
+    console.error(message, cause)
 
     if (message.startsWith("supabase")) {
       return NextResponse.json({error: "service_unavailable"}, {status: 503})

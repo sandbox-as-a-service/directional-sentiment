@@ -42,8 +42,8 @@ export async function GET(_req: NextRequest, ctx: RouteContext<"/api/polls/[slug
     return NextResponse.json(data, {status: 200, headers: {"Cache-Control": "no-store"}})
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e)
-    const cause = e instanceof Error ? e.cause : undefined
-    console.error(message, cause ?? "")
+    const cause = e instanceof Error ? (e.cause ?? "") : ""
+    console.error(message, cause)
 
     if (message === "not_found") {
       return NextResponse.json({error: "not_found"}, {status: 404})
