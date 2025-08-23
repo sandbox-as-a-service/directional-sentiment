@@ -45,7 +45,7 @@ if (env.USE_MEMORY === "1") {
   source = composeMemorySource() // Singleton ensures vote persistence across routes
 } else {
   // Production environment - use Supabase
-  const supabase = await createClient()
+  const supabase = await createSupabaseServerClient()
   const {data, error} = await supabase.auth.getUser()
   if (error) console.warn(error.message, error.cause)
 

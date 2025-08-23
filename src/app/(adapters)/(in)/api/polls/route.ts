@@ -4,7 +4,7 @@ import {z} from "zod"
 import {createMemoryPollFeedSource} from "@/app/(adapters)/(out)/memory/create-memory-poll-feed-source"
 import {memoryPollFeed} from "@/app/(adapters)/(out)/memory/fixtures/poll-feed"
 import {createSupabasePollFeedSource} from "@/app/(adapters)/(out)/supabase/create-supabase-poll-feed-source"
-import {createClient} from "@/app/(adapters)/(out)/supabase/server"
+import {createSupabaseServerClient} from "@/app/(adapters)/(out)/supabase/server"
 import {env} from "@/app/_config/env"
 import type {GetPollFeedInput} from "@/app/_domain/ports/in/get-poll-feed"
 import type {PollFeedSource} from "@/app/_domain/ports/out/poll-feed-source"
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
         poll: createMemoryPollFeedSource(memoryPollFeed),
       }
     } else {
-      const supabase = await createClient()
+      const supabase = await createSupabaseServerClient()
       source = {
         poll: createSupabasePollFeedSource(supabase),
       }

@@ -91,7 +91,7 @@ const QuerySchema = z.object({
 
 ```typescript
 // Server-side (request-scoped)
-const client = await createClient()
+const client = await createSupabaseServerClient()
 
 // Query pattern with error handling
 const {data, error} = await client

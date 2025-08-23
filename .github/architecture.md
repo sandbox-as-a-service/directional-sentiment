@@ -298,7 +298,7 @@ if (env.USE_MEMORY === "1") {
     poll: createMemoryPollFeedSource(memoryPollFeed),
   }
 } else {
-  const supabase = await createClient()
+  const supabase = await createSupabaseServerClient()
   source = {
     poll: createSupabasePollFeedSource(supabase),
   }

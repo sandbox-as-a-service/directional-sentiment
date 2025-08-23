@@ -4,7 +4,7 @@ import z from "zod"
 import {composeMemorySource} from "@/app/(adapters)/(out)/memory/compose-memory-sources"
 import {createSupabasePollsSource} from "@/app/(adapters)/(out)/supabase/create-supabase-polls-source"
 import {createSupabaseVotesSource} from "@/app/(adapters)/(out)/supabase/create-supabase-votes-source"
-import {createClient} from "@/app/(adapters)/(out)/supabase/server"
+import {createSupabaseServerClient} from "@/app/(adapters)/(out)/supabase/server"
 import {env} from "@/app/_config/env"
 import type {PollsSource} from "@/app/_domain/ports/out/polls-source"
 import type {VotesSource} from "@/app/_domain/ports/out/votes-source"
@@ -29,7 +29,7 @@ export async function GET(_req: NextRequest, ctx: RouteContext<"/api/polls/[slug
     if (env.USE_MEMORY === "1") {
       source = composeMemorySource()
     } else {
-      const supabase = await createClient()
+      const supabase = await createSupabaseServerClient()
       source = {
         polls: createSupabasePollsSource(supabase),
         votes: createSupabaseVotesSource(supabase),

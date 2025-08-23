@@ -195,3 +195,10 @@ create index if not exists idx_vote_latest_per_user on public.vote (poll_id, use
 -- Cover composite FK (poll_id, option_id) → poll_option(poll_id, id)
 -- Helps parent deletes/updates and any lookups/join checks involving both columns
 create index if not exists idx_vote_poll_option on public.vote (poll_id, option_id);
+
+-- Deny all by default (no policies)
+alter table public.poll enable row level security;
+
+alter table public.poll_option enable row level security;
+
+alter table public.vote enable row level security;

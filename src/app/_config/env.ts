@@ -4,6 +4,7 @@ import {z} from "zod"
 const EnvSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.url().optional().default(""), // TODO: Remove .optional().default("")
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().optional().default(""), // TODO: Remove .optional().default("")
+  SUPABASE_SERVICE_ROLE_KEY: z.string().optional().default(""), // TODO: Remove .optional().default("")
   USE_MEMORY: z.coerce.string().optional().default("0"),
 })
 
