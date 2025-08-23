@@ -16,7 +16,7 @@
     "test:unit:jest:watch": "jest --watch",
     "test:unit:jest:cov": "jest --coverage",
     "supabase": "supabase",
-    "supabase:typegen": "supabase gen types --linked --schema public > \"src/app/(adapters)/(out)/supabase/types.ts\""
+    "supabase:typegen": "supabase gen types --linked --schema public,auth > \"src/app/(adapters)/(out)/supabase/types.ts\""
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
