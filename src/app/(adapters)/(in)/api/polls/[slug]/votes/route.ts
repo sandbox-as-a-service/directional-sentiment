@@ -48,7 +48,7 @@ export async function POST(req: NextRequest, ctx: RouteContext<"/api/polls/[slug
       const supabase = await createClient()
       const {data, error} = await supabase.auth.getUser()
       if (error) {
-        console.warn(error.message, error.cause ?? "")
+        console.warn("auth_session_missing")
       }
       userId = data?.user?.id ?? null
       source = {
