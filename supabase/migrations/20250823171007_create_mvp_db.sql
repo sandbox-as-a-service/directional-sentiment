@@ -84,9 +84,13 @@ create index if not exists idx_poll_created_desc on public.poll (created_at desc
 comment on index idx_poll_created_desc is 'Keyset pagination index for newest-first poll feed (created_at DESC, id DESC)';
 
 -- Trigger to auto-update updated_at on every update
-create or replace function public.set_updated_at () returns trigger language plpgsql as $$
+-- Lock down search_path for the trigger function to avoid name resolution surprises
+create or replace function public.set_updated_at () returns trigger language plpgsql
+set
+  search_path = pg_catalog -- resolve only built-ins
+  as $$
 begin
-  new.updated_at := now();
+  new.updated_at := pg_catalog.now();  -- explicit qualification
   return new;
 end
 $$;
