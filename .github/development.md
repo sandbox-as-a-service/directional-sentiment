@@ -4,8 +4,12 @@
 
 ```bash
 pnpm dev --turbopack        # Development server with Turbopack
-pnpm test                  # Run Jest unit tests
-pnpm test-api              # Run Bruno API tests
+pnpm test:unit:jest         # Run Jest unit tests
+pnpm test:unit:jest:watch   # Run Jest unit tests in watch mode
+pnpm test:unit:jest:ci      # Run Jest unit tests with coverage
+pnpm test:api:bruno         # Run Bruno API tests
+pnpm test:api:bruno:local   # Run Bruno API tests against localhost
+pnpm test:api:bruno:prod    # Run Bruno API tests against production
 pnpm typegen               # Generate Next.js route types (runs automatically on pnpm dev and pnpm build)
 pnpm build                 # Production build
 pnpm lint                  # ESLint check (runs automatically on pnpm build)
@@ -288,7 +292,7 @@ describe("limit handling", () => {
 - **Location**: `collections/` directory
 - **Format**: `.bru` files with HTTP requests
 - **Environments**: `collections/environments/` (localhost, production)
-- **Run tests**: `pnpm test-api` (uses `@usebruno/cli`)
+- **Run tests**: `pnpm test:api:bruno:prod` or `test:api:bruno:local` (uses `@usebruno/cli`)
 
 ### Bruno Test Structure
 

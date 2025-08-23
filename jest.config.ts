@@ -1,24 +1,51 @@
 import type {Config} from "jest"
 import nextJest from "next/jest.js"
 
-const createJestConfig = nextJest({
-  // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
-  dir: "./",
-})
+// Load Next config + .env so your domain can read env vars if needed
+const createJestConfig = nextJest({dir: "./"})
 
-// Add any custom config to be passed to Jest
 const config: Config = {
-  coverageProvider: "v8",
+  // ---- Scope: Node-only domain tests ----
   testEnvironment: "node",
-  // Add more setup options before each test is run
-  // setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  roots: ["<rootDir>/src"],
+
+  // Only pick up *.test.ts in your domain area
+  testMatch: ["<rootDir>/src/**/__tests__/**/*.test.ts", "<rootDir>/src/**/?(*.)test.ts"],
+
+  // Helpful hygiene
+  clearMocks: true,
+  restoreMocks: true,
+  testTimeout: 5000,
+
+  // Path aliases
   moduleNameMapper: {
-    // Handling Absolute Imports and Module Path Aliases
     "^@/(.*)$": "<rootDir>/src/$1",
   },
+
+  collectCoverage: false, // default off; enable via CLI
+  // Coverage (tune to taste)
+  collectCoverageFrom: [
+    "src/app/_domain/**/*.{ts,tsx}",
+    "!src/**/__tests__/**",
+    "!src/**/*.{spec,test}.{ts,tsx}",
+    "!src/**/dto/**",
+    "!src/**/ports/**", // ⬅ exclude hex ports (types/interfaces)
+    "!src/**/types/**", // optional
+    "!src/**/*.d.ts", // .d.ts files
+    "!src/**/index.{ts,tsx}", // optional: barrel files
+  ],
+  coverageProvider: "v8",
+  coverageReporters: ["text", "lcov"],
+
+  // Keep CI deterministic without grinding to a halt // or process.env.CI ? 2 : "75%"
+  maxWorkers: process.env.CI ? "50%" : "75%", // or process.env.CI ? 2 : "75%"
+
+  // Keep noise down
+  verbose: false,
+
+  // If you later add a jsdom project, we’ll switch to a multi-project config
 }
 
-// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
 export default createJestConfig(config)
 
 //Under the hood, next/jest is automatically configuring Jest for you, including:

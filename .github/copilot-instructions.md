@@ -20,8 +20,8 @@ This directory contains modular instructions for AI coding assistants working on
 **Key Commands:**
 
 ```bash
-pnpm dev --turbopack     # Development with Turbopack
-pnpm test-api           # Run Bruno API tests
+pnpm dev     # Development with Turbopack
+pnpm build   # Build the project
 ```
 
 **Environment Switch:**
