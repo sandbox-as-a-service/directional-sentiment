@@ -1,11 +1,12 @@
 import type {SupabaseClient} from "@supabase/supabase-js"
 
 import type {PollsSource} from "@/app/_domain/ports/out/polls-source"
-import type {PollStatus} from "@/app/_domain/use-cases/polls/dto/poll"
+
+import type {Database} from "./types"
 
 // MVP-friendly: we compute “latest per user” in the adapter by pulling votes for a poll and reducing in memory.
 // Later, flip to a Postgres view/materialized view and change only this file.
-export function createSupabasePollsSource(supabase: SupabaseClient): PollsSource {
+export function createSupabasePollsSource(supabase: SupabaseClient<Database>): PollsSource {
   return {
     async findBySlug(slug) {
       const {data, error} = await supabase
@@ -25,8 +26,8 @@ export function createSupabasePollsSource(supabase: SupabaseClient): PollsSource
 
       // Adapter Pattern
       return {
-        pollId: data.id as string,
-        status: data.status as PollStatus,
+        pollId: data.id,
+        status: data.status,
       }
     },
 
@@ -42,7 +43,7 @@ export function createSupabasePollsSource(supabase: SupabaseClient): PollsSource
       }
 
       // Adapter Pattern
-      return data.map((r) => ({optionId: r.id as string}))
+      return data.map((r) => ({optionId: r.id}))
     },
   }
 }

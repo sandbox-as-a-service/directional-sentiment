@@ -2,7 +2,9 @@ import type {SupabaseClient} from "@supabase/supabase-js"
 
 import type {VotesSource} from "@/app/_domain/ports/out/votes-source"
 
-export function createSupabaseVotesSource(supabase: SupabaseClient): VotesSource {
+import type {Database} from "./types"
+
+export function createSupabaseVotesSource(supabase: SupabaseClient<Database>): VotesSource {
   return {
     async append({pollId, optionId, userId, idempotencyKey}) {
       const {error} = await supabase.from("vote").insert({
@@ -59,15 +61,15 @@ export function createSupabaseVotesSource(supabase: SupabaseClient): VotesSource
 
       // Iterate newest → oldest; keep only the first row per user (their current vote)
       for (const vote of data ?? []) {
-        const user = vote.user_id as string // normalize type; used as the map key
+        const key = vote.user_id // normalize type; used as the map key
 
         // If this user hasn't been seen yet, record this row as their latest vote
         // (due to the DESC sort, this is guaranteed to be the newest for this user)
-        if (!perUser.has(user)) {
-          perUser.set(user, {
-            optionId: vote.option_id as string, // which option they currently support
-            votedAt: vote.voted_at as string, // when they cast that latest vote
-            id: vote.id as string, // tie-breaker from the sort
+        if (!perUser.has(key)) {
+          perUser.set(key, {
+            optionId: vote.option_id, // which option they currently support
+            votedAt: vote.voted_at, // when they cast that latest vote
+            id: vote.id, // tie-breaker from the sort
           })
         }
 

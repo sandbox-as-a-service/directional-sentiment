@@ -2,8 +2,10 @@ import type {SupabaseClient} from "@supabase/supabase-js"
 
 import type {PollFeedSource} from "@/app/_domain/ports/out/poll-feed-source"
 
+import type {Database} from "./types"
+
 // Talks Supabase; returns the tiny shape the use case expects.
-export function createSupabasePollFeedSource(supabase: SupabaseClient): PollFeedSource {
+export function createSupabasePollFeedSource(supabase: SupabaseClient<Database>): PollFeedSource {
   return {
     async page({limit, cursor}) {
       let query = supabase
@@ -29,7 +31,7 @@ export function createSupabasePollFeedSource(supabase: SupabaseClient): PollFeed
       }
 
       // Adapter Pattern
-      return data.map((r) => ({pollId: r.id as string, createdAt: r.created_at as string}))
+      return data.map((r) => ({pollId: r.id, createdAt: r.created_at}))
     },
   }
 }
