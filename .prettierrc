@@ -5,5 +5,14 @@
   "importOrder": ["^@/(.*)$", "^[./]"],
   "importOrderSortSpecifiers": true,
   "importOrderSeparation": true,
-  "plugins": ["@trivago/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"]
+  "plugins": ["prettier-plugin-sql", "@trivago/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"],
+  "overrides": [
+    {
+      "files": "*.sql",
+      "options": {
+        "parser": "sql",
+        "language": "postgresql"
+      }
+    }
+  ]
 }
