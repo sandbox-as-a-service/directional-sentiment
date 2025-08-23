@@ -31,7 +31,7 @@ export function createSupabasePollsSource(supabase: SupabaseClient): PollsSource
     },
 
     async listOptions(pollId) {
-      const {data, error} = await supabase.from("poll_option").select("id").eq("pollId", pollId)
+      const {data, error} = await supabase.from("poll_option").select("id").eq("poll_id", pollId)
 
       if (error) {
         throw new Error("supabase_query_failed", {cause: error})

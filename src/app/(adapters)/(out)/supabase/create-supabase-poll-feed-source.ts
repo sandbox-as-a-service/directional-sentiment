@@ -7,14 +7,16 @@ export function createSupabasePollFeedSource(supabase: SupabaseClient): PollFeed
   return {
     async page({limit, cursor}) {
       let query = supabase
-        .from("polls")
-        .select("id,created_at")
+        .from("poll")
+        .select("id, created_at")
         .order("created_at", {ascending: false}) // newest first
-        .limit(limit) // ask one extra → caller detects hasNext
+        .order("id", {ascending: false}) // tie-breaker
+        .limit(limit) // use-case already sends N+1 if needed
 
       if (cursor) {
+        // MVP: simple keyset on timestamp only
         query = query.lt("created_at", cursor)
-      } // keyset: strictly older than cursor
+      }
 
       const {data, error} = await query
 

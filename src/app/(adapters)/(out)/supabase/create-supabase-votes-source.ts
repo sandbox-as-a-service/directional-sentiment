@@ -6,11 +6,11 @@ export function createSupabaseVotesSource(supabase: SupabaseClient): VotesSource
   return {
     async append({pollId, optionId, userId, idempotencyKey}) {
       const {error} = await supabase.from("vote").insert({
-        pollId,
-        optionId,
-        userId,
-        idempotencyKey: idempotencyKey ?? null,
-        // votedAt is default now() in DB
+        poll_id: pollId,
+        option_id: optionId,
+        user_id: userId,
+        idempotency_key: idempotencyKey ?? null,
+        // voted_at defaults to now() in DB
       })
 
       if (error) {
@@ -22,8 +22,8 @@ export function createSupabaseVotesSource(supabase: SupabaseClient): VotesSource
       const {count, error} = await supabase
         .from("vote")
         .select("id", {count: "exact", head: true})
-        .eq("userId", userId)
-        .eq("idempotencyKey", idempotencyKey)
+        .eq("user_id", userId)
+        .eq("idempotency_key", idempotencyKey)
         .limit(1)
 
       if (error) {
@@ -40,12 +40,12 @@ export function createSupabaseVotesSource(supabase: SupabaseClient): VotesSource
     },
 
     async tallyCurrent(pollId) {
-      // MVP: fetch all votes for poll, reduce latest-per-user client-side
+      // MVP: fetch all votes for poll → reduce latest-per-user client-side
       const {data, error} = await supabase
         .from("vote")
-        .select("id, userId, optionId, votedAt")
-        .eq("pollId", pollId)
-        .order("votedAt", {ascending: false})
+        .select("id, user_id, option_id, voted_at")
+        .eq("poll_id", pollId)
+        .order("voted_at", {ascending: false})
         .order("id", {ascending: false})
 
       if (error) {
@@ -59,14 +59,14 @@ export function createSupabaseVotesSource(supabase: SupabaseClient): VotesSource
 
       // Iterate newest → oldest; keep only the first row per user (their current vote)
       for (const vote of data ?? []) {
-        const key = vote.userId as string // normalize type; used as the map key
+        const user = vote.user_id as string // normalize type; used as the map key
 
         // If this user hasn't been seen yet, record this row as their latest vote
         // (due to the DESC sort, this is guaranteed to be the newest for this user)
-        if (!perUser.has(key)) {
-          perUser.set(key, {
-            optionId: vote.optionId as string, // which option they currently support
-            votedAt: vote.votedAt as string, // when they cast that latest vote
+        if (!perUser.has(user)) {
+          perUser.set(user, {
+            optionId: vote.option_id as string, // which option they currently support
+            votedAt: vote.voted_at as string, // when they cast that latest vote
             id: vote.id as string, // tie-breaker from the sort
           })
         }
