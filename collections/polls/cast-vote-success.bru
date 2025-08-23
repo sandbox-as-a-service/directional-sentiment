@@ -1,0 +1,25 @@
+meta {
+  name: cast-vote-success
+  type: http
+  seq: 15
+}
+
+post {
+  url: {{URL}}/api/polls/best-bj-flavor/votes
+  body: json
+  auth: inherit
+}
+
+headers {
+  x-user-id: 1
+}
+
+body:json {
+  {
+    "optionId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

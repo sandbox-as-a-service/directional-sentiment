@@ -1,0 +1,19 @@
+meta {
+  name: get-poll-feed-error-400-cursor-invalid
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{URL}}/api/polls?cursor=invalid-date
+  body: none
+  auth: inherit
+}
+
+params:query {
+  cursor: invalid-date
+}
+
+settings {
+  encodeUrl: true
+}

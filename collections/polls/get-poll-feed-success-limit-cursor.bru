@@ -1,0 +1,20 @@
+meta {
+  name: get-poll-feed-success-limit-cursor
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{URL}}/api/polls?limit=1&cursor=2025-08-18T15:30:00Z
+  body: none
+  auth: inherit
+}
+
+params:query {
+  limit: 1
+  cursor: 2025-08-18T15:30:00Z
+}
+
+settings {
+  encodeUrl: true
+}

@@ -1,17 +1,17 @@
 meta {
-  name: get-poll-feed-limit-invalid
+  name: get-poll-feed-error-400-limit-zero
   type: http
-  seq: 4
+  seq: 10
 }
 
 get {
-  url: {{URL}}/api/polls?limit=a
+  url: {{URL}}/api/polls?limit=0
   body: none
   auth: inherit
 }
 
 params:query {
-  limit: a
+  limit: 0
 }
 
 settings {

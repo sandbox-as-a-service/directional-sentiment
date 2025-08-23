@@ -1,16 +1,17 @@
 meta {
-  name: get-poll-feed-limit
+  name: get-poll-feed-success-limit
   type: http
   seq: 2
 }
 
 get {
-  url: {{URL}}/api/polls?limit=2
+  url: {{URL}}/api/polls?limit=1
+  body: none
   auth: inherit
 }
 
 params:query {
-  limit: 2
+  limit: 1
 }
 
 settings {

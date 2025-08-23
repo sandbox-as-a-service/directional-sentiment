@@ -1,0 +1,19 @@
+meta {
+  name: get-poll-feed-error-400-limit-invalid
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{URL}}/api/polls?limit=a
+  body: none
+  auth: inherit
+}
+
+params:query {
+  limit: a
+}
+
+settings {
+  encodeUrl: true
+}

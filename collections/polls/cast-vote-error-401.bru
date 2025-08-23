@@ -1,0 +1,22 @@
+meta {
+  name: cast-vote-error-401
+  type: http
+  seq: 16
+}
+
+post {
+  url: {{URL}}/api/polls/ketchup-on-steak/votes
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "optionId": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+    "idempotencyKey": "unauthorized-test"
+  }
+}
+
+settings {
+  encodeUrl: true
+}
