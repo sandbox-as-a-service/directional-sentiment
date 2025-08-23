@@ -23,15 +23,19 @@ export async function POST(req: NextRequest, ctx: RouteContext<"/api/polls/[slug
     const params = await ctx.params
     const paramsParsed = ParamsSchema.safeParse(params)
     if (!paramsParsed.success) {
-      console.warn(paramsParsed.error.issues)
-      return NextResponse.json({error: "bad_request", message: paramsParsed.error.message}, {status: 400})
+      const message = z.treeifyError(paramsParsed.error).properties
+      console.warn(message)
+      return NextResponse.json({error: "bad_request", message}, {status: 400})
     }
 
     const body = await req.json()
     const bodyParsed = BodySchema.safeParse(body)
     if (!bodyParsed.success) {
       console.warn(bodyParsed.error.issues)
-      return NextResponse.json({error: "bad_request", issues: bodyParsed.error.message}, {status: 400})
+      return NextResponse.json(
+        {error: "bad_request", message: z.treeifyError(bodyParsed.error).properties},
+        {status: 400},
+      )
     }
 
     let userId: string | null = null

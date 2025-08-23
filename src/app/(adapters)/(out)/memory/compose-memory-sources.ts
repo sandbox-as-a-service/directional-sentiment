@@ -14,7 +14,7 @@ function source() {
 
 // Singleton instance shared across all route handlers (per node process)
 // This ensures votes cast in one route are visible in other routes
-let memorySource: ReturnType<typeof source>
+let memorySource: ReturnType<typeof source> | null = null
 
 export function composeMemorySource() {
   if (!memorySource) {

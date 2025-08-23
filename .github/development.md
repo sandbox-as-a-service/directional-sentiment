@@ -294,6 +294,24 @@ describe("limit handling", () => {
 - **Environments**: `collections/environments/` (localhost, production)
 - **Run tests**: `pnpm test:api:bruno:prod` or `test:api:bruno:local` (uses `@usebruno/cli`)
 
+### Bruno Naming Conventions
+
+Bruno test files follow a consistent naming pattern:
+
+- **Success cases**: `{endpoint}-success[-variant]`
+  - `get-poll-feed-success.bru` - Basic successful poll feed request
+  - `get-poll-feed-success-limit.bru` - Success with custom limit
+  - `cast-vote-success.bru` - Basic successful vote casting
+
+- **Error cases**: `{endpoint}-error-{status-code}[-description]`
+  - `get-poll-feed-error-400-limit-invalid.bru` - 400 error for invalid limit
+  - `cast-vote-error-404.bru` - 404 error for nonexistent poll
+  - `cast-vote-error-422.bru` - 422 error for option mismatch
+
+- **Variations**: `{endpoint}-{variant}`
+  - `cast-vote-idempotency.bru` - Tests idempotency functionality
+  - `cast-vote-different-user.bru` - Tests with different user ID
+
 ### Bruno Test Structure
 
 ```
@@ -307,13 +325,31 @@ collections/
 │   └── health.bru      # Health endpoint test
 └── polls/              # Test suites by feature
     ├── folder.bru      # Folder metadata
-    ├── get-poll-feed.bru
-    ├── get-poll-feed-limit.bru
-    ├── get-poll-feed-limit-cursor.bru
-    ├── get-poll-feed-limit-cursor-invalid.bru
-    ├── get-poll-feed-limit-invalid.bru
-    ├── get-poll-results.bru
-    └── cast-vote.bru
+    ├── get-poll-feed-success.bru
+    ├── get-poll-feed-success-limit.bru
+    ├── get-poll-feed-success-limit-cursor.bru
+    ├── get-poll-feed-success-cursor-timezone.bru
+    ├── get-poll-feed-error-400-limit-invalid.bru
+    ├── get-poll-feed-error-400-limit-cursor-invalid.bru
+    ├── get-poll-feed-error-400-cursor-invalid.bru
+    ├── get-poll-feed-error-503.bru
+    ├── get-poll-feed-limit-zero.bru
+    ├── get-poll-feed-limit-exceed.bru
+    ├── get-poll-results-success-default.bru
+    ├── get-poll-results-success.bru
+    ├── get-poll-results-error-400.bru
+    ├── get-poll-results-error-404.bru
+    ├── cast-vote-success.bru
+    ├── cast-vote-idempotency.bru
+    ├── cast-vote-no-idempotency.bru
+    ├── cast-vote-different-user.bru
+    ├── cast-vote-different-option.bru
+    ├── cast-vote-error-400-params.bru
+    ├── cast-vote-error-400-body.bru
+    ├── cast-vote-error-401.bru
+    ├── cast-vote-error-404.bru
+    ├── cast-vote-error-409-closed.bru
+    └── cast-vote-error-422.bru
 ```
 
 ## Error Handling Pattern

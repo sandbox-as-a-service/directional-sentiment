@@ -19,7 +19,10 @@ export async function GET(_req: NextRequest, ctx: RouteContext<"/api/polls/[slug
 
     if (!parsed.success) {
       console.warn(parsed.error.issues)
-      return NextResponse.json({error: "bad_request", message: parsed.error.message}, {status: 400})
+      return NextResponse.json(
+        {error: "bad_request", message: z.treeifyError(parsed.error).properties},
+        {status: 400},
+      )
     }
 
     let source: {polls: PollsSource; votes: VotesSource}

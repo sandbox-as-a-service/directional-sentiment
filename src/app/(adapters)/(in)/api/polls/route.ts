@@ -25,8 +25,9 @@ export async function GET(req: NextRequest) {
     const parsed = QuerySchema.safeParse(queries)
 
     if (!parsed.success) {
-      console.warn(parsed.error.issues)
-      return NextResponse.json({error: "bad_request", message: parsed.error.message}, {status: 400})
+      const message = z.treeifyError(parsed.error).properties
+      console.warn(message)
+      return NextResponse.json({error: "bad_request", message}, {status: 400})
     }
 
     const {limit, cursor} = parsed.data
