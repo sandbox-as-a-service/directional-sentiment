@@ -24,9 +24,32 @@ pnpm dev
 
 ## Unit Testing with Jest
 
-- **Location**: `src/app/_domain/use-cases/` directory (co-located with use cases)
-- **Format**: `*.test.ts` files using Jest
-- **Run tests**: `pnpm test` (uses Jest with TypeScript)
+- **Location**: `__tests__/` folders per feature (e.g., `src/app/_domain/use-cases/polls/__tests__/`)
+- **Format**: `*.test.ts` files using Jest v30 with Next.js helpers
+- **Run tests**: `pnpm test` (uses Jest v30 with TypeScript configured via `next/jest`)
+- **Configuration**: Jest configured with Next.js helpers for SWC transforms, auto mocking stylesheets/images, loading environment variables, and ignoring node_modules/Next.js build files
+
+### Test Structure & Organization
+
+#### Feature-Based `__tests__` Folders
+
+- **Use `__tests__` folders per feature**: `src/app/_domain/use-cases/polls/__tests__/`
+- **Keeps domain folders clean**: DTOs, ports, use cases without test noise
+- **Allows shared fakes/helpers**: Drop in same folder without leaking into prod code
+- **Mirrors feature tree clearly**: `polls/` ↔ `polls/__tests__/`
+
+```
+src/app/_domain/use-cases/polls/
+├── cast-vote.ts
+├── get-poll-feed.ts
+├── get-poll-results.ts
+├── __tests__/              # Test folder per feature
+│   ├── get-poll-feed.test.ts
+│   ├── get-poll-results.test.ts
+│   └── shared-helpers.ts   # Shared test utilities
+└── dto/
+    └── poll.ts
+```
 
 ### Test Structure & Conventions
 
@@ -78,16 +101,19 @@ it("works with cursor") // Too vague
 #### Typing Rules
 
 - **No `any` types**: Use domain DTOs and port interfaces
-- **Type mocks properly**: Use `Parameters<>` and `ReturnType<>` for port methods
+- **Type mocks with Jest v30**: Use `jest.fn<FunctionType>()` for proper typing
 - **Import domain types**: Use `PollFeedSource`, `PollFeedItem`, etc.
+- **Import Jest globals**: Use `import {describe, expect, it, jest} from "@jest/globals"`
 
 ```typescript
+import {describe, expect, it, jest} from "@jest/globals"
+
 import type {PollFeedSource} from "@/app/_domain/ports/out/poll-feed-source"
 import type {PollFeedItem} from "@/app/_domain/use-cases/polls/dto/poll"
 
-// Typed mock using Parameters<> helper
+// Typed mock using Jest v30 generic syntax
 function makePollFeedSource(allItems: PollFeedItem[]): PollFeedSource {
-  const page = jest.fn(async ({limit, cursor}: Parameters<PollFeedSource["page"]>[0]) => {
+  const page = jest.fn<PollFeedSource["page"]>().mockImplementation(async ({limit, cursor}) => {
     // Implementation
   })
 
@@ -104,7 +130,7 @@ function makePollFeedSource(allItems: PollFeedItem[]): PollFeedSource {
 ```typescript
 // ✅ Typed fake implementing full port interface
 function makePollFeedSource(allItems: PollFeedItem[]): PollFeedSource {
-  const page = jest.fn(async ({limit, cursor}) => {
+  const page = jest.fn<PollFeedSource["page"]>().mockImplementation(async ({limit, cursor}) => {
     // Deterministic logic matching production behavior
     let startIndex = 0
     if (cursor) {
@@ -128,6 +154,45 @@ const mockSource = {
 - **Use helper functions**: Create reusable, parameterized data builders
 - **Keep fixtures realistic**: Match production data shapes and relationships
 - **Make data deterministic**: Predictable timestamps, IDs, and ordering
+
+##### Helper vs Inline Data Strategy
+
+**Rule of thumb**: Choose based on whether the data is the point of the test or just scaffolding.
+
+**Use inline data when** (≤3 items and each value matters):
+
+- **Data is the assertion point**: Small, explicit data that tells the story at a glance
+- **Values are meaningful**: Each item directly relates to what you're testing
+
+```typescript
+// ✅ Inline when data is the point - testing percentage calculation
+const votes = makeVotesSource([
+  {optionId: "o1", count: 2}, // Will be 66.7%
+  {optionId: "o2", count: 1}, // Will be 33.3%
+])
+// Total = 3, percentages are obvious from the counts
+```
+
+**Use helpers when** (many items, repetitive shapes, or size matters more than values):
+
+- **Shape is repetitive**: Consistent structure across many items
+- **Size matters more than exact values**: Testing pagination, limits, ranges
+- **Complex setup**: Timestamps, ordering, relationships
+
+```typescript
+// ✅ Helper when scaffolding pagination - 25 items with consistent spacing
+const data = makeItems(25) // 1-minute apart, newest-first
+const poll = makePollFeedSource(data)
+// Focus is on pagination behavior, not specific item content
+```
+
+**Reused fixtures**: Use helpers (file-local or `__tests__/shared-helpers.ts`)
+
+##### Helper Design Rules
+
+- **Must be dumb and deterministic**: No randomness, no hidden side effects, no branching
+- **Name by intent**: `makeItems`, `makePollsSource`, `makeVotesSource` (not "builder" or "factory")
+- **Parameterized but simple**: Accept count/start values, maintain predictable output
 
 ```typescript
 // Helper: newest-first items, 1-minute apart

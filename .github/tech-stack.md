@@ -29,6 +29,7 @@
 
 ### Testing
 
+- **Unit Testing**: Jest v30 with Next.js helpers (`next/jest`) for ts-node, environment variables, and module mapping
 - **API Testing**: Bruno CLI (`@usebruno/cli`) v2.9+
 - **Test Runner**: Bruno collections in `collections/` directory
 

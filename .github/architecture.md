@@ -21,6 +21,10 @@ src/app/
 │           ├── cast-vote.ts        # Vote validation & idempotency
 │           ├── get-poll-feed.ts    # Paginated poll listing
 │           ├── get-poll-results.ts # Vote tallying & results
+│           ├── __tests__/          # Feature test folder
+│           │   ├── get-poll-feed.test.ts
+│           │   ├── get-poll-results.test.ts
+│           │   └── shared-helpers.ts # Test utilities
 │           └── dto/
 │               └── poll.ts         # Domain transfer objects
 ├── _infra/            # Infrastructure concerns (cross-cutting)
