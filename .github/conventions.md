@@ -63,6 +63,12 @@ export function createSomethingSource(config: Config): SomethingSource {
 - Prefix interfaces with purpose: `PollFeedSource`, `GetPollFeedInput`
 - Export types from dedicated `dto/` folders in domain layer
 - Use `import type` rather than `import` when importing types and interfaces
+- Prefer functions over classes for implementation
+- Favor functional programming patterns over imperative loops
+  - ✅ `items.map(item => transform(item))`
+  - ❌ `for (const item of items) { ... }`
+  - ✅ `items.filter(predicate).find(condition)`
+  - ❌ Manual loop with break/continue statements
 
 ## Error Handling
 

@@ -16,7 +16,7 @@ src/app/
 │   │       ├── poll-feed-source.ts # Poll feed data access
 │   │       ├── polls-source.ts     # Poll metadata access
 │   │       └── votes-source.ts     # Vote storage and tallying
-│   └── use-cases/     # Business logic implementation
+│   └── use-cases/     # Domain logic implementation
 │       └── polls/
 │           ├── cast-vote.ts        # Vote validation & idempotency
 │           ├── get-poll-feed.ts    # Paginated poll listing
@@ -53,7 +53,7 @@ src/app/
 └── (public)/          # UI pages, components and assets
 ```
 
-## Use Cases & Business Logic
+## Use Cases & Domain Logic
 
 The domain layer implements three core use cases for the directional sentiment polling system:
 
@@ -129,7 +129,7 @@ type PollFeedSource = {
 ## Domain Layer Rules
 
 - **NEVER import from adapters** - domain stays pure
-- **Use cases** contain business logic (e.g., pagination, validation, idempotency)
+- **Use cases** contain domain logic (e.g., pagination, validation, idempotency)
 - **Ports** define minimal interfaces for what domain needs
 - **DTOs** are vendor-agnostic domain objects
 - **Error handling** uses semantic domain errors (not technical exceptions)
@@ -270,7 +270,7 @@ console.warn(error.message, error.cause) // Log auth/service warnings
 3. **Authentication** extracts user ID (Supabase auth or test header)
 4. **Adapter Selection** creates data source adapters based on environment
 5. **Dependency Injection** calls use case with ports and input
-6. **Business Logic** executes in use case (validation, idempotency, storage)
+6. **Domain Logic** executes in use case (validation, idempotency, storage)
 7. **Domain Objects** returned from use case to adapter
 8. **Response Formatting** adapter transforms to HTTP response
 9. **Error Mapping** domain errors translated to appropriate HTTP status codes
