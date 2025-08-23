@@ -2,7 +2,7 @@ import {createMemoryPollsSource} from "./create-memory-polls-source"
 import {createMemoryVotesSource} from "./create-memory-votes-source"
 import {memoryOptions, memoryPolls} from "./fixtures/polls"
 
-export function source() {
+function source() {
   return {
     polls: createMemoryPollsSource({
       polls: memoryPolls,
