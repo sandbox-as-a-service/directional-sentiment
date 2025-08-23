@@ -29,11 +29,16 @@ docs(readme): update setup instructions
 - **Functions**: camelCase factory functions (`createSupabasePollFeedSource`)
 - **Types**: PascalCase with descriptive suffixes (`PollFeedSource`, `GetPollFeedInput`)
 - **Constants**: SCREAMING_SNAKE_CASE for module-level constants
+- **Variables**: Use descriptive names that convey purpose and context
+  - ✅ `pollTitle`, `userEmail`, `voteCount`
+  - ❌ `title`, `email`, `count`
+  - ✅ `currentPoll`, `selectedOption`
+  - ❌ `x`, `y`,
 
 ## File Organization
 
 ```typescript
-// Import order (handled by prettier-plugin-sort-imports)
+// Import order (automatically enforced by @trivago/prettier-plugin-sort-imports)
 import {external} from "external-package"
 
 import {internal} from "@/app/internal"
@@ -50,9 +55,11 @@ export function createSomethingSource(config: Config): SomethingSource {
 }
 ```
 
+**Note**: Import ordering is automatically handled by `@trivago/prettier-plugin-sort-imports` - no manual sorting required.
+
 ## TypeScript Patterns
 
-- Use `type` for unions and primitives, `type` for object shapes
+- Use `type` for all type definitions (avoid mixing `interface` and `type` keywords)
 - Prefix interfaces with purpose: `PollFeedSource`, `GetPollFeedInput`
 - Export types from dedicated `dto/` folders in domain layer
 - Use `import type` rather than `import` when importing types and interfaces
@@ -94,7 +101,7 @@ if (!result.success) {
   console.warn(result.error.issues) // Log validation details
   return NextResponse.json({
     error: "bad_request",
-    message: result.error.message
+    message: result.error.message // Only expose a basic message for security purposes
   }, {status: 400})
 }
 ```
@@ -103,10 +110,10 @@ if (!result.success) {
 
 ```typescript
 // Success operations
-console.info("🎉") // Use emoji for quick visual parsing
+console.info("🎉") // Use emoji for quick visual parsing (might change before the launch)
 
 // Validation failures
-console.warn(parsed.error.issues)
+console.warn(parsed.error.issues) // only exposed to the server (not browser)
 console.warn(error.message, error.cause) // Auth/service warnings
 
 // Unhandled exceptions
