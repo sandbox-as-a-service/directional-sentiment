@@ -39,6 +39,7 @@ src/app/
 │   │               └── votes/    # POST /api/polls/:slug/votes
 │   └── (out)/         # Outbound adapters (databases, external APIs)
 │       ├── memory/               # In-memory test adapters
+│       │   ├── compose-memory-sources.ts         # Singleton source composition
 │       │   ├── create-memory-poll-feed-source.ts
 │       │   ├── create-memory-polls-source.ts
 │       │   ├── create-memory-votes-source.ts
@@ -197,12 +198,9 @@ let userId: string | null = null
 let source: {polls: PollsSource; votes: VotesSource}
 
 if (env.USE_MEMORY === "1") {
-  // Test environment - use fixtures
+  // Test environment - use shared singleton for state consistency
   userId = req.headers.get("x-user-id")
-  source = {
-    polls: createMemoryPollsSource({polls: memoryPolls, options: memoryOptions}),
-    votes: createMemoryVotesSource(),
-  }
+  source = composeMemorySource() // Singleton ensures vote persistence across routes
 } else {
   // Production environment - use Supabase
   const supabase = await createClient()
@@ -216,6 +214,30 @@ if (env.USE_MEMORY === "1") {
   }
 }
 ```
+
+### Memory Source Composition
+
+The `compose-memory-sources.ts` provides a singleton pattern for in-memory testing that maintains state consistency across different API routes:
+
+```typescript
+// Singleton instance shared across all route handlers (per Node.js process)
+// This ensures votes cast in one route are visible in other routes
+let memorySource: ReturnType<typeof source>
+
+export function composeMemorySource() {
+  if (!memorySource) {
+    memorySource = source()
+  }
+  return memorySource
+}
+```
+
+**Key Benefits:**
+
+- **State Persistence**: Votes cast via `POST /api/polls/:slug/votes` are immediately visible in `GET /api/polls/:slug/results`
+- **Cross-Route Consistency**: All routes share the same in-memory data instance within a Node.js process
+- **Test Reliability**: Enables realistic end-to-end testing workflows without external dependencies
+- **Singleton Pattern**: Prevents creating multiple disconnected memory instances that would lose data
 
 ## Logging & Observability
 
@@ -356,10 +378,20 @@ const items = tallies.map((t) => ({
 Seamless switching between test fixtures and production data:
 
 ```typescript
-const useMemory = env.USE_MEMORY === "1"
-const source = useMemory
-  ? createMemoryPollFeedSource(memoryPollFeed)
-  : createSupabasePollFeedSource(await createClient())
+// Example from GET /api/polls route
+let source: {poll: PollFeedSource}
+if (env.USE_MEMORY === "1") {
+  source = {
+    poll: createMemoryPollFeedSource(memoryPollFeed),
+  }
+} else {
+  const supabase = await createClient()
+  source = {
+    poll: createSupabasePollFeedSource(supabase),
+  }
+}
 ```
 
-This enables testing with controlled data while using real databases in production.
+This enables testing with controlled data while using real databases in production. Each route creates its own source object with the specific adapters it needs (e.g., `poll`, `polls`, `votes`).
+
+**Note**: Routes that need to share state (like vote casting and results) use `composeMemorySource()` for the singleton pattern, while routes that only need specific adapters (like poll feed) create individual source objects.
