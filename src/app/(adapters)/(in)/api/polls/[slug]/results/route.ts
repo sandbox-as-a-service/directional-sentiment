@@ -43,7 +43,7 @@ export async function GET(_req: NextRequest, ctx: RouteContext<"/api/polls/[slug
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e)
     const cause = e instanceof Error ? e.cause : undefined
-    console.error(message, cause)
+    console.error(message, cause ?? "")
 
     if (message === "not_found") {
       return NextResponse.json({error: "not_found"}, {status: 404})

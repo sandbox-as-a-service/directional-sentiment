@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e)
     const cause = e instanceof Error ? e.cause : undefined
-    console.error(message, cause)
+    console.error(message, cause ?? "")
 
     if (message.startsWith("supabase")) {
       return NextResponse.json({error: "service_unavailable"}, {status: 503})
