@@ -24,14 +24,29 @@
 ### Linting & Formatting
 
 - **ESLint**: v9 with Next.js config and Prettier integration
+  - `@next/eslint-plugin-next`: v15.5+ for Next.js specific rules
+  - `eslint-config-next`: v15.5+ for Next.js ESLint configuration
+  - `eslint-config-prettier`: v10.1+ for Prettier integration
+  - `eslint-plugin-react-hooks`: v5.2+ for React Hooks rules
+  - `@eslint/eslintrc`: v3.3+ for legacy config support
 - **Prettier**: v3.6+ with Tailwind plugin and import sorting
-- **Import Sorting**: `@trivago/prettier-plugin-sort-imports`
+- **Import Sorting**: `@trivago/prettier-plugin-sort-imports` v5.2+
 
 ### Testing
 
 - **Unit Testing**: Jest v30 with Next.js helpers (`next/jest`) for ts-node, environment variables, and module mapping
+  - `@jest/globals`: v30+ for Jest globals in TypeScript
 - **API Testing**: Bruno CLI (`@usebruno/cli`) v2.9+
 - **Test Runner**: Bruno collections in `collections/` directory
+
+### TypeScript & Development
+
+- **TypeScript**: v5.9+ with strict type checking
+- **ts-node**: v10.9+ for TypeScript execution in Node.js
+- **Type Definitions**:
+  - `@types/node`: v24.3+ for Node.js types
+  - `@types/react`: v19.1+ for React types
+  - `@types/react-dom`: v19.1+ for React DOM types
 
 ## Tool-Specific Guidance
 
