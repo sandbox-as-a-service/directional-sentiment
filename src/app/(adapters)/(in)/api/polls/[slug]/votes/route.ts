@@ -1,8 +1,8 @@
 import {type NextRequest, NextResponse} from "next/server"
 import {z} from "zod"
 
-import {createSupabasePollsSource} from "@/app/(adapters)/(out)/supabase/create-polls-source"
-import {createSupabaseVotesSource} from "@/app/(adapters)/(out)/supabase/create-votes-source"
+import {createPollsSource} from "@/app/(adapters)/(out)/supabase/create-polls-source"
+import {createVotesSource} from "@/app/(adapters)/(out)/supabase/create-votes-source"
 import {
   createSupabaseServerClient,
   createSupabaseServerServiceClient,
@@ -44,8 +44,8 @@ export async function POST(req: NextRequest, ctx: RouteContext<"/api/polls/[slug
 
     const supabase = await createSupabaseServerServiceClient()
     const source = {
-      polls: createSupabasePollsSource(supabase),
-      votes: createSupabaseVotesSource(supabase),
+      polls: createPollsSource(supabase),
+      votes: createVotesSource(supabase),
     }
 
     const input: CastVoteInput = {

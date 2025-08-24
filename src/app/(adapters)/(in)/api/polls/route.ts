@@ -1,7 +1,7 @@
 import {type NextRequest, NextResponse} from "next/server"
 import {z} from "zod"
 
-import {createSupabasePollFeedSource} from "@/app/(adapters)/(out)/supabase/create-supabase-poll-feed-source"
+import {createPollFeedSource} from "@/app/(adapters)/(out)/supabase/create-supabase-poll-feed-source"
 import {createSupabaseServerServiceClient} from "@/app/(adapters)/(out)/supabase/server"
 import type {GetPollFeedInput} from "@/app/_domain/ports/in/get-poll-feed"
 import {getPollFeed} from "@/app/_domain/use-cases/polls/get-poll-feed"
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
 
     const supabase = await createSupabaseServerServiceClient()
     const source = {
-      poll: createSupabasePollFeedSource(supabase),
+      poll: createPollFeedSource(supabase),
     }
 
     const data = await getPollFeed({poll: source.poll, input})

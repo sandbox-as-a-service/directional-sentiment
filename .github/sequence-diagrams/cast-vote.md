@@ -9,8 +9,8 @@ sequenceDiagram
     participant ZodParams as Zod Validator<br/>ParamsSchema
     participant ZodBody as Zod Validator<br/>BodySchema
     participant Auth as Authentication<br/>Supabase Auth
-    participant SupabasePollsAdapter as Supabase Polls Adapter<br/>createSupabasePollsSource
-    participant SupabaseVotesAdapter as Supabase Votes Adapter<br/>createSupabaseVotesSource
+    participant SupabasePollsAdapter as Supabase Polls Adapter<br/>createPollsSource
+    participant SupabaseVotesAdapter as Supabase Votes Adapter<br/>createVotesSource
     participant UseCase as Use Case<br/>castVote
     participant PollsSource as PollsSource<br/>Port Interface
     participant VotesSource as VotesSource<br/>Port Interface
@@ -32,8 +32,8 @@ sequenceDiagram
         Route-->>Client: 401 Unauthorized<br/>{error: "unauthorized"}
     else Authenticated
         Note over Route: Adapter Creation
-        Route->>SupabasePollsAdapter: createSupabasePollsSource(client)
-        Route->>SupabaseVotesAdapter: createSupabaseVotesSource(client)
+        Route->>SupabasePollsAdapter: createPollsSource(client)
+        Route->>SupabaseVotesAdapter: createVotesSource(client)
         SupabasePollsAdapter-->>Route: PollsSource implementation
         SupabaseVotesAdapter-->>Route: VotesSource implementation
 

@@ -7,7 +7,7 @@ sequenceDiagram
     participant Client
     participant Route as API Route<br/>/api/polls/route.ts
     participant Zod as Zod Validator<br/>QuerySchema
-    participant SupabaseAdapter as Supabase Adapter<br/>createSupabasePollFeedSource
+    participant SupabaseAdapter as Supabase Adapter<br/>createPollFeedSource
     participant UseCase as Use Case<br/>getPollFeed
     participant PollFeedSource as PollFeedSource<br/>Port Interface
 
@@ -19,7 +19,7 @@ sequenceDiagram
 
     Note over Route: Adapter Creation
     Note over Route: In development: USE_MEMORY=1 enables in-memory fixtures<br/>In production: Uses Supabase database
-    Route->>SupabaseAdapter: createSupabasePollFeedSource(client)
+    Route->>SupabaseAdapter: createPollFeedSource(client)
     SupabaseAdapter-->>Route: PollFeedSource implementation
 
     Note over Route: Domain Logic Execution

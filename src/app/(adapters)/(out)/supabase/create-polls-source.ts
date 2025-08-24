@@ -6,7 +6,7 @@ import type {Database} from "./types"
 
 // MVP-friendly: we compute “latest per user” in the adapter by pulling votes for a poll and reducing in memory.
 // Later, flip to a Postgres view/materialized view and change only this file.
-export function createSupabasePollsSource(supabase: SupabaseClient<Database>): PollsSource {
+export function createPollsSource(supabase: SupabaseClient<Database>): PollsSource {
   return {
     async findBySlug(slug) {
       const {data, error} = await supabase

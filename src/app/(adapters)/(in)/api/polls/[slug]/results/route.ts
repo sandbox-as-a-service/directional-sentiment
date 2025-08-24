@@ -1,8 +1,8 @@
 import {type NextRequest, NextResponse} from "next/server"
 import z from "zod"
 
-import {createSupabasePollsSource} from "@/app/(adapters)/(out)/supabase/create-polls-source"
-import {createSupabaseVotesSource} from "@/app/(adapters)/(out)/supabase/create-votes-source"
+import {createPollsSource} from "@/app/(adapters)/(out)/supabase/create-polls-source"
+import {createVotesSource} from "@/app/(adapters)/(out)/supabase/create-votes-source"
 import {createSupabaseServerServiceClient} from "@/app/(adapters)/(out)/supabase/server"
 import {getPollResults} from "@/app/_domain/use-cases/polls/get-poll-results"
 
@@ -21,8 +21,8 @@ export async function GET(_req: NextRequest, ctx: RouteContext<"/api/polls/[slug
 
     const supabase = await createSupabaseServerServiceClient()
     const source = {
-      polls: createSupabasePollsSource(supabase),
-      votes: createSupabaseVotesSource(supabase),
+      polls: createPollsSource(supabase),
+      votes: createVotesSource(supabase),
     }
 
     const data = await getPollResults({polls: source.polls, votes: source.votes, slug: parsed.data.slug})

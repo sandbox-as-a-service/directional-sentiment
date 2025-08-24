@@ -26,7 +26,7 @@ docs(readme): update setup instructions
 
 - **Files**: kebab-case (`get-poll-feed.ts`)
 - **Directories**: Next.js route groups `(adapters)`, `(in)`, `(out)`, `(public)`
-- **Functions**: camelCase factory functions (`createSupabasePollFeedSource`)
+- **Functions**: camelCase factory functions (`createPollFeedSource`)
 - **Types**: PascalCase with descriptive suffixes (`PollFeedSource`, `GetPollFeedInput`)
 - **Constants**: SCREAMING_SNAKE_CASE for module-level constants
 - **Variables**: Use descriptive names that convey purpose and context

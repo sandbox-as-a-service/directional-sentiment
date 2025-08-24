@@ -7,8 +7,8 @@ sequenceDiagram
     participant Client
     participant Route as API Route<br/>/api/polls/[slug]/results/route.ts
     participant Zod as Zod Validator<br/>ParamsSchema
-    participant SupabasePollsAdapter as Supabase Polls Adapter<br/>createSupabasePollsSource
-    participant SupabaseVotesAdapter as Supabase Votes Adapter<br/>createSupabaseVotesSource
+    participant SupabasePollsAdapter as Supabase Polls Adapter<br/>createPollsSource
+    participant SupabaseVotesAdapter as Supabase Votes Adapter<br/>createVotesSource
     participant UseCase as Use Case<br/>getPollResults
     participant PollsSource as PollsSource<br/>Port Interface
     participant VotesSource as VotesSource<br/>Port Interface
@@ -21,8 +21,8 @@ sequenceDiagram
 
     Note over Route: Adapter Creation
     Note over Route: In development: USE_MEMORY=1 uses shared singleton for state consistency<br/>In production: Uses Supabase database
-    Route->>SupabasePollsAdapter: createSupabasePollsSource(client)
-    Route->>SupabaseVotesAdapter: createSupabaseVotesSource(client)
+    Route->>SupabasePollsAdapter: createPollsSource(client)
+    Route->>SupabaseVotesAdapter: createVotesSource(client)
     SupabasePollsAdapter-->>Route: PollsSource implementation
     SupabaseVotesAdapter-->>Route: VotesSource implementation
 
