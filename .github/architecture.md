@@ -43,11 +43,12 @@ src/app/
 │   │               └── votes/    # POST /api/polls/:slug/votes
 │   └── (out)/         # Outbound adapters (databases, external APIs)
 │       └── supabase/             # Production Supabase adapters
-│           ├── create-supabase-poll-feed-source.ts
-│           ├── create-supabase-polls-source.ts
-│           ├── create-supabase-votes-source.ts
+│           ├── create-poll-feed-source.ts
+│           ├── create-polls-source.ts
+│           ├── create-votes-source.ts
 │           ├── client.ts         # Client-side Supabase
 │           └── server.ts         # Server-side Supabase
+│           └── types.ts          # Supabase Typescript types
 └── (public)/          # UI pages, components and assets
 ```
 

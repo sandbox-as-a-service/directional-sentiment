@@ -1,8 +1,8 @@
 import {type NextRequest, NextResponse} from "next/server"
 import {z} from "zod"
 
-import {createSupabasePollsSource} from "@/app/(adapters)/(out)/supabase/create-supabase-polls-source"
-import {createSupabaseVotesSource} from "@/app/(adapters)/(out)/supabase/create-supabase-votes-source"
+import {createSupabasePollsSource} from "@/app/(adapters)/(out)/supabase/create-polls-source"
+import {createSupabaseVotesSource} from "@/app/(adapters)/(out)/supabase/create-votes-source"
 import {
   createSupabaseServerClient,
   createSupabaseServerServiceClient,
