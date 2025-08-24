@@ -23,6 +23,9 @@ import type {VotesSource} from "@/app/_domain/ports/out/votes-source"
  * - If you need zero-count options included, merge with PollsSource.listOptions()
  *   and fill missing tallies with { count: 0 } before computing percentages.
  */
+
+const MIN_QUORUM = 30 // tune/externally config if you want
+
 export async function getPollResults(args: {
   polls: PollsSource
   votes: VotesSource
@@ -36,29 +39,41 @@ export async function getPollResults(args: {
     throw new Error("not_found")
   }
 
-  // 2) Ask votes port for current tallies: [{ optionId, count }]
-  const tallies = await votes.tallyCurrent(poll.pollId)
+  // 2) Fetch all options and current tallies (latest-per-user) in parallel.
+  const [allOptions, tallies] = await Promise.all([
+    polls.listOptions(poll.pollId), // [{ optionId }]
+    votes.tallyCurrent(poll.pollId), // [{ optionId, count }] (only >0 rows)
+  ])
 
-  // 3) Total unique voters (size of “current votes” set).
-  const total = tallies.reduce((sum, t) => sum + t.count, 0)
+  // 3) Ensure every option appears (0 when missing).
+  const tallyByOptionId = new Map<string, number>()
+  for (const {optionId, count} of tallies) tallyByOptionId.set(optionId, count)
 
-  // 4) Map to presentation with percentage at 1 decimal place.
-  //    pct = round((count / total) * 100, 1dp) → round((count * 1000) / total) / 10
-  const items = tallies.map((t) => {
-    const pct = total === 0 ? 0 : Math.round((t.count * 1000) / total) / 10
+  const mergedCounts = allOptions.map(({optionId, label}) => ({
+    optionId,
+    label,
+    count: tallyByOptionId.get(optionId) ?? 0,
+  }))
 
-    return {
-      optionId: t.optionId,
-      count: t.count,
-      pct,
-    }
-  })
+  // 4) Totals + percentages (1 decimal place). Guard divide-by-zero.
+  const totalVotes = mergedCounts.reduce((sum, {count}) => sum + count, 0)
 
-  // 5) Emit snapshot with status and server timestamp.
+  const items = mergedCounts.map(({optionId, count, label}) => ({
+    optionId,
+    count,
+    label,
+    pct: totalVotes === 0 ? 0 : Math.round((count * 1000) / totalVotes) / 10,
+  }))
+
+  // 5) Include warming-up signal
+  const warmingUp = totalVotes < MIN_QUORUM
+
   return {
     items,
-    total,
+    total: totalVotes,
     status: poll.status,
     updatedAt: new Date().toISOString(),
+    warmingUp,
+    minQuorum: MIN_QUORUM,
   }
 }

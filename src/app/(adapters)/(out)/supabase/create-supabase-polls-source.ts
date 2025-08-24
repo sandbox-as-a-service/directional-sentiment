@@ -32,7 +32,7 @@ export function createSupabasePollsSource(supabase: SupabaseClient<Database>): P
     },
 
     async listOptions(pollId) {
-      const {data, error} = await supabase.from("poll_option").select("id").eq("poll_id", pollId)
+      const {data, error} = await supabase.from("poll_option").select("id, label").eq("poll_id", pollId)
 
       if (error) {
         throw new Error("supabase_query_failed", {cause: error})
@@ -43,7 +43,7 @@ export function createSupabasePollsSource(supabase: SupabaseClient<Database>): P
       }
 
       // Adapter Pattern
-      return data.map((r) => ({optionId: r.id}))
+      return data.map((r) => ({optionId: r.id, label: r.label}))
     },
   }
 }
