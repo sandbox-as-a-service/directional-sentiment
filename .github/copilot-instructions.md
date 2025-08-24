@@ -25,12 +25,6 @@ pnpm dev     # Development with Turbopack
 pnpm build   # Build the project
 ```
 
-**Environment Switch:**
-
-```bash
-USE_MEMORY=1 pnpm dev   # Use in-memory fixtures instead of Supabase
-```
-
 **Architecture Pattern:**
 Domain (`_domain/`) → Use Cases → Ports → Adapters (`(adapters)/`)
 
@@ -38,7 +32,7 @@ Domain (`_domain/`) → Use Cases → Ports → Adapters (`(adapters)/`)
 - **Validation**: Zod for runtime type checking
 - **Styling**: Tailwind CSS
 - **Package Manager**: pnpm (specified in packageManager field)
-- **Testing**: Bruno for API testing, Jest for unit testing, in-memory fixtures for both
+- **Testing**: Bruno for API testing, Jest for unit testing
 
 ## General Guidelines
 
