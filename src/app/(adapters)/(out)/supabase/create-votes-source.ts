@@ -2,9 +2,9 @@ import type {SupabaseClient} from "@supabase/supabase-js"
 
 import type {VotesSource} from "@/app/_domain/ports/out/votes-source"
 
-import type {Database} from "./types"
+import type {DatabaseExtended} from "./types-extended"
 
-export function createVotesSource(supabase: SupabaseClient<Database>): VotesSource {
+export function createVotesSource(supabase: SupabaseClient<DatabaseExtended>): VotesSource {
   return {
     async append({pollId, optionId, userId, idempotencyKey}) {
       const {error} = await supabase.from("vote").insert({
