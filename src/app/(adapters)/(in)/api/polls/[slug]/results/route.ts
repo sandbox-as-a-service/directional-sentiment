@@ -14,11 +14,9 @@ export async function GET(_req: NextRequest, ctx: RouteContext<"/api/polls/[slug
     const parsed = ParamsSchema.safeParse(params)
 
     if (!parsed.success) {
-      console.warn(parsed.error.issues)
-      return NextResponse.json(
-        {error: "bad_request", message: z.treeifyError(parsed.error).properties},
-        {status: 400},
-      )
+      const message = z.treeifyError(parsed.error).properties
+      console.warn(message)
+      return NextResponse.json({error: "bad_request", message}, {status: 400})
     }
 
     const supabase = await createSupabaseServerServiceClient()

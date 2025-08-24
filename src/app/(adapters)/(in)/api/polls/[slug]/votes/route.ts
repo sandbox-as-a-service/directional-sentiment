@@ -30,11 +30,9 @@ export async function POST(req: NextRequest, ctx: RouteContext<"/api/polls/[slug
     const body = await req.json()
     const bodyParsed = BodySchema.safeParse(body)
     if (!bodyParsed.success) {
-      console.warn(bodyParsed.error.issues)
-      return NextResponse.json(
-        {error: "bad_request", message: z.treeifyError(bodyParsed.error).properties},
-        {status: 400},
-      )
+      const message = z.treeifyError(bodyParsed.error).properties
+      console.warn(message)
+      return NextResponse.json({error: "bad_request", message}, {status: 400})
     }
 
     const {data} = await (await createSupabaseServerClient()).auth.getUser()
