@@ -4,18 +4,41 @@ import type {PollFeedSource} from "@/app/_domain/ports/out/poll-feed-source"
 import type {PollFeedItem} from "@/app/_domain/use-cases/polls/dto/poll"
 import {getPollFeed} from "@/app/_domain/use-cases/polls/get-poll-feed"
 
-// Helper: newest-first items, 1-minute apart
+// Helper: newest-first items, 1-minute apart, full PollFeedItem shape
 function makeItems(count: number, startISO = "2025-08-20T12:00:00.000Z"): PollFeedItem[] {
   const startMs = new Date(startISO).getTime()
-  return Array.from({length: count}, (_unused, index) => ({
-    pollId: `p${index + 1}`,
-    createdAt: new Date(startMs - index * 60_000).toISOString(), // DESC timestamps
-  }))
+  return Array.from({length: count}, (_unused, index) => {
+    const createdAt = new Date(startMs - index * 60_000).toISOString() // DESC timestamps
+    const pollId = `p${index + 1}`
+    return {
+      pollId,
+      slug: `slug-${pollId}`,
+      question: `Question ${index + 1}?`,
+      status: "open",
+      category: null,
+      openedAt: createdAt,
+      createdAt,
+      options: [
+        {optionId: `${pollId}-o1`, label: "Yes"},
+        {optionId: `${pollId}-o2`, label: "No"},
+      ],
+      results: {
+        total: 0,
+        updatedAt: null,
+        warmingUp: true,
+        items: [
+          {optionId: `${pollId}-o1`, label: "Yes", count: 0, pct: 0},
+          {optionId: `${pollId}-o2`, label: "No", count: 0, pct: 0},
+        ],
+      },
+    }
+  })
 }
 
-// Typed fake implementing PollFeedSource (no `any`, no single-letter vars, Jest v30-typed )
+// Typed fake implementing PollFeedSource (no `any`, no single-letter vars, Jest v30-typed)
 export function makePollFeedSource(allItems: PollFeedItem[]): PollFeedSource {
-  const page = jest.fn<PollFeedSource["page"]>().mockImplementation(async ({limit, cursor}) => {
+  const page = jest.fn<PollFeedSource["page"]>().mockImplementation(async (input) => {
+    const {limit, cursor} = input
     let startIndex = 0
     if (cursor) {
       const cursorIndex = allItems.findIndex((item) => item.createdAt === cursor)
@@ -38,7 +61,7 @@ describe("getPollFeed", () => {
       expect(result.items).toHaveLength(20)
       expect(result.nextCursor).toBe(result.items[19].createdAt)
       // N+1 verified via call arg (impl detail in assertion, not title)
-      expect(poll.page).toHaveBeenCalledWith({limit: 21, cursor: undefined})
+      expect(poll.page).toHaveBeenCalledWith({limit: 21, cursor: undefined, quorum: 30})
     })
 
     it("returns all items and no nextCursor at the end", async () => {
@@ -49,7 +72,7 @@ describe("getPollFeed", () => {
 
       expect(result.items).toHaveLength(20)
       expect(result.nextCursor).toBeUndefined()
-      expect(poll.page).toHaveBeenCalledWith({limit: 21, cursor: undefined})
+      expect(poll.page).toHaveBeenCalledWith({limit: 21, cursor: undefined, quorum: 30})
     })
   })
 
@@ -63,7 +86,7 @@ describe("getPollFeed", () => {
 
       expect(result.items.map((item) => item.pollId)).toEqual(["p4", "p5", "p6"])
       expect(result.nextCursor).toBe(result.items[2].createdAt)
-      expect(poll.page).toHaveBeenCalledWith({limit: 4, cursor})
+      expect(poll.page).toHaveBeenCalledWith({limit: 4, cursor, quorum: 30})
     })
   })
 
@@ -76,7 +99,7 @@ describe("getPollFeed", () => {
 
       expect(result.items).toHaveLength(5)
       expect(result.nextCursor).toBe(result.items[4].createdAt)
-      expect(poll.page).toHaveBeenCalledWith({limit: 6, cursor: undefined})
+      expect(poll.page).toHaveBeenCalledWith({limit: 6, cursor: undefined, quorum: 30})
     })
 
     it("clamps an excessive limit to 50", async () => {
@@ -87,7 +110,7 @@ describe("getPollFeed", () => {
 
       expect(result.items).toHaveLength(50)
       expect(result.nextCursor).toBe(result.items[49].createdAt)
-      expect(poll.page).toHaveBeenCalledWith({limit: 51, cursor: undefined})
+      expect(poll.page).toHaveBeenCalledWith({limit: 51, cursor: undefined, quorum: 30})
     })
 
     it("floors invalid limits to 1", async () => {
@@ -98,7 +121,7 @@ describe("getPollFeed", () => {
 
       expect(result.items).toHaveLength(1)
       expect(result.nextCursor).toBe(result.items[0].createdAt)
-      expect(poll.page).toHaveBeenCalledWith({limit: 2, cursor: undefined})
+      expect(poll.page).toHaveBeenCalledWith({limit: 2, cursor: undefined, quorum: 30})
     })
   })
 
@@ -110,7 +133,7 @@ describe("getPollFeed", () => {
 
       expect(result.items).toHaveLength(0)
       expect(result.nextCursor).toBeUndefined()
-      expect(poll.page).toHaveBeenCalledWith({limit: 21, cursor: undefined})
+      expect(poll.page).toHaveBeenCalledWith({limit: 21, cursor: undefined, quorum: 30})
     })
   })
 })
