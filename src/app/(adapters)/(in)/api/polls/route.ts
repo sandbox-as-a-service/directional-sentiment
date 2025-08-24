@@ -1,13 +1,9 @@
 import {type NextRequest, NextResponse} from "next/server"
 import {z} from "zod"
 
-import {createMemoryPollFeedSource} from "@/app/(adapters)/(out)/memory/create-memory-poll-feed-source"
-import {memoryPollFeed} from "@/app/(adapters)/(out)/memory/fixtures/poll-feed"
 import {createSupabasePollFeedSource} from "@/app/(adapters)/(out)/supabase/create-supabase-poll-feed-source"
 import {createSupabaseServerServiceClient} from "@/app/(adapters)/(out)/supabase/server"
-import {env} from "@/app/_config/env"
 import type {GetPollFeedInput} from "@/app/_domain/ports/in/get-poll-feed"
-import type {PollFeedSource} from "@/app/_domain/ports/out/poll-feed-source"
 import {getPollFeed} from "@/app/_domain/use-cases/polls/get-poll-feed"
 
 const QuerySchema = z.object({
@@ -33,16 +29,9 @@ export async function GET(req: NextRequest) {
     const {limit, cursor} = parsed.data
     const input: GetPollFeedInput = {limit, cursor}
 
-    let source: {poll: PollFeedSource}
-    if (env.USE_MEMORY === "1") {
-      source = {
-        poll: createMemoryPollFeedSource(memoryPollFeed),
-      }
-    } else {
-      const supabase = await createSupabaseServerServiceClient()
-      source = {
-        poll: createSupabasePollFeedSource(supabase),
-      }
+    const supabase = await createSupabaseServerServiceClient()
+    const source = {
+      poll: createSupabasePollFeedSource(supabase),
     }
 
     const data = await getPollFeed({poll: source.poll, input})

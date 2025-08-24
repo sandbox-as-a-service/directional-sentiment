@@ -1,17 +1,13 @@
 import {type NextRequest, NextResponse} from "next/server"
 import {z} from "zod"
 
-import {composeMemorySource} from "@/app/(adapters)/(out)/memory/compose-memory-sources"
 import {createSupabasePollsSource} from "@/app/(adapters)/(out)/supabase/create-supabase-polls-source"
 import {createSupabaseVotesSource} from "@/app/(adapters)/(out)/supabase/create-supabase-votes-source"
 import {
   createSupabaseServerClient,
   createSupabaseServerServiceClient,
 } from "@/app/(adapters)/(out)/supabase/server"
-import {env} from "@/app/_config/env"
 import type {CastVoteInput} from "@/app/_domain/ports/in/cast-vote"
-import type {PollsSource} from "@/app/_domain/ports/out/polls-source"
-import type {VotesSource} from "@/app/_domain/ports/out/votes-source"
 import {castVote} from "@/app/_domain/use-cases/polls/cast-vote"
 
 const ParamsSchema = z.object({slug: z.string().min(1)})
@@ -41,34 +37,21 @@ export async function POST(req: NextRequest, ctx: RouteContext<"/api/polls/[slug
       )
     }
 
-    let userId: string | null = null
+    const {data} = await (await createSupabaseServerClient()).auth.getUser()
 
-    if (env.USE_MEMORY === "1") {
-      userId = req.headers.get("x-user-id")
-    } else {
-      const supabase = await createSupabaseServerClient()
-      const {data} = await supabase.auth.getUser()
-      userId = data?.user?.id ?? null
-    }
-
-    if (!userId) {
+    if (!data?.user?.id) {
       console.warn("auth_session_missing")
       return NextResponse.json({error: "unauthorized"}, {status: 401})
     }
 
-    let source: {polls: PollsSource; votes: VotesSource}
-    if (env.USE_MEMORY === "1") {
-      source = composeMemorySource()
-    } else {
-      const supabase = await createSupabaseServerServiceClient()
-      source = {
-        polls: createSupabasePollsSource(supabase),
-        votes: createSupabaseVotesSource(supabase),
-      }
+    const supabase = await createSupabaseServerServiceClient()
+    const source = {
+      polls: createSupabasePollsSource(supabase),
+      votes: createSupabaseVotesSource(supabase),
     }
 
     const input: CastVoteInput = {
-      userId,
+      userId: data.user.id,
       slug: paramsParsed.data.slug,
       optionId: bodyParsed.data.optionId,
       idempotencyKey: bodyParsed.data.idempotencyKey,

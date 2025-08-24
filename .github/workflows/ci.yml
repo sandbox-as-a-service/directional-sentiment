@@ -32,8 +32,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build Next.js (includes typechecking and linting)
+      - name: Build Next.js (includes typechecking)
         run: pnpm build
+
+      - name: Run ESLint
+        run: pnpm lint
 
       - name: Run Jest Unit Tests
         run: pnpm test:unit:jest:cov
