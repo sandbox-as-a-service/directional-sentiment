@@ -102,3 +102,5 @@ where
   o.poll_id = p.id
   and p.slug = 'should-tipping-end'
   and o.label not in ('Yes', 'No');
+
+commit;
