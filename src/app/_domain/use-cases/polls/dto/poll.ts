@@ -1,7 +1,22 @@
 // Domain DTOs (vendor-agnostic)
-export type PollFeedItem = {pollId: string; createdAt: string}
-export type PollResultsItem = {optionId: string; count: number; pct: number; label: string}
-
 export type PollStatus = "draft" | "open" | "closed"
 export type PollSummary = {pollId: string; status: PollStatus}
 export type PollOption = {optionId: string; label: string}
+
+export type PollResultsItem = {optionId: string; label: string; count: number; pct: number}
+export type PollFeedItem = {
+  pollId: string
+  slug: string
+  question: string
+  status: PollStatus
+  category: string | null
+  openedAt: string | null
+  createdAt: string
+  options: PollOption[]
+  results: {
+    total: number
+    updatedAt: string | null
+    warmingUp: boolean
+    items: PollResultsItem[]
+  }
+}

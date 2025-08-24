@@ -202,3 +202,152 @@ alter table public.poll enable row level security;
 alter table public.poll_option enable row level security;
 
 alter table public.vote enable row level security;
+
+-- =============================================================================
+-- RPC: get_poll_cards(poll_ids uuid[], quorum int)
+-- Purpose: Return card-ready data for a set of polls in ONE call.
+-- Notes:
+--   - Computes "latest per (poll_id, user_id)" using DISTINCT ON (voted_at DESC, id DESC).
+--   - Counts current votes per option (including zero-count options).
+--   - Rounds percentages to 1 decimal.
+--   - Returns JSON arrays for options and results.items to keep the adapter tiny.
+--   - Does NOT touch public.poll.updated_at (that remains "metadata changed").
+-- =============================================================================
+create or replace function public.get_poll_cards (p_poll_ids uuid[], p_quorum int default 30) returns table (
+  poll_id uuid,
+  slug text,
+  question text,
+  status public.poll_status,
+  category text,
+  opened_at timestamptz,
+  created_at timestamptz,
+  -- Simple options list for the UI (order = option.created_at, id)
+  options jsonb,
+  -- Results snapshot
+  results_total bigint,
+  results_updated_at timestamptz,
+  results_warming_up boolean,
+  results_items jsonb
+) language sql stable
+set
+  search_path = public,
+  pg_temp as $$
+  -- Limit to the requested polls
+  with input_polls as (
+    select p.*
+    from public.poll p
+    where p.id = any (p_poll_ids)
+  ),
+
+  -- Latest vote per (poll_id, user_id), using your deterministic tie-breaker
+  latest as (
+    select distinct on (v.poll_id, v.user_id)
+           v.poll_id, v.user_id, v.option_id, v.voted_at, v.id
+    from public.vote v
+    where v.poll_id = any (p_poll_ids)
+    order by v.poll_id, v.user_id, v.voted_at desc, v.id desc
+  ),
+
+  -- Counts per (poll, option) + most recent voted_at per poll
+  tally as (
+    select l.poll_id,
+           l.option_id,
+           count(*)::bigint as count,
+           max(l.voted_at)   as latest_voted_at
+    from latest l
+    group by l.poll_id, l.option_id
+  ),
+
+  -- Per-poll totals and last activity time (read-time derivation)
+  per_poll as (
+    select ip.id          as poll_id,
+           ip.slug,
+           ip.question,
+           ip.status,
+           ip.category,
+           ip.opened_at,
+           ip.created_at,
+           coalesce(sum(t.count) filter (where t.poll_id = ip.id), 0)::bigint as total,
+           max(t.latest_voted_at) filter (where t.poll_id = ip.id)           as updated_at
+    from input_polls ip
+    left join tally t on t.poll_id = ip.id
+    group by ip.id, ip.slug, ip.question, ip.status, ip.category, ip.opened_at, ip.created_at
+  ),
+
+  -- Option rows (include created_at for stable UI ordering)
+  option_rows as (
+    select o.poll_id, o.id as option_id, o.label, o.created_at
+    from public.poll_option o
+    where o.poll_id = any (p_poll_ids)
+  ),
+
+  -- Options with zero-safe counts
+  option_with_counts as (
+    select
+      o.poll_id,
+      o.option_id,
+      o.label,
+      o.created_at,
+      coalesce(t.count, 0)::bigint as count
+    from option_rows o
+    left join tally t
+      on t.poll_id = o.poll_id
+     and t.option_id = o.option_id
+  ),
+
+  -- JSON array of `{optionId,label}` (UI "options" block)
+  options_json as (
+    select
+      o.poll_id,
+      jsonb_agg(
+        jsonb_build_object(
+          'optionId', o.option_id,
+          'label',    o.label
+        )
+        order by o.created_at, o.option_id
+      ) as options
+    from option_rows o
+    group by o.poll_id
+  ),
+
+  -- JSON array of result items `{optionId,label,count,pct}` (UI "results.items")
+  results_items as (
+    select
+      owc.poll_id,
+      jsonb_agg(
+        jsonb_build_object(
+          'optionId', owc.option_id,
+          'label',    owc.label,
+          'count',    owc.count,
+          'pct',
+            case
+              when pp.total > 0
+                then round((owc.count::numeric / nullif(pp.total, 0)::numeric) * 100, 1)
+              else 0
+            end
+        )
+        order by owc.created_at, owc.option_id
+      ) as items
+    from option_with_counts owc
+    join per_poll pp on pp.poll_id = owc.poll_id
+    group by owc.poll_id
+  )
+
+  -- Final card rows (one per poll)
+  select
+    pp.poll_id,
+    pp.slug,
+    pp.question,
+    pp.status,
+    pp.category,
+    pp.opened_at,
+    pp.created_at,
+    coalesce(oj.options, '[]'::jsonb) as options,
+    pp.total                          as results_total,
+    pp.updated_at                     as results_updated_at,
+    (pp.total < p_quorum)             as results_warming_up,
+    coalesce(ri.items, '[]'::jsonb)   as results_items
+  from per_poll pp
+  left join options_json  oj on oj.poll_id = pp.poll_id
+  left join results_items ri on ri.poll_id = pp.poll_id;
+$$;
