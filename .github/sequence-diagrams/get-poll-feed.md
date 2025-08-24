@@ -1,17 +1,17 @@
 # Get Poll Feed Sequence Diagram
 
-This sequence diagram shows the data flow for the `GET /api/polls` endpoint, which implements the poll feed use case with pagination support.
+This sequence diagram shows the data flow for the `GET /api/polls/feed` endpoint, which implements the poll feed use case with pagination support.
 
 ```mermaid
 sequenceDiagram
     participant Client
-    participant Route as API Route<br/>/api/polls/route.ts
+    participant Route as API Route<br/>/api/polls/feed/route.ts
     participant Zod as Zod Validator<br/>QuerySchema
     participant SupabaseAdapter as Supabase Adapter<br/>createPollFeedSource
     participant UseCase as Use Case<br/>getPollFeed
     participant PollFeedSource as PollFeedSource<br/>Port Interface
 
-    Client->>Route: GET /api/polls?limit=20&cursor=2025-01-15T10:00:00Z
+    Client->>Route: GET /api/polls/feed?limit=20&cursor=2025-01-15T10:00:00Z
 
     Note over Route: Input Validation
     Route->>Zod: validate query parameters

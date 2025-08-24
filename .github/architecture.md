@@ -37,7 +37,8 @@ src/app/
 │   │   └── api/
 │   │       ├── health/           # Health check endpoint
 │   │       └── polls/
-│   │           ├── route.ts      # GET /api/polls (poll feed)
+│   │           ├── feed/
+│   │           │   └── route.ts  # GET /api/polls/feed (poll feed)
 │   │           └── [slug]/
 │   │               ├── results/  # GET /api/polls/:slug/results
 │   │               └── votes/    # POST /api/polls/:slug/votes

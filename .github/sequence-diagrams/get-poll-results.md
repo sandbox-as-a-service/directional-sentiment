@@ -58,11 +58,11 @@ sequenceDiagram
         UseCase->>UseCase: calculate percentages with 1 decimal precision
         UseCase->>UseCase: format response with status & timestamp
 
-        UseCase-->>Route: {items, total, status, updatedAt}
+        UseCase-->>Route: {items, total, status, updatedAt, warmingUp, minQuorum}
 
         Note over Route: Response Formatting
         Route->>Route: console.info("🎉")
-        Route-->>Client: 200 OK<br/>{items, total, status, updatedAt}<br/>Cache-Control: no-store
+        Route-->>Client: 200 OK<br/>{items, total, status, updatedAt, warmingUp, minQuorum}<br/>Cache-Control: no-store
     end
 
     Note over Route,Client: Error Handling
@@ -118,17 +118,21 @@ sequenceDiagram
     {
       "optionId": "option-a",
       "count": 15,
-      "pct": 62.5
+      "pct": 62.5,
+      "label": "Strongly Agree"
     },
     {
       "optionId": "option-b",
       "count": 9,
-      "pct": 37.5
+      "pct": 37.5,
+      "label": "Disagree"
     }
   ],
   "total": 24,
   "status": "open",
-  "updatedAt": "2025-08-23T10:30:00.000Z"
+  "updatedAt": "2025-08-23T10:30:00.000Z",
+  "warmingUp": false,
+  "minQuorum": 10
 }
 ```
 
