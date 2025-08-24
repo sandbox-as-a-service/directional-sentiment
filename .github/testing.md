@@ -4,23 +4,10 @@
 
 ### Feature-Based `__tests__` Folders
 
-- **Use `__tests__` folders per feature**: `src/app/_domain/use-cases/polls/__tests__/`
+- **Use `__tests__` folders per feature**: Located within each use case directory (e.g., `src/app/_domain/use-cases/polls/__tests__/`)
 - **Keeps domain folders clean**: DTOs, ports, use cases without test noise
 - **Allows shared fakes/helpers**: Drop in same folder without leaking into prod code
 - **Mirrors feature tree clearly**: `polls/` ↔ `polls/__tests__/`
-
-```
-src/app/_domain/use-cases/polls/
-├── cast-vote.ts
-├── get-poll-feed.ts
-├── get-poll-results.ts
-├── __tests__/              # Test folder per feature
-│   ├── get-poll-feed.test.ts
-│   ├── get-poll-results.test.ts
-│   └── shared-helpers.ts   # Shared test utilities
-└── dto/
-    └── poll.ts
-```
 
 ## Test Structure & Conventions
 
@@ -57,18 +44,6 @@ describe("getPollFeed", () => {
 - **Test titles**: Present tense, behavior-focused, no "should" prefix
 - **Implementation details**: Keep in assertions/comments, not titles
 
-```typescript
-// ✅ Good test titles
-it("returns 20 items and a nextCursor when more exist")
-it("clamps an excessive limit to 50")
-it("returns the next page after the cursor")
-
-// ❌ Avoid these patterns
-it("should return 20 items") // No "should"
-it("fetches N+1 items for pagination") // Implementation detail
-it("works with cursor") // Too vague
-```
-
 ### Typing Rules
 
 - **No `any` types**: Use domain DTOs and port interfaces
@@ -76,49 +51,11 @@ it("works with cursor") // Too vague
 - **Import domain types**: Use `PollFeedSource`, `PollFeedItem`, etc.
 - **Import Jest globals**: Use `import {describe, expect, it, jest} from "@jest/globals"`
 
-```typescript
-import {describe, expect, it, jest} from "@jest/globals"
-
-import type {PollFeedSource} from "@/app/_domain/ports/out/poll-feed-source"
-import type {PollFeedItem} from "@/app/_domain/use-cases/polls/dto/poll"
-
-// Typed mock using Jest v30 generic syntax
-function makePollFeedSource(allItems: PollFeedItem[]): PollFeedSource {
-  const page = jest.fn<PollFeedSource["page"]>().mockImplementation(async ({limit, cursor}) => {
-    // Implementation
-  })
-
-  return {page}
-}
-```
-
 ### Mocks & Test Doubles
 
 - **Prefer in-memory fakes**: Small, deterministic implementations of port interfaces
 - **Implement exact port surface**: Full interface, not partial mocks
 - **Keep fakes typed**: Use domain types, avoid shortcuts
-
-```typescript
-// ✅ Typed fake implementing full port interface
-function makePollFeedSource(allItems: PollFeedItem[]): PollFeedSource {
-  const page = jest.fn<PollFeedSource["page"]>().mockImplementation(async ({limit, cursor}) => {
-    // Deterministic logic matching production behavior
-    let startIndex = 0
-    if (cursor) {
-      const cursorIndex = allItems.findIndex((item) => item.createdAt === cursor)
-      startIndex = cursorIndex === -1 ? allItems.length : cursorIndex + 1
-    }
-    return allItems.slice(startIndex, startIndex + limit)
-  })
-
-  return {page} // Complete interface
-}
-
-// ❌ Avoid partial mocks or any types
-const mockSource = {
-  page: jest.fn().mockResolvedValue(/* any */),
-} as any
-```
 
 ### Test Data & Fixtures
 
@@ -165,21 +102,6 @@ const poll = makePollFeedSource(data)
 - **Name by intent**: `makeItems`, `makePollsSource`, `makeVotesSource` (not "builder" or "factory")
 - **Parameterized but simple**: Accept count/start values, maintain predictable output
 
-```typescript
-// Helper: newest-first items, 1-minute apart
-function makeItems(count: number, startISO = "2025-08-20T12:00:00.000Z"): PollFeedItem[] {
-  const startMs = new Date(startISO).getTime()
-  return Array.from({length: count}, (_unused, index) => ({
-    pollId: `p${index + 1}`,
-    createdAt: new Date(startMs - index * 60_000).toISOString(), // DESC timestamps
-  }))
-}
-
-// Usage in tests
-const data = makeItems(25) // 25 items for pagination test
-const smallData = makeItems(3) // 3 items for edge case
-```
-
 ### Edge Cases & Boundary Testing
 
 - **Empty datasets**: Test with zero items
@@ -187,72 +109,17 @@ const smallData = makeItems(3) // 3 items for edge case
 - **Invalid inputs**: Test validation and error handling
 - **Off-by-one scenarios**: Test pagination boundaries
 
-```typescript
-describe("edge cases", () => {
-  it("returns an empty result for an empty feed", async () => {
-    const poll = makePollFeedSource([])
-    const result = await getPollFeed({poll, input: {}})
-
-    expect(result.items).toHaveLength(0)
-    expect(result.nextCursor).toBeUndefined()
-  })
-})
-
-describe("limit handling", () => {
-  it("clamps an excessive limit to 50", async () => {
-    const data = makeItems(120)
-    const poll = makePollFeedSource(data)
-
-    const result = await getPollFeed({poll, input: {limit: 100}})
-
-    expect(result.items).toHaveLength(50) // Domain policy: max 50
-  })
-})
-```
-
 ### Assertions & Verification
 
 - **Check meaningful state**: Verify lengths, key IDs, critical business fields
 - **Assert domain invariants**: Test policy numbers (defaults, limits) explicitly
 - **Include implementation checks**: Verify adapter calls in assertions/comments
 
-```typescript
-it("returns 20 items and a nextCursor when more exist", async () => {
-  const data = makeItems(25)
-  const poll = makePollFeedSource(data)
-
-  const result = await getPollFeed({poll, input: {}})
-
-  // Domain assertions
-  expect(result.items).toHaveLength(20) // Default page size
-  expect(result.nextCursor).toBe(result.items[19].createdAt)
-
-  // Implementation verification (N+1 fetch for hasMore detection)
-  expect(poll.page).toHaveBeenCalledWith({limit: 21, cursor: undefined})
-})
-```
-
 ### Domain Invariants Testing
 
 - **Treat domain defaults as authoritative**: Use cases enforce policy, not adapters
 - **Test policy numbers explicitly**: Default page sizes, limits, clamps
 - **Verify business rules**: Pagination logic, validation rules, idempotency
-
-```typescript
-describe("limit handling", () => {
-  it("honors a smaller requested limit", async () => {
-    // Test: domain respects user preference within bounds
-  })
-
-  it("clamps an excessive limit to 50", async () => {
-    // Test: domain enforces maximum policy (50 items)
-  })
-
-  it("floors invalid limits to 1", async () => {
-    // Test: domain enforces minimum policy (1 item)
-  })
-})
-```
 
 ## API Testing with Bruno
 
@@ -273,21 +140,3 @@ Bruno test files follow a consistent naming pattern:
 - **Variations**: `{endpoint}-{variant}`
   - `cast-vote-idempotency.bru` - Tests idempotency functionality
   - `cast-vote-different-user.bru` - Tests with different user ID
-
-### Bruno Test Structure
-
-```
-collections/
-├── bruno.json           # Bruno configuration
-├── environments/        # Environment variables
-│   ├── localhost.bru
-│   └── production.bru
-├── health/             # Health check tests
-│   ├── folder.bru      # Folder metadata
-│   └── health.bru      # Health endpoint test
-└── polls/              # Test suites by feature
-    ├── folder.bru      # Folder metadata
-    ├── get-poll-feed-success.bru
-    ├── get-poll-feed-success-limit.bru
-    ├── etc..
-```
