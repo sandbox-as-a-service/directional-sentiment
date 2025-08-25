@@ -1,7 +1,9 @@
 import type {Database} from "./types"
 
-/** Row shape that JSON RPC actually returns (camelCase arrays). */
-export type GetPollCardsRow = {
+export type PollOptionDTO = {optionId: string; label: string}
+export type VoteBreakdownItemDTO = {optionId: string; label: string; count: number; pct: number}
+
+export type GetPollSummariesRow = {
   poll_id: string
   slug: string
   question: string
@@ -9,20 +11,20 @@ export type GetPollCardsRow = {
   category: string | null
   opened_at: string | null
   created_at: string
-  options: {optionId: string; label: string}[]
-  results_total: number
-  results_updated_at: string | null
-  results_warming_up: boolean
-  results_items: {optionId: string; label: string; count: number; pct: number}[]
+  options: PollOptionDTO[]
+  vote_total: number
+  vote_latest_at: string | null
+  below_quorum: boolean
+  vote_breakdown: VoteBreakdownItemDTO[]
 }
 
-/** Override just the RPC signature while keeping the rest of the generated types. */
+// Override just the RPC signature while keeping the rest of the generated types.
 export type DatabaseExtended = Omit<Database, "public"> & {
   public: Omit<Database["public"], "Functions"> & {
-    Functions: Omit<Database["public"]["Functions"], "get_poll_cards"> & {
-      get_poll_cards: {
-        Args: {p_poll_ids: string[]; p_quorum: number}
-        Returns: GetPollCardsRow[]
+    Functions: Omit<Database["public"]["Functions"], "get_poll_summaries"> & {
+      get_poll_summaries: {
+        Args: {poll_ids: string[]; quorum_threshold: number}
+        Returns: Array<GetPollSummariesRow>
       }
     }
   }

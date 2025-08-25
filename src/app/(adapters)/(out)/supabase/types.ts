@@ -836,21 +836,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_poll_cards: {
-        Args: { p_poll_ids: string[]; p_quorum?: number }
+      get_poll_summaries: {
+        Args: { poll_ids: string[]; quorum_threshold: number }
         Returns: {
+          below_quorum: boolean
           category: string
           created_at: string
           opened_at: string
           options: Json
           poll_id: string
           question: string
-          results_items: Json
-          results_total: number
-          results_updated_at: string
-          results_warming_up: boolean
           slug: string
           status: Database["public"]["Enums"]["poll_status"]
+          vote_breakdown: Json
+          vote_latest_at: string
+          vote_total: number
         }[]
       }
     }

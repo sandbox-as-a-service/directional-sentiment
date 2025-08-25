@@ -3,14 +3,15 @@ import type {SupabaseClient} from "@supabase/supabase-js"
 import type {PollFeedSource, PollFeedSourcePageInput} from "@/app/_domain/ports/out/poll-feed-source"
 import type {PollFeedPageItem} from "@/app/_domain/use-cases/polls/dto/poll"
 
-import type {DatabaseExtended, GetPollCardsRow} from "./types-extended"
+import type {DatabaseExtended, GetPollSummariesRow} from "./types-extended"
 
 export function createPollFeedSource(supabase: SupabaseClient<DatabaseExtended>): PollFeedSource {
   return {
     async page(input: PollFeedSourcePageInput): Promise<PollFeedPageItem[]> {
       const {limit, cursor, quorum} = input
 
-      let pageQuery = supabase
+      // 1) Page the base poll rows (keyset pagination: created_at DESC, id DESC).
+      let pagedPollsQuery = supabase
         .from("poll")
         .select("id, created_at")
         .order("created_at", {ascending: false})
@@ -18,51 +19,52 @@ export function createPollFeedSource(supabase: SupabaseClient<DatabaseExtended>)
         .limit(limit)
 
       if (cursor) {
-        pageQuery = pageQuery.lt("created_at", cursor)
+        pagedPollsQuery = pagedPollsQuery.lt("created_at", cursor)
       }
 
-      const pageQueryResult = await pageQuery
+      const pagedPollsResponse = await pagedPollsQuery
 
-      if (pageQueryResult.error) {
-        throw new Error("supabase_query_failed", {cause: pageQueryResult.error})
+      if (pagedPollsResponse.error) {
+        throw new Error("supabase_query_failed", {cause: pagedPollsResponse.error})
       }
 
-      if (!pageQueryResult.data || pageQueryResult.data.length === 0) {
+      if (!pagedPollsResponse.data || pagedPollsResponse.data.length === 0) {
         return []
       }
 
-      const pollIds = pageQueryResult.data.map((row) => row.id)
+      const pollIdsInPageOrder = pagedPollsResponse.data.map((row) => row.id)
 
-      const aggregatedPageQueryResult = await supabase.rpc("get_poll_cards", {
-        p_poll_ids: pollIds,
-        p_quorum: quorum,
+      // 2) Aggregate per-poll summaries via RPC.
+      const summariesRpcResponse = await supabase.rpc("get_poll_summaries", {
+        poll_ids: pollIdsInPageOrder,
+        quorum_threshold: quorum,
       })
 
-      if (aggregatedPageQueryResult.error) {
-        throw new Error("supabase_rpc_failed", {cause: aggregatedPageQueryResult.error})
+      if (summariesRpcResponse.error) {
+        throw new Error("supabase_query_failed", {cause: summariesRpcResponse.error})
       }
 
-      if (!aggregatedPageQueryResult.data || aggregatedPageQueryResult.data.length === 0) {
+      if (!summariesRpcResponse.data || summariesRpcResponse.data.length === 0) {
         return []
       }
 
       // 3) Preserve page order (avoid nullable row issue by explicit type guard)
-      const aggregatedPageResultsById = new Map<string, GetPollCardsRow>()
-      for (const row of aggregatedPageQueryResult.data) {
-        aggregatedPageResultsById.set(row.poll_id, row)
+      const summariesByPollId = new Map<string, GetPollSummariesRow>()
+      for (const summaryRow of summariesRpcResponse.data) {
+        summariesByPollId.set(summaryRow.poll_id, summaryRow)
       }
 
-      // 3) Preserve page order by mapping poll IDs to RPC results
-      const ordered: Array<GetPollCardsRow> = []
-      for (const row of pageQueryResult.data) {
-        const result = aggregatedPageResultsById.get(row.id)
-        if (result) {
-          ordered.push(result)
+      // 4) Preserve page order by mapping poll IDs to RPC results
+      const summariesInPageOrder: Array<GetPollSummariesRow> = []
+      for (const baseRow of pagedPollsResponse.data) {
+        const summary = summariesByPollId.get(baseRow.id)
+        if (summary) {
+          summariesInPageOrder.push(summary)
         }
       }
 
-      // 4) Map RPC rows → domain PollFeedPageItem
-      return ordered.map((row) => ({
+      // 5) Map RPC rows → domain PollFeedPageItem
+      return summariesInPageOrder.map((row) => ({
         pollId: row.poll_id,
         slug: row.slug,
         question: row.question,
@@ -72,10 +74,10 @@ export function createPollFeedSource(supabase: SupabaseClient<DatabaseExtended>)
         createdAt: row.created_at,
         options: row.options,
         results: {
-          total: row.results_total,
-          updatedAt: row.results_updated_at,
-          warmingUp: row.results_warming_up,
-          items: row.results_items,
+          total: row.vote_total,
+          updatedAt: row.vote_latest_at,
+          warmingUp: row.below_quorum,
+          items: row.vote_breakdown,
         },
       }))
     },
