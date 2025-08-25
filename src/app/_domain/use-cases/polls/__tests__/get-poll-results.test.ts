@@ -51,7 +51,6 @@ describe("getPollResults", () => {
 
       // quorum flags
       expect(result.warmingUp).toBe(true) // 3 < 30
-      expect(result.minQuorum).toBe(30)
 
       // timestamp is ISO-like
       expect(typeof result.updatedAt).toBe("string")
@@ -83,7 +82,6 @@ describe("getPollResults", () => {
       expect(result.items).toHaveLength(0)
       expect(result.status).toBe("open")
       expect(result.warmingUp).toBe(true)
-      expect(result.minQuorum).toBe(30)
       expect(typeof result.updatedAt).toBe("string")
     })
 
@@ -148,7 +146,6 @@ describe("getPollResults", () => {
       expect(pctByOption["c"]).toBe(20.0)
 
       expect(result.warmingUp).toBe(true) // 10 < 30
-      expect(result.minQuorum).toBe(30)
     })
 
     it("sets warmingUp = false when total >= minQuorum", async () => {
@@ -164,7 +161,6 @@ describe("getPollResults", () => {
 
       expect(result.total).toBe(30)
       expect(result.warmingUp).toBe(false)
-      expect(result.minQuorum).toBe(30)
     })
   })
 })

@@ -6,7 +6,6 @@ export type GetPollResultsResult = {
   status: PollStatus
   updatedAt: string
   warmingUp: boolean
-  minQuorum: number
 }
 // (unused) if you ever add inputs
 export type GetPollResultsInput = Record<string, never>

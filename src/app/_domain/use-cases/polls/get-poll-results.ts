@@ -76,6 +76,5 @@ export async function getPollResults(args: {
     total: totalVotes,
     updatedAt: new Date().toISOString(), // In-memory when the results were computed. Not when the poll was last updated or when the user voted.
     warmingUp,
-    minQuorum: MIN_QUORUM,
   }
 }
