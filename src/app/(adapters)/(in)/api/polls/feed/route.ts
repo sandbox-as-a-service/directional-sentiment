@@ -12,6 +12,7 @@ const QuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).optional(),
   // Require timezone to keep keyset pagination lexicographically safe.
   cursor: z.iso.datetime({offset: true}).optional(),
+  quorum: z.coerce.number().min(1).optional(),
 })
 
 export async function GET(req: NextRequest) {
@@ -25,8 +26,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({error: "bad_request", message}, {status: 400})
     }
 
-    const {limit, cursor} = parsed.data
-    const input: GetPollFeedInput = {limit, cursor}
+    const {limit, cursor, quorum} = parsed.data
+    const input: GetPollFeedInput = {limit, cursor, quorum}
 
     const supabase = await createSupabaseServerServiceClient()
     const source = {
