@@ -31,10 +31,10 @@ export async function GET(req: NextRequest) {
 
     const supabase = await createSupabaseServerServiceClient()
     const source = {
-      poll: createPollFeedSource(supabase),
+      pollFeed: createPollFeedSource(supabase),
     }
 
-    const data = await getPollFeed({poll: source.poll, input})
+    const data = await getPollFeed({pollFeed: source.pollFeed, input})
 
     console.info("🎉")
     return NextResponse.json(data, {status: 200, headers: {"Cache-Control": "no-store"}})

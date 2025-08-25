@@ -48,7 +48,7 @@ describe("getPollFeed", () => {
 
 - **No `any` types**: Use domain DTOs and port interfaces
 - **Type mocks with Jest v30**: Use `jest.fn<FunctionType>()` for proper typing
-- **Import domain types**: Use `PollFeedSource`, `PollFeedItem`, etc.
+- **Import domain types**: Use `PollFeedSource`, `PollFeedPageItem`, etc.
 - **Import Jest globals**: Use `import {describe, expect, it, jest} from "@jest/globals"`
 
 ### Mocks & Test Doubles

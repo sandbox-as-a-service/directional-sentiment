@@ -1,7 +1,7 @@
-import type {PollFeedItem} from "@/app/_domain/use-cases/polls/dto/poll"
+import type {PollFeedPageItem} from "@/app/_domain/use-cases/polls/dto/poll"
 
 export type GetPollFeedResult = {
-  items: PollFeedItem[]
+  items: PollFeedPageItem[]
   nextCursor?: string
 }
 export type GetPollFeedInput = {

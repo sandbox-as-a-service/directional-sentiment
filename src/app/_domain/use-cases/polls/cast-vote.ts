@@ -43,15 +43,15 @@ export async function castVote(args: {
 
   // 3) Ensure the option belongs to the poll.
   const options = await polls.listOptions(poll.pollId)
-  const optionExistsInPoll = options.some((o) => o.optionId === optionId)
-  if (!optionExistsInPoll) {
+  const optionBelongs = options.some((option) => option.optionId === optionId)
+  if (!optionBelongs) {
     throw new Error("option_mismatch")
   }
 
   // 4) Idempotency check (no-op if user already used this key for this action).
   if (idempotencyKey) {
-    const alreadyUsed = await votes.wasUsed(userId, idempotencyKey)
-    if (alreadyUsed) {
+    const idempotentHit = await votes.wasUsed({userId, idempotencyKey})
+    if (idempotentHit) {
       return // idempotent no-op
     }
   }

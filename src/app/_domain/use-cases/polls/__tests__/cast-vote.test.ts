@@ -3,17 +3,17 @@ import {describe, expect, it, jest} from "@jest/globals"
 import type {PollsSource} from "@/app/_domain/ports/out/polls-source"
 import type {VotesSource} from "@/app/_domain/ports/out/votes-source"
 import {castVote} from "@/app/_domain/use-cases/polls/cast-vote"
-import type {PollOption, PollSummary} from "@/app/_domain/use-cases/polls/dto/poll"
+import type {PollOptionItem, PollSummary} from "@/app/_domain/use-cases/polls/dto/poll"
 
-function makePollsSource(summary: PollSummary | null, options: PollOption[]): PollsSource {
+function makePollsSource(summary: PollSummary | null, options: Array<PollOptionItem>): PollsSource {
   const findBySlug = jest.fn<PollsSource["findBySlug"]>().mockResolvedValue(summary)
   const listOptions = jest.fn<PollsSource["listOptions"]>().mockResolvedValue(options)
   return {findBySlug, listOptions}
 }
 
-function makeVotesSource(opts?: {wasUsed?: boolean}): VotesSource {
+function makeVotesSource(options?: {wasUsed?: boolean}): VotesSource {
   const tallyCurrent = jest.fn<VotesSource["tallyCurrent"]>().mockResolvedValue([]) // not used here
-  const wasUsed = jest.fn<VotesSource["wasUsed"]>().mockResolvedValue(opts?.wasUsed ?? false)
+  const wasUsed = jest.fn<VotesSource["wasUsed"]>().mockResolvedValue(options?.wasUsed ?? false)
   const append = jest.fn<VotesSource["append"]>().mockResolvedValue(undefined)
   return {tallyCurrent, wasUsed, append}
 }
@@ -21,7 +21,7 @@ function makeVotesSource(opts?: {wasUsed?: boolean}): VotesSource {
 describe("castVote", () => {
   describe("happy path", () => {
     it("appends a vote for an open poll with a valid option", async () => {
-      const polls = makePollsSource({pollId: "p1", status: "open"}, [{optionId: "o1"}])
+      const polls = makePollsSource({pollId: "p1", status: "open"}, [{optionId: "o1", label: "Option 1"}])
       const votes = makeVotesSource()
 
       await castVote({
@@ -58,7 +58,7 @@ describe("castVote", () => {
     })
 
     it("throws when the poll is closed", async () => {
-      const polls = makePollsSource({pollId: "p1", status: "closed"}, [{optionId: "o1"}])
+      const polls = makePollsSource({pollId: "p1", status: "closed"}, [{optionId: "o1", label: "Option 1"}])
       const votes = makeVotesSource()
 
       await expect(
@@ -71,7 +71,7 @@ describe("castVote", () => {
     })
 
     it("throws when the option does not belong to the poll", async () => {
-      const polls = makePollsSource({pollId: "p1", status: "open"}, [{optionId: "oA"}])
+      const polls = makePollsSource({pollId: "p1", status: "open"}, [{optionId: "oA", label: "Option A"}])
       const votes = makeVotesSource()
 
       await expect(
@@ -86,7 +86,7 @@ describe("castVote", () => {
 
   describe("idempotency", () => {
     it("does not append when the idempotency key was already used", async () => {
-      const polls = makePollsSource({pollId: "p9", status: "open"}, [{optionId: "o9"}])
+      const polls = makePollsSource({pollId: "p9", status: "open"}, [{optionId: "o9", label: "Option 9"}])
       const votes = makeVotesSource({wasUsed: true})
 
       await castVote({
@@ -95,12 +95,12 @@ describe("castVote", () => {
         input: {slug: "s9", optionId: "o9", userId: "u9", idempotencyKey: "key-1"},
       })
 
-      expect(votes.wasUsed).toHaveBeenCalledWith("u9", "key-1")
+      expect(votes.wasUsed).toHaveBeenCalledWith({userId: "u9", idempotencyKey: "key-1"})
       expect(votes.append).not.toHaveBeenCalled()
     })
 
     it("appends when the idempotency key has not been used", async () => {
-      const polls = makePollsSource({pollId: "p2", status: "open"}, [{optionId: "o2"}])
+      const polls = makePollsSource({pollId: "p2", status: "open"}, [{optionId: "o2", label: "Option 2"}])
       const votes = makeVotesSource({wasUsed: false})
 
       await castVote({
@@ -109,7 +109,7 @@ describe("castVote", () => {
         input: {slug: "s2", optionId: "o2", userId: "u2", idempotencyKey: "key-2"},
       })
 
-      expect(votes.wasUsed).toHaveBeenCalledWith("u2", "key-2")
+      expect(votes.wasUsed).toHaveBeenCalledWith({userId: "u2", idempotencyKey: "key-2"})
       expect(votes.append).toHaveBeenCalledWith({
         pollId: "p2",
         optionId: "o2",
@@ -119,7 +119,7 @@ describe("castVote", () => {
     })
 
     it("does not call idempotency check when no key is provided", async () => {
-      const polls = makePollsSource({pollId: "p3", status: "open"}, [{optionId: "o3"}])
+      const polls = makePollsSource({pollId: "p3", status: "open"}, [{optionId: "o3", label: "Option 3"}])
       const votes = makeVotesSource()
 
       await castVote({

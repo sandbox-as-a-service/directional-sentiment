@@ -28,7 +28,7 @@ sequenceDiagram
     UseCase->>UseCase: limit = Math.min(input.limit ?? 20, 50)
     UseCase->>PollFeedSource: page({limit: limit + 1, cursor})    PollFeedSource->>SupabaseAdapter: page({limit: 21, cursor})
     Note over SupabaseAdapter: SELECT id, created_at<br/>FROM polls<br/>WHERE created_at < cursor<br/>ORDER BY created_at DESC<br/>LIMIT 21
-    SupabaseAdapter-->>PollFeedSource: Array<PollFeedItem>
+    SupabaseAdapter-->>PollFeedSource: Array<PollFeedPageItem>
 
     PollFeedSource-->>UseCase: rows (21 items max)
 
@@ -37,7 +37,7 @@ sequenceDiagram
     UseCase->>UseCase: slice = hasMore ? rows.slice(0, limit) : rows
     UseCase->>UseCase: nextCursor = hasMore ? slice[last].createdAt : undefined
 
-    UseCase-->>Route: {items: PollFeedItem[], nextCursor?: string}
+    UseCase-->>Route: {items: PollFeedPageItem[], nextCursor?: string}
 
     Note over Route: Response Formatting
     Route->>Route: console.info("🎉")
@@ -79,7 +79,7 @@ sequenceDiagram
 
 ### 5. Response Format
 
-Returns paginated feed data with `items` array and optional `nextCursor`. See [`PollFeedItem`](../../../src/app/_domain/use-cases/polls/dto/poll.ts) for complete response structure.
+Returns paginated feed data with `items` array and optional `nextCursor`. See [`PollFeedPageItem`](../../../src/app/_domain/use-cases/polls/dto/poll.ts) for complete response structure.
 
 ## Architectural Patterns
 

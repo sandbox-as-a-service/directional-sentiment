@@ -1,14 +1,14 @@
 import type {SupabaseClient} from "@supabase/supabase-js"
 
-import type {PollFeedPageInput, PollFeedSource} from "@/app/_domain/ports/out/poll-feed-source"
-import type {PollFeedItem} from "@/app/_domain/use-cases/polls/dto/poll"
+import type {PollFeedSource, PollFeedSourcePageInput} from "@/app/_domain/ports/out/poll-feed-source"
+import type {PollFeedPageItem} from "@/app/_domain/use-cases/polls/dto/poll"
 
 import type {DatabaseExtended} from "./types-extended"
 
 // Talks Supabase; returns card-ready items by calling the DB RPC for the current page.
 export function createPollFeedSource(supabase: SupabaseClient<DatabaseExtended>): PollFeedSource {
   return {
-    async page({limit, cursor, quorum}: PollFeedPageInput): Promise<PollFeedItem[]> {
+    async page({limit, cursor, quorum}: PollFeedSourcePageInput): Promise<PollFeedPageItem[]> {
       // 1) Page poll ids (use-case already applies N+1)
       let pageQuery = supabase
         .from("poll")
@@ -64,7 +64,7 @@ export function createPollFeedSource(supabase: SupabaseClient<DatabaseExtended>)
         }
       }
 
-      // 4) Map RPC rows → domain PollFeedItem (cast Json fields to the exact shapes our DTO expects)
+      // 4) Map RPC rows → domain PollFeedPageItem (cast Json fields to the exact shapes our DTO expects)
       return ordered.map((row) => ({
         pollId: row.poll_id,
         slug: row.slug,

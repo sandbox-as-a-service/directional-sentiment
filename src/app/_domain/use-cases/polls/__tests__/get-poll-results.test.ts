@@ -7,7 +7,7 @@ import {getPollResults} from "@/app/_domain/use-cases/polls/get-poll-results"
 
 type OptionMeta = {optionId: string; label: string; createdAt?: string}
 
-export function makePollsSource(summary: PollSummary | null, options: OptionMeta[] = []): PollsSource {
+export function makePollsSource(summary: PollSummary | null, options: Array<OptionMeta> = []): PollsSource {
   const findBySlug = jest.fn<PollsSource["findBySlug"]>().mockResolvedValue(summary)
   const listOptions = jest.fn<PollsSource["listOptions"]>().mockResolvedValue(options)
   return {findBySlug, listOptions}

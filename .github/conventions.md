@@ -24,16 +24,40 @@ docs(readme): update setup instructions
 
 ## Naming Conventions
 
+### Files & Directories
+
 - **Files**: kebab-case (`get-poll-feed.ts`)
 - **Directories**: Next.js route groups `(adapters)`, `(in)`, `(out)`, `(public)`
+
+### Functions & Types
+
 - **Functions**: camelCase factory functions (`createPollFeedSource`)
 - **Types**: PascalCase with descriptive suffixes (`PollFeedSource`, `GetPollFeedInput`)
 - **Constants**: SCREAMING_SNAKE_CASE for module-level constants
-- **Variables**: Use descriptive names that convey purpose and context
-  - ✅ `pollTitle`, `userEmail`, `voteCount`
-  - ❌ `title`, `email`, `count`
-  - ✅ `currentPoll`, `selectedOption`
-  - ❌ `x`, `y`,
+
+### Variables
+
+Use descriptive names that convey purpose and context:
+
+- ✅ `pollTitle`, `userEmail`, `voteCount`
+- ❌ `title`, `email`, `count`
+- ✅ `currentPoll`, `selectedOption`
+- ❌ `x`, `y`,
+
+**Transformation Variables**
+
+Use specific names when the transformation is specific:
+
+- ✅ `clampedLimit` (after Math.min/Math.max clamp)
+- ✅ `resolvedQuorum` (after applying defaults)
+- ✅ `validatedLimit` (after schema/domain validation)
+
+**Collection Variables**
+
+Avoid vague prefixes like `effective*` on collections. Name by role instead:
+
+- ✅ `pageItems`, `visibleItems`, `currentPolls`
+- ❌ `effectivePolls`, `effectiveItems`
 
 ## Import Organization
 

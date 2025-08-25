@@ -24,8 +24,6 @@ import type {VotesSource} from "@/app/_domain/ports/out/votes-source"
  *   and fill missing tallies with { count: 0 } before computing percentages.
  */
 
-const MIN_QUORUM = 30 // tune/externally config if you want
-
 export async function getPollResults(args: {
   polls: PollsSource
   votes: VotesSource
@@ -39,40 +37,44 @@ export async function getPollResults(args: {
     throw new Error("not_found")
   }
 
+  const {pollId, status} = poll
+
   // 2) Fetch all options and current tallies (latest-per-user) in parallel.
-  const [allOptions, tallies] = await Promise.all([
-    polls.listOptions(poll.pollId), // [{ optionId }]
-    votes.tallyCurrent(poll.pollId), // [{ optionId, count }] (only >0 rows)
-  ])
+  const [options, tallies] = await Promise.all([polls.listOptions(pollId), votes.tallyCurrent(pollId)])
 
   // 3) Ensure every option appears (0 when missing).
   const tallyByOptionId = new Map<string, number>()
-  for (const {optionId, count} of tallies) tallyByOptionId.set(optionId, count)
+  for (const tally of tallies) {
+    tallyByOptionId.set(tally.optionId, tally.count)
+  }
 
-  const mergedCounts = allOptions.map(({optionId, label}) => ({
-    optionId,
-    label,
-    count: tallyByOptionId.get(optionId) ?? 0,
+  const mergedCounts = options.map((option) => ({
+    optionId: option.optionId,
+    label: option.label,
+    count: tallyByOptionId.get(option.optionId) ?? 0,
   }))
 
   // 4) Totals + percentages (1 decimal place). Guard divide-by-zero.
-  const totalVotes = mergedCounts.reduce((sum, {count}) => sum + count, 0)
+  const totalVotes = mergedCounts.reduce((sum, item) => {
+    return sum + item.count
+  }, 0)
 
-  const items = mergedCounts.map(({optionId, count, label}) => ({
-    optionId,
-    count,
-    label,
-    pct: totalVotes === 0 ? 0 : Math.round((count * 1000) / totalVotes) / 10,
+  const items = mergedCounts.map((option) => ({
+    optionId: option.optionId,
+    count: option.count,
+    label: option.label,
+    pct: totalVotes === 0 ? 0 : Math.round((option.count * 1000) / totalVotes) / 10,
   }))
 
   // 5) Include warming-up signal
+  const MIN_QUORUM = 30 // tune/externally config if you want
   const warmingUp = totalVotes < MIN_QUORUM
 
   return {
     items,
+    status,
     total: totalVotes,
-    status: poll.status,
-    updatedAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(), // In-memory when the results were computed. Not when the poll was last updated or when the user voted.
     warmingUp,
     minQuorum: MIN_QUORUM,
   }

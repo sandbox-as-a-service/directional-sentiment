@@ -1,13 +1,17 @@
-// Out-port: append vote, idempotency check, and snapshot tally
-export type VotesAppendInput = {
+export type VotesSourceAppendInput = {
   pollId: string
   optionId: string
   userId: string
   idempotencyKey?: string
 }
 
+export type VotesSourceWasUsedInput = {
+  userId: string
+  idempotencyKey: string
+}
+
 export type VotesSource = {
-  append(input: VotesAppendInput): Promise<void>
-  wasUsed(userId: string, idempotencyKey: string): Promise<boolean>
+  append(input: VotesSourceAppendInput): Promise<void>
+  wasUsed(input: VotesSourceWasUsedInput): Promise<boolean>
   tallyCurrent(pollId: string): Promise<Array<{optionId: string; count: number}>>
 }

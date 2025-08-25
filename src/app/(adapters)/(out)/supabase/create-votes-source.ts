@@ -20,7 +20,7 @@ export function createVotesSource(supabase: SupabaseClient<DatabaseExtended>): V
       }
     },
 
-    async wasUsed(userId, idempotencyKey) {
+    async wasUsed({userId, idempotencyKey}) {
       const {count, error} = await supabase
         .from("vote")
         .select("id", {count: "exact", head: true})
