@@ -1,11 +1,11 @@
 meta {
-  name: cast-vote-error-404
+  name: cast-vote-success-idempotency
   type: http
-  seq: 9
+  seq: 11
 }
 
 post {
-  url: {{URL}}/api/polls/nonexistent-poll/votes
+  url: {{URL}}/api/polls/ketchup-on-steak/votes
   body: json
   auth: inherit
 }
@@ -17,7 +17,7 @@ headers {
 body:json {
   {
     "optionId": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
-    "idempotencyKey": "not-found-test"
+    "idempotencyKey": "repeated-key-test"
   }
 }
 
