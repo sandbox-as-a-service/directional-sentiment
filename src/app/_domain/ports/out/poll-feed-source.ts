@@ -51,5 +51,5 @@ export type PollFeedSource = {
    *   - Returned items are in `opened_at DESC` order. Callers must not
    *     depend on any other implicit ordering.
    */
-  page(input: PollFeedSourcePageInput): Promise<PollFeedPageItem[]>
+  page(input: PollFeedSourcePageInput): Promise<Array<PollFeedPageItem>>
 }

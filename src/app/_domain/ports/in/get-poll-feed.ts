@@ -4,6 +4,7 @@ export type GetPollFeedResult = {
   items: PollFeedPageItem[]
   nextCursor?: string
 }
+
 export type GetPollFeedInput = {
   limit?: number
   cursor?: string

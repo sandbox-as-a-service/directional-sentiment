@@ -1,3 +1,5 @@
+import type {PollTallyItem} from "@/app/_domain/use-cases/polls/dto/poll"
+
 export type VotesSourceAppendInput = {
   pollId: string
   optionId: string
@@ -60,5 +62,5 @@ export type VotesSource = {
    * - Output: Array<{ optionId: string; count: number }>.
    * - Errors: Throw "supabase_query_failed" (or similar infra error) if query fails.
    */
-  tallyCurrent(pollId: string): Promise<Array<{optionId: string; count: number}>>
+  tallyCurrent(pollId: string): Promise<Array<PollTallyItem>>
 }

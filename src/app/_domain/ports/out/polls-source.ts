@@ -1,3 +1,5 @@
+import type {PollMetadata, PollOptionItem} from "@/app/_domain/use-cases/polls/dto/poll"
+
 /**
  * PollsSource
  *
@@ -15,7 +17,7 @@ export type PollsSource = {
    * - Notes: status is a DB field; caller (use case) is responsible for interpreting it
    *   (e.g., "open" vs "closed") and throwing domain errors like "not_found"/"poll_closed".
    */
-  findBySlug(slug: string): Promise<{pollId: string; status: "draft" | "open" | "closed"} | null>
+  findBySlug(slug: string): Promise<PollMetadata | null>
 
   /**
    * listOptions
@@ -27,5 +29,5 @@ export type PollsSource = {
    * - Semantics: presence in this list is the sole source of truth for option membership;
    *   the use case enforces membership and throws "option_mismatch" if needed.
    */
-  listOptions(pollId: string): Promise<Array<{optionId: string; label: string}>>
+  listOptions(pollId: string): Promise<Array<PollOptionItem>>
 }

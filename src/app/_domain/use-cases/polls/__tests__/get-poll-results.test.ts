@@ -2,18 +2,19 @@ import {describe, expect, it, jest} from "@jest/globals"
 
 import type {PollsSource} from "@/app/_domain/ports/out/polls-source"
 import type {VotesSource} from "@/app/_domain/ports/out/votes-source"
-import type {PollSummary} from "@/app/_domain/use-cases/polls/dto/poll"
+import type {PollMetadata, PollOptionItem, PollTallyItem} from "@/app/_domain/use-cases/polls/dto/poll"
 import {getPollResults} from "@/app/_domain/use-cases/polls/get-poll-results"
 
-type OptionMeta = {optionId: string; label: string; createdAt?: string}
-
-export function makePollsSource(summary: PollSummary | null, options: Array<OptionMeta> = []): PollsSource {
+export function makePollsSource(
+  summary: PollMetadata | null,
+  options: Array<PollOptionItem> = [],
+): PollsSource {
   const findBySlug = jest.fn<PollsSource["findBySlug"]>().mockResolvedValue(summary)
   const listOptions = jest.fn<PollsSource["listOptions"]>().mockResolvedValue(options)
   return {findBySlug, listOptions}
 }
 
-export function makeVotesSource(tallies: Array<{optionId: string; count: number}>): VotesSource {
+export function makeVotesSource(tallies: Array<PollTallyItem>): VotesSource {
   const tallyCurrent = jest.fn<VotesSource["tallyCurrent"]>().mockResolvedValue(tallies)
   const wasUsed = jest.fn<VotesSource["wasUsed"]>().mockResolvedValue(false)
   const append = jest.fn<VotesSource["append"]>().mockResolvedValue(undefined)

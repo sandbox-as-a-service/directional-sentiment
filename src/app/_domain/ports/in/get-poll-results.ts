@@ -1,7 +1,7 @@
 import type {PollResultsItem, PollStatus} from "@/app/_domain/use-cases/polls/dto/poll"
 
 export type GetPollResultsResult = {
-  items: PollResultsItem[]
+  items: Array<PollResultsItem>
   total: number
   status: PollStatus
   updatedAt: string

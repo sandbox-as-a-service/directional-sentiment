@@ -3,9 +3,9 @@ import {describe, expect, it, jest} from "@jest/globals"
 import type {PollsSource} from "@/app/_domain/ports/out/polls-source"
 import type {VotesSource} from "@/app/_domain/ports/out/votes-source"
 import {castVote} from "@/app/_domain/use-cases/polls/cast-vote"
-import type {PollOptionItem, PollSummary} from "@/app/_domain/use-cases/polls/dto/poll"
+import type {PollMetadata, PollOptionItem} from "@/app/_domain/use-cases/polls/dto/poll"
 
-function makePollsSource(summary: PollSummary | null, options: Array<PollOptionItem>): PollsSource {
+function makePollsSource(summary: PollMetadata | null, options: Array<PollOptionItem>): PollsSource {
   const findBySlug = jest.fn<PollsSource["findBySlug"]>().mockResolvedValue(summary)
   const listOptions = jest.fn<PollsSource["listOptions"]>().mockResolvedValue(options)
   return {findBySlug, listOptions}
