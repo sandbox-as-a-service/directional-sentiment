@@ -27,7 +27,6 @@ sequenceDiagram
     Note over UseCase: Pagination Logic
     UseCase->>UseCase: limit = Math.min(input.limit ?? 20, 50)
     UseCase->>PollFeedSource: page({limit: limit + 1, cursor})    PollFeedSource->>SupabaseAdapter: page({limit: 21, cursor})
-    Note over SupabaseAdapter: SELECT id, created_at<br/>FROM polls<br/>WHERE created_at < cursor<br/>ORDER BY created_at DESC<br/>LIMIT 21
     SupabaseAdapter-->>PollFeedSource: Array<PollFeedPageItem>
 
     PollFeedSource-->>UseCase: rows (21 items max)

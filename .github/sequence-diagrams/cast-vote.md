@@ -43,7 +43,6 @@ sequenceDiagram
         UseCase->>PollsSource: findBySlug("poll-123")
 
         PollsSource->>SupabasePollsAdapter: findBySlug("poll-123")
-        Note over SupabasePollsAdapter: SELECT id, status<br/>FROM poll<br/>WHERE slug = 'poll-123'<br/>LIMIT 1
         SupabasePollsAdapter-->>PollsSource: {pollId, status} | null
 
         PollsSource-->>UseCase: pollSummary
@@ -61,7 +60,6 @@ sequenceDiagram
             UseCase->>PollsSource: listOptions(pollId)
 
             PollsSource->>SupabasePollsAdapter: listOptions(pollId)
-            Note over SupabasePollsAdapter: SELECT optionId<br/>FROM poll_option<br/>WHERE pollId = pollId
             SupabasePollsAdapter-->>PollsSource: Array<{optionId}>
 
             PollsSource-->>UseCase: options
@@ -75,7 +73,6 @@ sequenceDiagram
                 UseCase->>VotesSource: wasUsed(userId, idempotencyKey)
 
                 VotesSource->>SupabaseVotesAdapter: wasUsed(userId, idempotencyKey)
-                Note over SupabaseVotesAdapter: SELECT COUNT(*)<br/>FROM vote<br/>WHERE userId = userId<br/>AND idempotencyKey = key
                 SupabaseVotesAdapter-->>VotesSource: boolean
 
                 VotesSource-->>UseCase: used
@@ -88,7 +85,6 @@ sequenceDiagram
                     UseCase->>VotesSource: append({pollId, optionId, userId, idempotencyKey})
 
                     VotesSource->>SupabaseVotesAdapter: append(voteData)
-                    Note over SupabaseVotesAdapter: INSERT INTO vote<br/>(pollId, optionId, userId, idempotencyKey)<br/>VALUES (...)
                     SupabaseVotesAdapter-->>VotesSource: void
 
                     VotesSource-->>UseCase: void

@@ -32,7 +32,6 @@ sequenceDiagram
     UseCase->>PollsSource: findBySlug("poll-123")
 
     PollsSource->>SupabasePollsAdapter: findBySlug("poll-123")
-    Note over SupabasePollsAdapter: SELECT id, status<br/>FROM poll<br/>WHERE slug = 'poll-123'<br/>LIMIT 1
     SupabasePollsAdapter-->>PollsSource: {pollId, status} | null
 
     PollsSource-->>UseCase: pollSummary
@@ -46,7 +45,6 @@ sequenceDiagram
         UseCase->>VotesSource: tallyCurrent(pollId)
 
         VotesSource->>SupabaseVotesAdapter: tallyCurrent(pollId)
-        Note over SupabaseVotesAdapter: SELECT id, userId, optionId, votedAt<br/>FROM vote<br/>WHERE pollId = pollId<br/>ORDER BY votedAt DESC, id DESC
         Note over SupabaseVotesAdapter: Client-side reduction:<br/>latest vote per user
         SupabaseVotesAdapter-->>VotesSource: Array<{optionId, count}>
 
