@@ -9,7 +9,7 @@ import {
 } from "@/app/(adapters)/(out)/supabase/server"
 import type {CastVoteInput} from "@/app/_domain/ports/in/cast-vote"
 import {castVote} from "@/app/_domain/use-cases/polls/cast-vote"
-import {logError, toError} from "@/app/_infra/logging/error"
+import {logError, toError} from "@/app/_infra/logging/console-error"
 
 const ParamsSchema = z.object({slug: z.string().min(1)})
 

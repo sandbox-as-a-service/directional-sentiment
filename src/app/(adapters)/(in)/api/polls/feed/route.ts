@@ -5,7 +5,7 @@ import {createPollFeedSource} from "@/app/(adapters)/(out)/supabase/create-poll-
 import {createSupabaseServerServiceClient} from "@/app/(adapters)/(out)/supabase/server"
 import type {GetPollFeedInput} from "@/app/_domain/ports/in/get-poll-feed"
 import {getPollFeed} from "@/app/_domain/use-cases/polls/get-poll-feed"
-import {logError, toError} from "@/app/_infra/logging/error"
+import {logError, toError} from "@/app/_infra/logging/console-error"
 
 const QuerySchema = z.object({
   // Pass through undefined so domain can apply its own default.
