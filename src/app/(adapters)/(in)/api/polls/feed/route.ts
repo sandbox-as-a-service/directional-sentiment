@@ -13,7 +13,7 @@ const QuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).optional(),
   // Require timezone to keep keyset pagination lexicographically safe.
   cursor: z.iso.datetime({offset: true}).optional(),
-  quorum: z.coerce.number().min(1).optional(),
+  quorum: z.coerce.number().optional(),
 })
 
 export async function GET(req: NextRequest) {
