@@ -4,6 +4,8 @@ import {type NextRequest, NextResponse} from "next/server"
 import {env} from "@/app/_config/env"
 import type {Middleware} from "@/app/_infra/edge/compose"
 
+import {logError, toError} from "../../loggin/error"
+
 export const withSupabase: Middleware = async (req: NextRequest, res: NextResponse) => {
   // carry forward anything earlier middlewares already set
   let out = res
@@ -46,8 +48,8 @@ export const withSupabase: Middleware = async (req: NextRequest, res: NextRespon
     return out
   } catch (e) {
     // fail-closed: if Supabase throws, break requests
-    const message = e instanceof Error ? e.message : String(e)
-    console.error(message)
+    const error = toError(e)
+    logError(error)
 
     return NextResponse.json({message: "service_unavailable"}, {status: 503})
   }

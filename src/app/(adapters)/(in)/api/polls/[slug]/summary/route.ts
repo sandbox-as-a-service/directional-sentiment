@@ -5,6 +5,7 @@ import {createPollSummarySource} from "@/app/(adapters)/(out)/supabase/create-po
 import {createSupabaseServerServiceClient} from "@/app/(adapters)/(out)/supabase/server"
 import {GetPollSummaryInput} from "@/app/_domain/ports/in/get-poll-summary"
 import {getPollSummary} from "@/app/_domain/use-cases/polls/get-poll-summary"
+import {logError, toError} from "@/app/_infra/loggin/error"
 
 const ParamsSchema = z.object({slug: z.string().min(1)})
 
@@ -43,16 +44,15 @@ export async function GET(req: NextRequest, ctx: RouteContext<"/api/polls/[slug]
     console.info("🎉")
     return NextResponse.json(data, {status: 200, headers: {"Cache-Control": "no-store"}})
   } catch (e) {
-    const message = e instanceof Error ? e.message : String(e)
-    const cause = e instanceof Error ? (e.cause ?? "") : ""
-    console.error(message, cause)
+    const error = toError(e)
+    logError(error)
 
-    if (message === "not_found") {
-      return NextResponse.json({error: "not_found"}, {status: 404})
+    if (error.message.startsWith("supabase")) {
+      return NextResponse.json({error: "service_unavailable"}, {status: 503})
     }
 
-    if (message.startsWith("supabase")) {
-      return NextResponse.json({error: "service_unavailable"}, {status: 503})
+    if (error.message === "not_found") {
+      return NextResponse.json({error: "not_found"}, {status: 404})
     }
 
     return NextResponse.json({error: "internal_server_error"}, {status: 500})

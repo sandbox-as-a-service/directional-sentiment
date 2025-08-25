@@ -5,6 +5,7 @@ import {createPollFeedSource} from "@/app/(adapters)/(out)/supabase/create-poll-
 import {createSupabaseServerServiceClient} from "@/app/(adapters)/(out)/supabase/server"
 import type {GetPollFeedInput} from "@/app/_domain/ports/in/get-poll-feed"
 import {getPollFeed} from "@/app/_domain/use-cases/polls/get-poll-feed"
+import {logError, toError} from "@/app/_infra/loggin/error"
 
 const QuerySchema = z.object({
   // Pass through undefined so domain can apply its own default.
@@ -39,11 +40,10 @@ export async function GET(req: NextRequest) {
     console.info("🎉")
     return NextResponse.json(data, {status: 200, headers: {"Cache-Control": "no-store"}})
   } catch (e) {
-    const message = e instanceof Error ? e.message : String(e)
-    const cause = e instanceof Error ? (e.cause ?? "") : ""
-    console.error(message, cause)
+    const error = toError(e)
+    logError(error)
 
-    if (message.startsWith("supabase")) {
+    if (error.message.startsWith("supabase")) {
       return NextResponse.json({error: "service_unavailable"}, {status: 503})
     }
 
