@@ -4,8 +4,6 @@ import type {PollsSource} from "@/app/_domain/ports/out/polls-source"
 
 import type {DatabaseExtended} from "./types-extended"
 
-// MVP-friendly: we compute “latest per user” in the adapter by pulling votes for a poll and reducing in memory.
-// Later, flip to a Postgres view/materialized view and change only this file.
 export function createPollsSource(supabase: SupabaseClient<DatabaseExtended>): PollsSource {
   return {
     async findBySlug(slug) {
