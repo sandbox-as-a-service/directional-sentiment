@@ -4,6 +4,5 @@ export type CastVoteInput = {
   userId: string
   idempotencyKey?: string
 }
-
-// Optional: if you ever want to return a result
+// (unused): if you ever want to return a result
 export type CastVoteResult = string

@@ -8,5 +8,5 @@ export type GetPollResultsResult = {
   warmingUp: boolean
   minQuorum: number
 }
-// (optional) if you ever add inputs
+// (unused) if you ever add inputs
 export type GetPollResultsInput = Record<string, never>
