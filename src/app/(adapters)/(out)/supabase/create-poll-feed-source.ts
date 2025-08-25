@@ -8,12 +8,13 @@ import type {DatabaseExtended, GetPollSummariesRow} from "./types-extended"
 export function createPollFeedSource(supabase: SupabaseClient<DatabaseExtended>): PollFeedSource {
   return {
     async page(input: PollFeedSourcePageInput): Promise<PollFeedPageItem[]> {
-      const {limit, cursor, quorum} = input
+      const {limit, cursor, quorum, statuses} = input
 
       // 1) Page the base poll rows (keyset pagination: created_at DESC, id DESC).
       let pagedPollsQuery = supabase
         .from("poll")
         .select("id, created_at")
+        .in("status", statuses)
         .order("created_at", {ascending: false})
         .order("id", {ascending: false})
         .limit(limit)

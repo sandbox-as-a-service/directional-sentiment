@@ -59,7 +59,12 @@ describe("getPollFeed", () => {
       expect(result.items).toHaveLength(20)
       expect(result.nextCursor).toBe(result.items[19].createdAt)
       // N+1 verified via call arg (impl detail in assertion, not title)
-      expect(pollFeed.page).toHaveBeenCalledWith({limit: 21, cursor: undefined, quorum: 30})
+      expect(pollFeed.page).toHaveBeenCalledWith({
+        limit: 21,
+        cursor: undefined,
+        quorum: 30,
+        statuses: ["open"],
+      })
     })
 
     it("returns all items and no nextCursor at the end", async () => {
@@ -70,7 +75,12 @@ describe("getPollFeed", () => {
 
       expect(result.items).toHaveLength(20)
       expect(result.nextCursor).toBeUndefined()
-      expect(pollFeed.page).toHaveBeenCalledWith({limit: 21, cursor: undefined, quorum: 30})
+      expect(pollFeed.page).toHaveBeenCalledWith({
+        limit: 21,
+        cursor: undefined,
+        quorum: 30,
+        statuses: ["open"],
+      })
     })
   })
 
@@ -84,7 +94,7 @@ describe("getPollFeed", () => {
 
       expect(result.items.map((item) => item.pollId)).toEqual(["p4", "p5", "p6"])
       expect(result.nextCursor).toBe(result.items[2].createdAt)
-      expect(pollFeed.page).toHaveBeenCalledWith({limit: 4, cursor, quorum: 30})
+      expect(pollFeed.page).toHaveBeenCalledWith({limit: 4, cursor, quorum: 30, statuses: ["open"]})
     })
   })
 
@@ -97,7 +107,12 @@ describe("getPollFeed", () => {
 
       expect(result.items).toHaveLength(5)
       expect(result.nextCursor).toBe(result.items[4].createdAt)
-      expect(pollFeed.page).toHaveBeenCalledWith({limit: 6, cursor: undefined, quorum: 30})
+      expect(pollFeed.page).toHaveBeenCalledWith({
+        limit: 6,
+        cursor: undefined,
+        quorum: 30,
+        statuses: ["open"],
+      })
     })
 
     it("clamps an excessive limit to 50", async () => {
@@ -108,7 +123,12 @@ describe("getPollFeed", () => {
 
       expect(result.items).toHaveLength(50)
       expect(result.nextCursor).toBe(result.items[49].createdAt)
-      expect(pollFeed.page).toHaveBeenCalledWith({limit: 51, cursor: undefined, quorum: 30})
+      expect(pollFeed.page).toHaveBeenCalledWith({
+        limit: 51,
+        cursor: undefined,
+        quorum: 30,
+        statuses: ["open"],
+      })
     })
 
     it("floors invalid limits to 1", async () => {
@@ -119,7 +139,12 @@ describe("getPollFeed", () => {
 
       expect(result.items).toHaveLength(1)
       expect(result.nextCursor).toBe(result.items[0].createdAt)
-      expect(pollFeed.page).toHaveBeenCalledWith({limit: 2, cursor: undefined, quorum: 30})
+      expect(pollFeed.page).toHaveBeenCalledWith({
+        limit: 2,
+        cursor: undefined,
+        quorum: 30,
+        statuses: ["open"],
+      })
     })
   })
 
@@ -131,7 +156,12 @@ describe("getPollFeed", () => {
 
       expect(result.items).toHaveLength(0)
       expect(result.nextCursor).toBeUndefined()
-      expect(pollFeed.page).toHaveBeenCalledWith({limit: 21, cursor: undefined, quorum: 30})
+      expect(pollFeed.page).toHaveBeenCalledWith({
+        limit: 21,
+        cursor: undefined,
+        quorum: 30,
+        statuses: ["open"],
+      })
     })
   })
 })

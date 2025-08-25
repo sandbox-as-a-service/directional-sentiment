@@ -1,6 +1,8 @@
 import type {GetPollFeedInput, GetPollFeedResult} from "@/app/_domain/ports/in/get-poll-feed"
 import type {PollFeedSource} from "@/app/_domain/ports/out/poll-feed-source"
 
+import type {PollStatus} from "./dto/poll"
+
 /**
  * getPollFeed
  *
@@ -31,6 +33,7 @@ export async function getPollFeed(args: {
   const DEFAULT_LIMIT = 20
   const MAX_LIMIT = 50
   const DEFAULT_QUORUM = 30 // tune/externally config if you want
+  const DEFAULT_FEED_STATUSES: PollStatus[] = ["open"] // domain policy
 
   // Clamp the requested limit between 1 and MAX_LIMIT
   // Math.max(requested, 1) ensures minimum value of 1
@@ -41,8 +44,16 @@ export async function getPollFeed(args: {
   // Quorum controls when the UI shows the "Warming up" state (total < quorum).
   const quorumThreshold = quorum ?? DEFAULT_QUORUM
 
+  // Hardcoded for now. Might expose later to query params
+  const statuses = DEFAULT_FEED_STATUSES
+
   // Fetch one extra record (N+1). If it exists, we know there’s another page.
-  const polls = await pollFeed.page({limit: pageSize + 1, cursor, quorum: quorumThreshold})
+  const polls = await pollFeed.page({
+    cursor,
+    statuses,
+    limit: pageSize + 1,
+    quorum: quorumThreshold,
+  })
 
   // Return only the requested amount; keep the extra record private.
   const hasMore = polls.length > pageSize

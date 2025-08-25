@@ -1,4 +1,4 @@
-import type {PollFeedPageItem} from "@/app/_domain/use-cases/polls/dto/poll"
+import type {PollFeedPageItem, PollStatus} from "@/app/_domain/use-cases/polls/dto/poll"
 
 export type GetPollFeedResult = {
   items: PollFeedPageItem[]
@@ -8,4 +8,5 @@ export type GetPollFeedInput = {
   limit?: number
   cursor?: string
   quorum?: number
+  statuses?: PollStatus[]
 }
