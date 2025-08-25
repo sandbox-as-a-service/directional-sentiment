@@ -3,13 +3,13 @@ import type {SupabaseClient} from "@supabase/supabase-js"
 import type {PollFeedSource, PollFeedSourcePageInput} from "@/app/_domain/ports/out/poll-feed-source"
 import type {PollFeedPageItem} from "@/app/_domain/use-cases/polls/dto/poll"
 
-import type {DatabaseExtended} from "./types-extended"
+import type {DatabaseExtended, GetPollCardsRow} from "./types-extended"
 
-// Talks Supabase; returns card-ready items by calling the DB RPC for the current page.
 export function createPollFeedSource(supabase: SupabaseClient<DatabaseExtended>): PollFeedSource {
   return {
-    async page({limit, cursor, quorum}: PollFeedSourcePageInput): Promise<PollFeedPageItem[]> {
-      // 1) Page poll ids (use-case already applies N+1)
+    async page(input: PollFeedSourcePageInput): Promise<PollFeedPageItem[]> {
+      const {limit, cursor, quorum} = input
+
       let pageQuery = supabase
         .from("poll")
         .select("id, created_at")
@@ -21,65 +21,60 @@ export function createPollFeedSource(supabase: SupabaseClient<DatabaseExtended>)
         pageQuery = pageQuery.lt("created_at", cursor)
       }
 
-      const {data: pageRows, error: pageError} = await pageQuery
+      const pageQueryResult = await pageQuery
 
-      if (pageError) {
-        throw new Error("supabase_query_failed", {cause: pageError})
+      if (pageQueryResult.error) {
+        throw new Error("supabase_query_failed", {cause: pageQueryResult.error})
       }
 
-      if (!pageRows || pageRows.length === 0) {
+      if (!pageQueryResult.data || pageQueryResult.data.length === 0) {
         return []
       }
 
-      const pollIds = pageRows.map((r) => r.id)
+      const pollIds = pageQueryResult.data.map((row) => row.id)
 
-      // 2) Project card-ready rows via RPC
-      const {data: rpcRows, error: rpcError} = await supabase.rpc("get_poll_cards", {
+      const aggregatedPageQueryResult = await supabase.rpc("get_poll_cards", {
         p_poll_ids: pollIds,
         p_quorum: quorum,
       })
 
-      if (rpcError) {
-        throw new Error("supabase_rpc_failed", {cause: rpcError})
+      if (aggregatedPageQueryResult.error) {
+        throw new Error("supabase_rpc_failed", {cause: aggregatedPageQueryResult.error})
       }
 
-      if (!rpcRows || rpcRows.length === 0) {
+      if (!aggregatedPageQueryResult.data || aggregatedPageQueryResult.data.length === 0) {
         return []
       }
 
-      type RpcRow = DatabaseExtended["public"]["Functions"]["get_poll_cards"]["Returns"][number]
-
       // 3) Preserve page order (avoid nullable row issue by explicit type guard)
-      const rpcResultsById = new Map<string, RpcRow>()
-      for (const rpcRow of rpcRows) {
-        rpcResultsById.set(rpcRow.poll_id, rpcRow)
+      const aggregatedPageResultsById = new Map<string, GetPollCardsRow>()
+      for (const row of aggregatedPageQueryResult.data) {
+        aggregatedPageResultsById.set(row.poll_id, row)
       }
 
       // 3) Preserve page order by mapping poll IDs to RPC results
-      const ordered: RpcRow[] = []
-      for (const pageRow of pageRows) {
-        const rpcResult = rpcResultsById.get(pageRow.id)
-        if (rpcResult) {
-          ordered.push(rpcResult)
+      const ordered: Array<GetPollCardsRow> = []
+      for (const row of pageQueryResult.data) {
+        const result = aggregatedPageResultsById.get(row.id)
+        if (result) {
+          ordered.push(result)
         }
       }
 
-      // 4) Map RPC rows → domain PollFeedPageItem (cast Json fields to the exact shapes our DTO expects)
+      // 4) Map RPC rows → domain PollFeedPageItem
       return ordered.map((row) => ({
         pollId: row.poll_id,
         slug: row.slug,
         question: row.question,
         status: row.status,
-        category: row.category, // DTO allows string | null; assign is safe
-        openedAt: row.opened_at, // DTO allows string | null; assign is safe
+        category: row.category,
+        openedAt: row.opened_at,
         createdAt: row.created_at,
-        // RPC emits JSON arrays with these exact keys; cast once and pass through.
         options: row.options,
         results: {
-          total: Number(row.results_total ?? 0),
+          total: row.results_total,
           updatedAt: row.results_updated_at,
           warmingUp: row.results_warming_up,
-          // RPC emits JSON arrays with these exact keys; cast once and pass through.
           items: row.results_items,
         },
       }))
