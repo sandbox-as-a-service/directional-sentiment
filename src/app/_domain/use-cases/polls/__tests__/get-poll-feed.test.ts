@@ -63,7 +63,6 @@ describe("getPollFeed", () => {
         limit: 21,
         cursor: undefined,
         quorum: 30,
-        statuses: ["open"],
       })
     })
 
@@ -79,7 +78,6 @@ describe("getPollFeed", () => {
         limit: 21,
         cursor: undefined,
         quorum: 30,
-        statuses: ["open"],
       })
     })
   })
@@ -94,7 +92,7 @@ describe("getPollFeed", () => {
 
       expect(result.items.map((item) => item.pollId)).toEqual(["p4", "p5", "p6"])
       expect(result.nextCursor).toBe(result.items[2].createdAt)
-      expect(pollFeed.page).toHaveBeenCalledWith({limit: 4, cursor, quorum: 30, statuses: ["open"]})
+      expect(pollFeed.page).toHaveBeenCalledWith({limit: 4, cursor, quorum: 30})
     })
   })
 
@@ -111,7 +109,6 @@ describe("getPollFeed", () => {
         limit: 6,
         cursor: undefined,
         quorum: 30,
-        statuses: ["open"],
       })
     })
 
@@ -127,7 +124,6 @@ describe("getPollFeed", () => {
         limit: 51,
         cursor: undefined,
         quorum: 30,
-        statuses: ["open"],
       })
     })
 
@@ -143,7 +139,6 @@ describe("getPollFeed", () => {
         limit: 2,
         cursor: undefined,
         quorum: 30,
-        statuses: ["open"],
       })
     })
   })
@@ -160,7 +155,6 @@ describe("getPollFeed", () => {
         limit: 21,
         cursor: undefined,
         quorum: 30,
-        statuses: ["open"],
       })
     })
   })

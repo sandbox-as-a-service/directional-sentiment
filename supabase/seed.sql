@@ -1,22 +1,20 @@
--- seeds/opinion_registry_seed_trimmed_with_users.sql
+-- seeds/opinion_registry_seed.sql
 begin;
 
--- Ensure pgcrypto
+-- Keep UUID generation available
 create extension if not exists pgcrypto;
 
 -- =========================================================
--- A) Prune any old sample polls (cascades options & votes)
+-- Nuke existing sample data (DEV ONLY)
+-- - Truncate polls; CASCADE clears poll_option and vote
 -- =========================================================
-delete from public.poll
-where
-  slug in (
-    'ketchup-on-steak',
-    'nba-goat',
-    'pineapple-on-pizza'
-  );
+truncate table public.poll cascade;
 
 -- =========================================================
--- B) Upsert the two polls (force OPEN)
+-- Seed: two OPEN polls with realistic, staggered timestamps
+-- - created_at is when the poll was authored
+-- - opened_at is when it became visible in the feed
+-- - updated_at set to opened_at on insert for sanity
 -- =========================================================
 insert into
   public.poll (
@@ -26,7 +24,9 @@ insert into
     category,
     opened_at,
     closed_at,
-    featured_at
+    featured_at,
+    created_at,
+    updated_at
   )
 values
   (
@@ -34,30 +34,26 @@ values
     'What''s the #1 Ben & Jerry''s flavor?',
     'open',
     'Products',
-    now(),
+    '2025-08-24T16:30:00Z', -- opened yesterday afternoon UTC
     null,
-    null
+    null,
+    '2025-08-20T14:00:00Z', -- authored a few days earlier
+    '2025-08-24T16:30:00Z'
   ),
   (
     'should-tipping-end',
     'Should the US move away from tipping?',
     'open',
     'Politics',
-    now(),
+    '2025-08-25T09:05:00Z', -- opened today morning UTC (newer)
     null,
-    null
-  )
-on conflict (slug) do update
-set
-  question = excluded.question,
-  status = 'open',
-  category = excluded.category,
-  opened_at = coalesce(public.poll.opened_at, excluded.opened_at),
-  closed_at = null,
-  featured_at = null;
+    null,
+    '2025-08-21T11:15:00Z',
+    '2025-08-25T09:05:00Z'
+  );
 
 -- =========================================================
--- C) Options — Ben & Jerry's (keep as-is)
+-- Options — Ben & Jerry's
 -- =========================================================
 insert into
   public.poll_option (poll_id, label)
@@ -74,11 +70,10 @@ from
       ('Chocolate Fudge Brownie')
   ) as x (label) on true
 where
-  p.slug = 'best-bj-flavor'
-on conflict (poll_id, label) do nothing;
+  p.slug = 'best-bj-flavor';
 
 -- =========================================================
--- D) Options — Tipping (ONLY Yes / No)
+-- Options — Tipping (Yes/No)
 -- =========================================================
 insert into
   public.poll_option (poll_id, label)
@@ -93,14 +88,6 @@ from
       ('No')
   ) as x (label) on true
 where
-  p.slug = 'should-tipping-end'
-on conflict (poll_id, label) do nothing;
-
--- Prune any other pre-existing options for this poll
-delete from public.poll_option o using public.poll p
-where
-  o.poll_id = p.id
-  and p.slug = 'should-tipping-end'
-  and o.label not in ('Yes', 'No');
+  p.slug = 'should-tipping-end';
 
 commit;

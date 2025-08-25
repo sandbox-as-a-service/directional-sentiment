@@ -9,7 +9,7 @@ export type GetPollSummariesRow = {
   question: string
   status: Database["public"]["Enums"]["poll_status"]
   category: string | null
-  opened_at: string | null
+  opened_at: string
   created_at: string
   options: PollOptionDTO[]
   vote_total: number

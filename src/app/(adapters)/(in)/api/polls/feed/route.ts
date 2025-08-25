@@ -11,8 +11,7 @@ const QuerySchema = z.object({
   // Keep min/max so bad values 0 or 999 get a 400 before hitting the domain.
   limit: z.coerce.number().int().min(1).max(50).optional(),
   // Require timezone to keep keyset pagination lexicographically safe.
-  // ISO datetime helper; default disallows offsets, accepts "Z"
-  cursor: z.iso.datetime().optional(),
+  cursor: z.iso.datetime({offset: true}).optional(),
 })
 
 export async function GET(req: NextRequest) {

@@ -10,7 +10,7 @@ export type PollFeedPageItem = {
   question: string
   status: PollStatus
   category: string | null
-  openedAt: string | null
+  openedAt: string
   createdAt: string
   options: Array<PollOptionItem>
   results: {

@@ -11,11 +11,12 @@
 --   - Trigger keeps poll.updated_at fresh on UPDATE
 -- =============================================================================
 -- --------- Poll feed (public): status='open' + keyset pagination ---------------
--- WHERE status='open' AND created_at < :cursor
--- ORDER BY created_at DESC, id DESC
-create index if not exists idx_poll_open_created_desc on public.poll (created_at desc, id desc)
+-- WHERE status='open' AND opened_at < :cursor
+-- ORDER BY opened_at DESC, id DESC
+create index if not exists idx_poll_open_opened_desc on public.poll (opened_at desc, id desc)
 where
-  status = 'open';
+  status = 'open'
+  and opened_at is not null;
 
 -- --------- Poll options lookups ------------------------------------------------
 -- SELECT id,label FROM poll_option WHERE poll_id = :id
