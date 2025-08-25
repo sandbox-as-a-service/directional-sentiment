@@ -123,6 +123,26 @@ erDiagram
 - `auth.users` cascade deletes remove user's votes
 - Poll deletion cascades to options and votes
 
+### Database Functions
+
+#### `get_poll_cards()` - Aggregated Poll Data
+
+- **Purpose**: Single-query retrieval of poll metadata + vote tallies for multiple polls
+- **Usage**: Powers poll feed and results endpoints with pre-calculated percentages
+- **Performance**: Eliminates N+1 queries by batching poll data retrieval
+- **Domain Logic**: **Read-only aggregation only** - contains no business rules or validation
+- **Returns**: Complete poll cards with options, vote counts, and calculated percentages
+
+**Key Features**:
+
+- Latest-wins vote calculation using `DISTINCT ON (voted_at DESC, id DESC)`
+- Zero-safe option counts (includes options with no votes)
+- Percentage rounding to 1 decimal place
+- JSON arrays for UI-ready data structures
+- Respects quorum thresholds for "warming up" status
+
+This function is purely a performance optimization for read operations and does not modify data or enforce domain logic.
+
 ## TypeScript Types
 
 **Generated Types Location**: `src/app/(adapters)/(out)/supabase/types.ts`
