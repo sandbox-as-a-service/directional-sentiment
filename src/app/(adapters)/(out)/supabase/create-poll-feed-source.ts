@@ -1,13 +1,12 @@
 import type {SupabaseClient} from "@supabase/supabase-js"
 
-import type {PollFeedSource, PollFeedSourcePageInput} from "@/app/_domain/ports/out/poll-feed-source"
-import type {PollFeedPageItem} from "@/app/_domain/use-cases/polls/dto/poll"
+import type {PollFeedSource} from "@/app/_domain/ports/out/poll-feed-source"
 
 import type {DatabaseExtended, GetPollSummariesRow} from "./types-extended"
 
 export function createPollFeedSource(supabase: SupabaseClient<DatabaseExtended>): PollFeedSource {
   return {
-    async page(input: PollFeedSourcePageInput): Promise<PollFeedPageItem[]> {
+    async page(input) {
       const {limit, cursor, quorum} = input
 
       let pagedPollsQuery = supabase
