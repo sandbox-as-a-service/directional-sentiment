@@ -5,7 +5,7 @@ import {createPollsSource} from "@/app/(adapters)/(out)/supabase/create-polls-so
 import {createVotesSource} from "@/app/(adapters)/(out)/supabase/create-votes-source"
 import {createSupabaseServerServiceClient} from "@/app/(adapters)/(out)/supabase/server"
 import {getPollResults} from "@/app/_domain/use-cases/polls/get-poll-results"
-import {logError, toError} from "@/app/_infra/loggin/error"
+import {logError, toError} from "@/app/_infra/logging/error"
 
 const ParamsSchema = z.object({slug: z.string().min(1)})
 
