@@ -6,6 +6,7 @@ import {env} from "@/app/_config/env"
 
 import {DatabaseExtended} from "./types-extended"
 
+// Use for supabase.auth calls
 export async function createSupabaseServerClient() {
   const cookieStore = await cookies()
 
@@ -31,6 +32,7 @@ export async function createSupabaseServerClient() {
   )
 }
 
+// Use for supabase read and write calls excluding auth
 export async function createSupabaseServerServiceClient() {
   return createClient<DatabaseExtended>(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
     auth: {persistSession: false, autoRefreshToken: false},
