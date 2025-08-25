@@ -3,8 +3,7 @@ import {type NextRequest, NextResponse} from "next/server"
 
 import {env} from "@/app/_config/env"
 import type {Middleware} from "@/app/_infra/edge/compose"
-
-import {logError, toError} from "../../logging/console-error"
+import {logError, toError} from "@/app/_infra/logging/console-error"
 
 export const withSupabase: Middleware = async (req: NextRequest, res: NextResponse) => {
   // carry forward anything earlier middlewares already set
