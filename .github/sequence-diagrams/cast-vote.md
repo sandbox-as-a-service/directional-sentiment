@@ -24,7 +24,6 @@ sequenceDiagram
     ZodBody-->>Route: {optionId: "option-a", idempotencyKey: "key-123"}
 
     Note over Route: Authentication
-    Note over Route: In development: USE_MEMORY=1 uses x-user-id header<br/>In production: Uses Supabase authentication
     Route->>Auth: getUser()
     Auth-->>Route: userId | null
 
@@ -131,13 +130,11 @@ sequenceDiagram
 
 ### 2. Authentication
 
-- **Development Mode**: `USE_MEMORY=1` uses `x-user-id` header for testing
 - **Production**: Uses Supabase authentication to get authenticated user
 - **Authorization**: Returns 401 if no valid user found
 
 ### 3. Adapter Selection
 
-- **Development Mode**: `USE_MEMORY=1` uses shared singleton for state consistency
 - **Production**: Creates separate Supabase adapters for polls and votes
 - **Port Pattern**: Both implementations provide `PollsSource` and `VotesSource` interfaces
 
@@ -167,7 +164,11 @@ sequenceDiagram
 - **Atomic Operation**: Single database insert with all vote data
 - **Success Response**: Returns 204 No Content on successful vote cast
 
-### 5. Data Sources (Supabase Adapters)
+### 5. Response Format
+
+Returns `204 No Content` with no response body on successful vote casting. The operation is idempotent when using `idempotencyKey`.
+
+### 6. Data Sources (Supabase Adapters)
 
 - **Polls Adapter**: Handles poll metadata and options queries
 - **Votes Adapter**: Handles vote storage and idempotency checks

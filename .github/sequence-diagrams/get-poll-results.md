@@ -20,7 +20,6 @@ sequenceDiagram
     Zod-->>Route: {slug: "poll-123"}
 
     Note over Route: Adapter Creation
-    Note over Route: In development: USE_MEMORY=1 uses shared singleton for state consistency<br/>In production: Uses Supabase database
     Route->>SupabasePollsAdapter: createPollsSource(client)
     Route->>SupabaseVotesAdapter: createVotesSource(client)
     SupabasePollsAdapter-->>Route: PollsSource implementation
@@ -86,7 +85,6 @@ sequenceDiagram
 
 ### 2. Adapter Selection
 
-- **Development Mode**: `USE_MEMORY=1` uses shared singleton for state consistency
 - **Production**: Creates separate Supabase adapters for polls and votes
 - **Port Pattern**: Both implementations provide `PollsSource` and `VotesSource` interfaces
 
@@ -112,29 +110,7 @@ sequenceDiagram
 
 ### 5. Response Format
 
-```json
-{
-  "items": [
-    {
-      "optionId": "option-a",
-      "count": 15,
-      "pct": 62.5,
-      "label": "Strongly Agree"
-    },
-    {
-      "optionId": "option-b",
-      "count": 9,
-      "pct": 37.5,
-      "label": "Disagree"
-    }
-  ],
-  "total": 24,
-  "status": "open",
-  "updatedAt": "2025-08-23T10:30:00.000Z",
-  "warmingUp": false,
-  "minQuorum": 10
-}
-```
+Returns poll results with vote tallies and percentages. See [`PollResultsItem`](../../../src/app/_domain/use-cases/polls/dto/poll.ts) for complete response structure.
 
 ## Architectural Patterns
 
@@ -142,5 +118,4 @@ sequenceDiagram
 - **Multiple Port Pattern**: Uses both `PollsSource` and `VotesSource` ports
 - **Dependency Injection**: Use case receives both adapters through dependency injection
 - **Error Mapping**: Domain errors mapped to appropriate HTTP status codes
-- **State Consistency**: Memory source singleton ensures votes persist across routes
 - **Real-time Calculation**: Results computed on-demand from current vote state

@@ -18,7 +18,6 @@ sequenceDiagram
     Zod-->>Route: {limit: 20, cursor: "2025-01-15T10:00:00Z"}
 
     Note over Route: Adapter Creation
-    Note over Route: In development: USE_MEMORY=1 enables in-memory fixtures<br/>In production: Uses Supabase database
     Route->>SupabaseAdapter: createPollFeedSource(client)
     SupabaseAdapter-->>Route: PollFeedSource implementation
 
@@ -63,9 +62,8 @@ sequenceDiagram
 
 ### 2. Adapter Selection
 
-- **Development Mode**: `USE_MEMORY=1` switches to in-memory fixtures for testing
 - **Production**: Uses Supabase database with real-time data
-- **Port Pattern**: Both adapters implement `PollFeedSource` interface
+- **Port Pattern**: Adapter implements `PollFeedSource` interface
 
 ### 3. Domain Logic (Use Case)
 
@@ -73,7 +71,7 @@ sequenceDiagram
 - **Pagination**: Requests `limit + 1` to detect if more pages exist
 - **Cursor Generation**: Uses last item's `createdAt` as next page cursor
 
-### 4. Data Source (Supabase Adapter)
+### 4. Data Sources (Supabase Adapter)
 
 - **SQL Query**: `ORDER BY created_at DESC` for newest-first ordering
 - **Keyset Pagination**: `WHERE created_at < cursor` prevents duplicates
@@ -81,22 +79,11 @@ sequenceDiagram
 
 ### 5. Response Format
 
-```json
-{
-  "items": [
-    {
-      "pollId": "poll-123",
-      "createdAt": "2025-01-15T10:00:00Z"
-    }
-  ],
-  "nextCursor": "2025-01-14T15:30:00Z"
-}
-```
+Returns paginated feed data with `items` array and optional `nextCursor`. See [`PollFeedItem`](../../../src/app/_domain/use-cases/polls/dto/poll.ts) for complete response structure.
 
 ## Architectural Patterns
 
 - **Hexagonal Architecture**: Clear separation between domain and infrastructure
-- **Port/Adapter Pattern**: `PollFeedSource` port with multiple implementations
+- **Port/Adapter Pattern**: `PollFeedSource` port with Supabase implementation
 - **Dependency Injection**: Use case receives adapter through dependency injection
 - **Error Mapping**: Domain errors mapped to appropriate HTTP status codes
-- **Environment Switching**: Seamless testing/production mode switching
