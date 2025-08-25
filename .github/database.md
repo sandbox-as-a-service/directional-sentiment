@@ -149,13 +149,22 @@ This function is purely a performance optimization for read operations and does 
 
 This file contains auto-generated TypeScript definitions for all database tables and is the **authoritative reference** for schema structure. It scales automatically with database changes and should be used instead of manually maintaining type definitions.
 
-**Usage Pattern**:
+**Extended Types Location**: `src/app/(adapters)/(out)/supabase/types-extended.ts`
+
+This file extends the generated types to provide proper TypeScript support for the `get_poll_cards` SQL function. The extended types are derived from the same Supabase typegen command but add strongly-typed function signatures and return types that the auto-generation doesn't handle correctly for custom SQL functions.
+
+**Usage Patterns**:
 
 ```typescript
+// Standard table types
 import type {Database} from "@/app/(adapters)/(out)/supabase/types"
+// Extended types for SQL functions
+import type {DatabaseExtended, GetPollCardsRow} from "@/app/(adapters)/(out)/supabase/types-extended"
 
 type Poll = Database["public"]["Tables"]["poll"]["Row"]
 type Vote = Database["public"]["Tables"]["vote"]["Insert"]
+
+type PollCard = GetPollCardsRow
 ```
 
 ## Migration Management
