@@ -14,6 +14,7 @@ This directory contains modular instructions for AI coding assistants working on
 
 - [`sequence-diagrams/get-poll-feed.md`](./sequence-diagrams/get-poll-feed.md) - Complete data flow for GET /api/polls endpoint with pagination
 - [`sequence-diagrams/get-poll-results.md`](./sequence-diagrams/get-poll-results.md) - Complete data flow for GET /api/polls/:slug/results endpoint with vote tallying
+- [`sequence-diagrams/get-poll-summary.md`](./sequence-diagrams/get-poll-summary.md) - Complete data flow for GET /api/polls/:slug/summary endpoint
 - [`sequence-diagrams/cast-vote.md`](./sequence-diagrams/cast-vote.md) - Complete data flow for POST /api/polls/:slug/votes endpoint with validation and idempotency
 
 ## Quick Reference
