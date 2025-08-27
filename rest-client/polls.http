@@ -33,7 +33,6 @@ Cookie: sb-iptrquovmtpwcrymnbtc-auth-token=<placeholder>
 # @name castVoteIdempotency
 POST {{URL}}/api/polls/ketchup-on-steak/votes
 Content-Type: application/json
-x-user-id: 1
 
 {
   "optionId": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
