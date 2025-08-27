@@ -1,0 +1,19 @@
+meta {
+  name: get-poll-summary-success
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{URL}}/api/polls/best-bj-flavor/summary?quorum=5
+  body: json
+  auth: inherit
+}
+
+params:query {
+  quorum: 5
+}
+
+settings {
+  encodeUrl: true
+}
