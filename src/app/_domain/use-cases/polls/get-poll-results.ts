@@ -1,6 +1,7 @@
 import type {GetPollResultsResult} from "@/app/_domain/ports/in/get-poll-results"
 import type {PollsSource} from "@/app/_domain/ports/out/polls-source"
 import type {VotesSource} from "@/app/_domain/ports/out/votes-source"
+import {POLLS} from "@/app/_domain/config/polls"
 
 /**
  * getPollResults
@@ -67,8 +68,7 @@ export async function getPollResults(args: {
   }))
 
   // 5) Include warming-up signal
-  const MIN_QUORUM = 30 // tune/externally config if you want
-  const warmingUp = totalVotes < MIN_QUORUM
+  const warmingUp = totalVotes < POLLS.DEFAULT_QUORUM
 
   return {
     items,

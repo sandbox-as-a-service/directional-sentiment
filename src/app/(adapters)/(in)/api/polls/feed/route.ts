@@ -1,5 +1,6 @@
 import {type NextRequest, NextResponse} from "next/server"
 import {z} from "zod"
+import {POLLS} from "@/app/_domain/config/polls"
 
 import {createPollFeedSource} from "@/app/(adapters)/(out)/supabase/create-poll-feed-source"
 import {createSupabaseServerServiceClient} from "@/app/(adapters)/(out)/supabase/server"
@@ -10,7 +11,7 @@ import {logError, toError} from "@/app/_infra/logging/console-error"
 const QuerySchema = z.object({
   // Pass through undefined so domain can apply its own default.
   // Keep min/max so bad values 0 or 999 get a 400 before hitting the domain.
-  limit: z.coerce.number().int().min(1).max(50).optional(),
+  limit: z.coerce.number().int().min(1).max(POLLS.FEED_MAX_LIMIT).optional(),
   // Require timezone to keep keyset pagination lexicographically safe.
   cursor: z.iso.datetime({offset: true}).optional(),
   quorum: z.coerce.number().optional(),
