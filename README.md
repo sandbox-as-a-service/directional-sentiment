@@ -44,7 +44,6 @@ Detailed API flow documentation:
 pnpm dev            # Development server with Turbopack
 pnpm build          # Production build
 pnpm test:unit:jest # Run unit tests
-pnpm test:api:bruno # Run API tests
 pnpm lint           # ESLint check
 pnpm format         # Prettier formatting
 ```

@@ -121,22 +121,6 @@ const poll = makePollFeedSource(data)
 - **Test policy numbers explicitly**: Default page sizes, limits, clamps
 - **Verify business rules**: Pagination logic, validation rules, idempotency
 
-## API Testing with Bruno
+## API Testing with REST Client
 
-### Bruno Naming Conventions
-
-Bruno test files follow a consistent naming pattern:
-
-- **Success cases**: `{endpoint}-success[-variant]`
-  - `get-poll-feed-success.bru` - Basic successful poll feed request
-  - `get-poll-feed-success-limit.bru` - Success with custom limit
-  - `cast-vote-success.bru` - Basic successful vote casting
-
-- **Error cases**: `{endpoint}-error-{status-code}[-description]`
-  - `get-poll-feed-error-400-limit-invalid.bru` - 400 error for invalid limit
-  - `cast-vote-error-404.bru` - 404 error for nonexistent poll
-  - `cast-vote-error-422.bru` - 422 error for option mismatch
-
-- **Variations**: `{endpoint}-{variant}`
-  - `cast-vote-idempotency.bru` - Tests idempotency functionality
-  - `cast-vote-different-user.bru` - Tests with different user ID
+API testing is handled manually inside the VS Code editor with the REST Client extension. All REST endpoint definitions are located in the `rest-client/` directory.

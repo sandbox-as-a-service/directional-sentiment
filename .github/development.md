@@ -7,9 +7,6 @@ pnpm dev --turbopack        # Development server with Turbopack
 pnpm test:unit:jest         # Run Jest unit tests
 pnpm test:unit:jest:watch   # Run Jest unit tests in watch mode
 pnpm test:unit:jest:cov      # Run Jest unit tests with coverage
-pnpm test:api:bruno         # Run Bruno API tests
-pnpm test:api:bruno:local   # Run Bruno API tests against localhost
-pnpm test:api:bruno:prod    # Run Bruno API tests against production
 pnpm typegen               # Generate Next.js route types (runs automatically on pnpm dev and pnpm build)
 pnpm build                 # Production build
 pnpm lint                  # ESLint check (runs automatically on pnpm build)
@@ -27,14 +24,6 @@ pnpm format                # Prettier formatting
 - **Run tests**: `pnpm test:unit:jest` (uses Jest v30 with TypeScript configured via `next/jest`)
 - **Configuration**: Jest configured with Next.js helpers for SWC transforms, auto mocking stylesheets/images, loading environment variables, and ignoring node_modules/Next.js build files
 - **Guidelines**: See `testing.md` for detailed methodology and conventions
-
-## API Testing with Bruno
-
-- **Location**: `collections/` directory
-- **Format**: `.bru` files with HTTP requests
-- **Environments**: `collections/environments/` (localhost, production)
-- **Run tests**: `pnpm test:api:bruno:prod` or `pnpm test:api:bruno:local` (uses `@usebruno/cli`)
-- **Guidelines**: See `testing.md` for naming conventions and structure
 
 ## Error Handling
 

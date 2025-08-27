@@ -33,7 +33,7 @@ Domain (`_domain/`) → Use Cases → Ports → Adapters (`(adapters)/`)
 - **Validation**: Zod for runtime type checking
 - **Styling**: Tailwind CSS
 - **Package Manager**: pnpm (specified in packageManager field)
-- **Testing**: Bruno for API testing, Jest for unit testing
+- **Testing**: REST Client for manual API testing, Jest for unit testing
 
 ## General Guidelines
 

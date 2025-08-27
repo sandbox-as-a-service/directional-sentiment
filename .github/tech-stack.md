@@ -36,8 +36,6 @@
 
 - **Unit Testing**: Jest v30 with Next.js helpers (`next/jest`) for ts-node, environment variables, and module mapping
   - `@jest/globals`: v30+ for Jest globals in TypeScript
-- **API Testing**: Bruno CLI (`@usebruno/cli`) v2.9+
-- **Test Runner**: Bruno collections in `collections/` directory
 
 ### TypeScript & Development
 
