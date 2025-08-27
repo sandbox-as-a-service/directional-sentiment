@@ -5,6 +5,7 @@ import {createPollFeedSource} from "@/app/(adapters)/(out)/supabase/create-poll-
 import {createSupabaseServerServiceClient} from "@/app/(adapters)/(out)/supabase/server"
 import type {GetPollFeedInput} from "@/app/_domain/ports/in/get-poll-feed"
 import {getPollFeed} from "@/app/_domain/use-cases/polls/get-poll-feed"
+import {logError, toError} from "@/app/_infra/logging/console-error"
 
 const QuerySchema = z.object({
   // Pass through undefined so domain can apply its own default.
@@ -12,6 +13,7 @@ const QuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).optional(),
   // Require timezone to keep keyset pagination lexicographically safe.
   cursor: z.iso.datetime({offset: true}).optional(),
+  quorum: z.coerce.number().optional(),
 })
 
 export async function GET(req: NextRequest) {
@@ -25,8 +27,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({error: "bad_request", message}, {status: 400})
     }
 
-    const {limit, cursor} = parsed.data
-    const input: GetPollFeedInput = {limit, cursor}
+    const {limit, cursor, quorum} = parsed.data
+    const input: GetPollFeedInput = {limit, cursor, quorum}
 
     const supabase = await createSupabaseServerServiceClient()
     const source = {
@@ -38,11 +40,10 @@ export async function GET(req: NextRequest) {
     console.info("🎉")
     return NextResponse.json(data, {status: 200, headers: {"Cache-Control": "no-store"}})
   } catch (e) {
-    const message = e instanceof Error ? e.message : String(e)
-    const cause = e instanceof Error ? (e.cause ?? "") : ""
-    console.error(message, cause)
+    const error = toError(e)
+    logError(error)
 
-    if (message.startsWith("supabase")) {
+    if (error.message.startsWith("supabase")) {
       return NextResponse.json({error: "service_unavailable"}, {status: 503})
     }
 

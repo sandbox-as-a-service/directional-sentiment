@@ -9,6 +9,7 @@ import {
 } from "@/app/(adapters)/(out)/supabase/server"
 import type {CastVoteInput} from "@/app/_domain/ports/in/cast-vote"
 import {castVote} from "@/app/_domain/use-cases/polls/cast-vote"
+import {logError, toError} from "@/app/_infra/logging/console-error"
 
 const ParamsSchema = z.object({slug: z.string().min(1)})
 
@@ -64,23 +65,22 @@ export async function POST(req: NextRequest, ctx: RouteContext<"/api/polls/[slug
     console.info("🎉")
     return new NextResponse(null, {status: 204})
   } catch (e) {
-    const message = e instanceof Error ? e.message : String(e)
-    const cause = e instanceof Error ? (e.cause ?? "") : ""
-    console.error(message, cause)
+    const error = toError(e)
+    logError(error)
 
-    if (message === "not_found") {
+    if (error.message === "not_found") {
       return NextResponse.json({error: "not_found"}, {status: 404})
     }
 
-    if (message === "poll_closed") {
+    if (error.message === "poll_closed") {
       return NextResponse.json({error: "poll_closed"}, {status: 409})
     }
 
-    if (message === "option_mismatch") {
+    if (error.message === "option_mismatch") {
       return NextResponse.json({error: "option_mismatch"}, {status: 422})
     }
 
-    if (message.startsWith("supabase")) {
+    if (error.message.startsWith("supabase")) {
       return NextResponse.json({error: "service_unavailable"}, {status: 503})
     }
 
