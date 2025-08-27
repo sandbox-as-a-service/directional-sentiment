@@ -1,0 +1,41 @@
+### Get Poll Feed
+# @name getPollFeed
+GET {{URL}}/api/polls/feed
+
+### Get Poll Feed (Limit)
+# @name getPollFeedLimit
+GET {{URL}}/api/polls/feed?limit=1
+
+### Get Poll Feed (Limit & Cursor)
+# @name getPollFeedLimitCursor
+GET {{URL}}/api/polls/feed?limit=1&cursor=2025-08-25T09:05:00+00:00
+
+### Get Poll Summary
+# @name getPollSummary
+GET {{URL}}/api/polls/best-bj-flavor/summary?quorum=5
+
+### Get Poll Results
+# @name getPollResults
+GET {{URL}}/api/polls/best-bj-flavor/results
+
+### Cast Vote
+# @name castVote
+POST {{URL}}/api/polls/best-bj-flavor/votes
+Content-Type: application/json
+Cookie: sb-iptrquovmtpwcrymnbtc-auth-token=<placeholder>
+
+{
+  "optionId": "e0e22128-747c-43dc-b3d5-5fc56660ecb1",
+  "idempotencyKey": "123"
+}
+
+### Cast Vote (Idempotency)
+# @name castVoteIdempotency
+POST {{URL}}/api/polls/ketchup-on-steak/votes
+Content-Type: application/json
+x-user-id: 1
+
+{
+  "optionId": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+  "idempotencyKey": "repeated-key-test"
+}
