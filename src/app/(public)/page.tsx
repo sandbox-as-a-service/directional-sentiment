@@ -18,21 +18,15 @@ function FeedList({polls}: {polls: GetPollFeedResult}) {
 }
 
 export default function Feed({searchParams}: {searchParams: Promise<{limit: string; cursor: string}>}) {
-  const queries = use(searchParams)
-  const url = new URL(
-    "/api/polls/feed",
-    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000",
-  )
+  const {limit, cursor} = use(searchParams)
 
-  if (queries.limit) {
-    url.searchParams.set("limit", queries.limit)
-  }
+  const qs = new URLSearchParams()
+  if (limit) qs.set("limit", limit)
+  if (cursor) qs.set("cursor", cursor)
 
-  if (queries.cursor) {
-    url.searchParams.set("cursor", queries.cursor)
-  }
+  const key = `/api/polls/feed${qs.toString() ? `?${qs}` : ""}`
 
-  const {data, error, isLoading} = useSWR<GetPollFeedResult>(url.toString(), fetcher)
+  const {data, error, isLoading} = useSWR<GetPollFeedResult>(key, fetcher)
 
   if (error) return <div>failed to load</div>
   if (isLoading) return <div>loading...</div>
