@@ -9,6 +9,8 @@ async function getPolls(filters: {limit?: string; cursor?: string}): Promise<Pol
     process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000",
   )
 
+  console.info("making_request", url.toString())
+
   if (filters.limit) {
     url.searchParams.set("limit", filters.limit)
   }
@@ -22,6 +24,7 @@ async function getPolls(filters: {limit?: string; cursor?: string}): Promise<Pol
   })
 
   if (!res.ok) {
+    console.error("polls_feed_error", await res.json())
     return {error: "something_went_wrong"}
   }
 
