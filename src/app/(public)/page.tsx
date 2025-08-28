@@ -24,7 +24,7 @@ async function getPolls(filters: {limit?: string; cursor?: string}): Promise<Pol
   })
 
   if (!res.ok) {
-    console.error("polls_feed_error", await res.json())
+    console.error("polls_feed_error")
     return {error: "something_went_wrong"}
   }
 
