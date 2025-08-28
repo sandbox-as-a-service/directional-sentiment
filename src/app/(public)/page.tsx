@@ -23,7 +23,7 @@ async function getPolls(filters: {limit?: string; cursor?: string}): Promise<Pol
     const res = await fetch(url.toString(), {
       cache: "no-store", // opt into dynamic rendering
     })
-    return res.json()
+    return await res.json()
   } catch (error) {
     console.error("polls_feed_error", error)
     return {error: "something_went_wrong"}
