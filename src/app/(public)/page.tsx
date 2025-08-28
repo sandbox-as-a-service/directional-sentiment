@@ -1,36 +1,11 @@
-import {headers} from "next/headers"
+"use client"
+
+import {use} from "react"
+import useSWR from "swr"
 
 import type {GetPollFeedResult} from "@/app/_domain/ports/in/get-poll-feed"
 
-type ErrorResult = {error: string}
-type PollsResult = GetPollFeedResult | ErrorResult
-
-async function getPolls(filters: {limit?: string; cursor?: string}): Promise<PollsResult> {
-  const h = await headers()
-  const url = new URL(
-    "/api/polls/feed",
-    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000",
-  )
-
-  if (filters.limit) {
-    url.searchParams.set("limit", filters.limit)
-  }
-
-  if (filters.cursor) {
-    url.searchParams.set("cursor", filters.cursor)
-  }
-
-  const res = await fetch(url.toString(), {
-    cache: "no-store", // opt into dynamic rendering
-    headers: {
-      cookie: h.get("cookie") ?? "",
-    },
-  })
-  if (!res.ok) {
-    return {error: "something_went_wrong"}
-  }
-  return res.json()
-}
+const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
 function FeedList({polls}: {polls: GetPollFeedResult}) {
   return (
@@ -42,14 +17,31 @@ function FeedList({polls}: {polls: GetPollFeedResult}) {
   )
 }
 
-export default async function Feed({searchParams}: {searchParams: Promise<{limit: string; cursor: string}>}) {
-  const filters = await searchParams
-  const polls = await getPolls(filters)
+export default function Feed({searchParams}: {searchParams: Promise<{limit: string; cursor: string}>}) {
+  const queries = use(searchParams)
+  const url = new URL(
+    "/api/polls/feed",
+    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000",
+  )
+
+  if (queries.limit) {
+    url.searchParams.set("limit", queries.limit)
+  }
+
+  if (queries.cursor) {
+    url.searchParams.set("cursor", queries.cursor)
+  }
+
+  const {data, error, isLoading} = useSWR<GetPollFeedResult>(url.toString(), fetcher)
+
+  if (error) return <div>failed to load</div>
+  if (isLoading) return <div>loading...</div>
+  if (!data) return <div>no data</div>
 
   return (
     <div className="min-h-screen w-full">
       <main className="flex w-full min-w-lg justify-center">
-        {"error" in polls ? <p>{polls.error}</p> : <FeedList polls={polls} />}
+        <FeedList polls={data} />
       </main>
     </div>
   )
