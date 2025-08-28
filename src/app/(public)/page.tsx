@@ -4,7 +4,10 @@ type ErrorResult = {error: string}
 type PollsResult = GetPollFeedResult | ErrorResult
 
 async function getPolls(filters: {limit?: string; cursor?: string}): Promise<PollsResult> {
-  const url = new URL("http://localhost:3000/api/polls/feed")
+  const url = new URL(
+    "/api/polls/feed",
+    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000",
+  )
 
   if (filters.limit) {
     url.searchParams.set("limit", filters.limit)
