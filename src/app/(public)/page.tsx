@@ -19,16 +19,15 @@ async function getPolls(filters: {limit?: string; cursor?: string}): Promise<Pol
     url.searchParams.set("cursor", filters.cursor)
   }
 
-  const res = await fetch(url.toString(), {
-    cache: "no-store", // opt into dynamic rendering
-  })
-
-  if (!res.ok) {
-    console.error("polls_feed_error")
+  try {
+    const res = await fetch(url.toString(), {
+      cache: "no-store", // opt into dynamic rendering
+    })
+    return res.json()
+  } catch (error) {
+    console.error("polls_feed_error", error)
     return {error: "something_went_wrong"}
   }
-
-  return res.json()
 }
 
 function FeedList({polls}: {polls: GetPollFeedResult}) {
