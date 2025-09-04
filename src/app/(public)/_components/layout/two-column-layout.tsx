@@ -88,6 +88,8 @@ Aside.displayName = "TwoColumnLayout.Aside"
 export {TwoColumnLayoutCompound as TwoColumnLayout}
 
 /**
+ * Design Decision Analysis: Component Patterns for Layout Components
+ *
  * Option A: Controlled by the layout (props + CSS on the root)
  *
  * What it is
@@ -152,4 +154,57 @@ export {TwoColumnLayoutCompound as TwoColumnLayout}
  * One-off prototypes or very custom screens where global rules do not fit.
  *
  * Very small teams where one person controls most screens.
+ */
+
+/**
+ * Component Pattern Evaluation for Layout Components
+ *
+ * 1) Compound components (what you're using)
+ *
+ * DX / types: Great. Consumers get TwoColumnLayout.Main / .Aside with normal JSX, full TS inference.
+ * Nesting: Works fine with wrappers (you used data-slot + container selectors; not brittle).
+ * SSR / RSC: Safe. No render-time child walking or effects required.
+ * Reordering / rules: Root knobs (stackAsideFirst, expandMainWhenNoAside) are predictable; you already pinned desktop with lg:col-start-* and solved the auto-placement row gap with grid-flow-row-dense.
+ * Verdict: ✅ Keep. It's the simplest, most maintainable match for "main/aside" layouts.
+ *
+ * 2) "Multiple slot props" (header, footer, etc.)
+ *
+ * DX / types: Very discoverable and type-safe.
+ * Nesting: Breaks if you want to wrap slot content in providers; everything must be passed as props.
+ * SSR / RSC: Safe, but less composable.
+ * Verdict: Fine for small, leaf components. For layouts, it fights natural composition. ❌ Not better here.
+ *
+ * 3) Slots by type (scan children, match child.type === Header)
+ * 
+ * DX / types: Still feels natural to write.
+ * Nesting: Works through wrappers.
+ * SSR / RSC: Can be OK, but it's brittle: equality checks on child.type can break with HMR, memo, forwardRef, or bundler boundaries; you end up adding guards. Also adds runtime work on every render.
+ * Verdict: Overkill for 2 children; adds fragility you don't need. ❌
+ *
+ * 4) Generic <Slot name="...">
+ * 
+ * DX / types: Loses type safety unless you build extra machinery to constrain names.
+ * Nesting: Works.
+ * SSR / RSC: Fine.
+ * Verdict: You give up the whole point of compound components (typed, discoverable API). ❌
+ *
+ * 5) Context-registered slots (Primer style)
+ *
+ * DX / types: Very flexible; can keep type safety with a factory.
+ * Nesting: Best-in-class (works anywhere in the subtree).
+ * SSR / RSC: Weak point. Registration usually happens in effects; you don't know slots at server render, so first paint/hydration can be off or require a client pass.
+ * Verdict: Use only if you truly need arbitrary, deep, multi-slot collection. Massive overkill for main/aside. ❌
+ *
+ * 6) "Fake DOM" / portal prepass (React Aria Components)
+ *
+ * DX / types: Powerful for collections, menus, trees.
+ * Nesting: Excellent.
+ * SSR / RSC: Designed to handle it, but at the cost of complexity and double render paths.
+ * Verdict: Way beyond the scope of a 2-region layout. 🚫
+ *
+ * Bottom line for your layout
+
+ * Keep the compound pattern with root knobs (container concerns) and child-local props (e.g., stickyOffsetClassName).
+ * Keep the CSS-driven logic (:has for "no aside" upgrade if you want it, grid-flow-row-dense, lg:col-start-* to pin columns). That gave you first-paint correctness without context races.
+ * Avoid child-type scanning and context-slots; they solve problems you don't have and introduce new ones.
  */
