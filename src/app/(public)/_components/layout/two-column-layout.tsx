@@ -41,8 +41,8 @@ const TwoColumnLayout: FC<TwoColumnLayoutProps> = (props) => {
 export type TwoColumnLayoutMainProps = ComponentPropsWithoutRef<"main">
 
 const mainBase = [
-  // default desktop span = left track (~70%)
-  "lg:col-span-1",
+  // default desktop span = left track (~70%): lock main to left track (~70%)
+  "lg:row-start-1 lg:col-start-1 lg:col-span-1",
 ]
 
 const Main: FC<TwoColumnLayoutMainProps> = ({className, ...mainProps}) => {
@@ -57,8 +57,8 @@ export type TwoColumnLayoutAsideProps = ComponentPropsWithoutRef<"aside"> & {
 }
 
 const asideBase = [
-  // desktop = right track
-  "lg:col-span-1",
+  // desktop: lock aside to right track (~30%)
+  "lg:row-start-1 lg:col-start-2 lg:col-span-1",
   // don't stretch vertically; sticky needs content-sized box
   "self-start",
 ]
