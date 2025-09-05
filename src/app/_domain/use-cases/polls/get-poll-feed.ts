@@ -1,6 +1,6 @@
+import {POLLS} from "@/app/_domain/config/polls"
 import type {GetPollFeedInput, GetPollFeedResult} from "@/app/_domain/ports/in/get-poll-feed"
 import type {PollFeedSource} from "@/app/_domain/ports/out/poll-feed-source"
-import {POLLS} from "@/app/_domain/config/polls"
 
 /**
  * getPollFeed
