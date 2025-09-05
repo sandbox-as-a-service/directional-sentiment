@@ -1,57 +1,134 @@
 # Architecture Guidelines
 
+## Project Structure Overview
+
+Complete directory tree showing the hexagonal architecture organization:
+
+```
+directional-sentiment/
+├── .github/                    # Documentation and workflows
+│   ├── copilot-instructions.md # Main AI assistant instructions
+│   ├── architecture.md         # This file - architecture patterns  
+│   ├── development.md          # Commands and workflows
+│   ├── testing.md              # Unit testing methodology
+│   ├── conventions.md          # Code style and naming
+│   ├── tech-stack.md           # Dependencies and frameworks
+│   ├── database.md             # Database schema and usage
+│   ├── quick-start.md          # Onboarding for new developers
+│   ├── task-examples.md        # Step-by-step development guides
+│   ├── environment-setup.md    # Environment variable configuration
+│   ├── troubleshooting.md      # Common errors and solutions
+│   ├── sequence-diagrams/      # API flow documentation
+│   │   ├── get-poll-feed.md    # Paginated poll listing flow
+│   │   ├── get-poll-results.md # Vote tallying and results flow
+│   │   ├── get-poll-summary.md # Poll metadata retrieval flow
+│   │   └── cast-vote.md        # Vote validation and storage flow
+│   └── workflows/              # GitHub Actions CI/CD
+├── src/
+│   ├── middleware.ts           # Edge middleware composition
+│   └── app/
+│       ├── _domain/            # 🏛️ Pure domain logic (hexagon core)
+│       │   ├── ports/
+│       │   │   ├── in/         # Use case contracts (what domain offers)
+│       │   │   │   ├── cast-vote.ts
+│       │   │   │   ├── get-poll-feed.ts
+│       │   │   │   ├── get-poll-results.ts
+│       │   │   │   └── get-poll-summary.ts
+│       │   │   └── out/        # Data source contracts (what domain needs)
+│       │   │       ├── poll-feed-source.ts
+│       │   │       ├── polls-source.ts
+│       │   │       └── votes-source.ts
+│       │   └── use-cases/      # Domain logic implementation
+│       │       └── polls/
+│       │           ├── cast-vote.ts           # Vote validation & idempotency
+│       │           ├── get-poll-feed.ts       # Paginated poll listing
+│       │           ├── get-poll-results.ts    # Vote tallying & results
+│       │           ├── get-poll-summary.ts    # Poll metadata retrieval
+│       │           ├── __tests__/             # Feature test folder
+│       │           │   ├── cast-vote.test.ts
+│       │           │   ├── get-poll-feed.test.ts
+│       │           │   ├── get-poll-results.test.ts
+│       │           │   └── shared-helpers.ts  # Test utilities
+│       │           └── dto/
+│       │               └── poll.ts            # Domain transfer objects
+│       ├── _infra/             # 🔧 Infrastructure concerns (cross-cutting)
+│       │   └── edge/           # Edge middleware components
+│       │       ├── compose.ts  # Middleware composition utility
+│       │       ├── auth/       # Authentication middleware
+│       │       │   └── with-supabase.ts
+│       │       └── rate-limit/ # Rate limiting middleware
+│       │           └── with-rate-limit.ts
+│       ├── _config/            # 🔧 Application configuration
+│       │   └── env.ts          # Environment validation with Zod
+│       ├── (adapters)/         # 🔌 Infrastructure implementations (hexagon edges)
+│       │   ├── (in)/           # Inbound adapters (API routes, Server Actions)
+│       │   │   └── api/
+│       │   │       ├── health/
+│       │   │       │   └── route.ts       # Health check endpoint
+│       │   │       └── polls/
+│       │   │           ├── feed/
+│       │   │           │   └── route.ts   # GET /api/polls/feed
+│       │   │           └── [slug]/
+│       │   │               ├── results/
+│       │   │               │   └── route.ts  # GET /api/polls/:slug/results
+│       │   │               ├── summary/
+│       │   │               │   └── route.ts  # GET /api/polls/:slug/summary
+│       │   │               └── votes/
+│       │   │                   └── route.ts  # POST /api/polls/:slug/votes
+│       │   └── (out)/          # Outbound adapters (databases, external APIs)
+│       │       └── supabase/   # Production Supabase adapters
+│       │           ├── create-poll-feed-source.ts
+│       │           ├── create-polls-source.ts
+│       │           ├── create-votes-source.ts
+│       │           ├── client.ts           # Client-side Supabase
+│       │           ├── server.ts           # Server-side Supabase
+│       │           ├── types.ts            # Generated Supabase types
+│       │           └── types-extended.ts   # Extended type definitions
+│       ├── (public)/           # 🎨 UI pages, components and assets
+│       │   ├── page.tsx        # Homepage
+│       │   ├── layout.tsx      # Root layout
+│       │   └── globals.css     # Global styles
+│       └── favicon.ico
+├── rest-client/                # 🧪 API testing with REST Client extension
+│   ├── polls-feed.http
+│   ├── polls-results.http
+│   ├── polls-votes.http
+│   └── health-check.http
+├── supabase/                   # 🗄️ Database schema and configuration
+│   ├── config.toml             # Supabase project configuration
+│   └── migrations/             # Database schema migrations
+├── public/                     # 📁 Static assets
+│   ├── next.svg
+│   ├── vercel.svg
+│   └── favicon.ico
+├── .env.example               # Environment variable template
+├── .gitignore                 # Git ignore patterns
+├── README.md                  # Project overview and getting started
+├── AGENTS.md                  # AI agent instructions (canonical)
+├── package.json               # Dependencies and scripts
+├── next.config.ts             # Next.js configuration
+├── tailwind.config.ts         # Tailwind CSS configuration
+├── jest.config.ts             # Jest testing configuration
+├── eslint.config.mjs          # ESLint configuration
+└── tsconfig.json              # TypeScript configuration
+```
+
+### Architecture Legend
+
+- 🏛️ **Domain Layer** (`_domain/`): Pure business logic with no external dependencies
+- 🔌 **Adapters** (`(adapters)/`): Infrastructure implementations for databases, APIs, etc.
+- 🔧 **Infrastructure** (`_infra/`, `_config/`): Cross-cutting concerns like middleware and configuration
+- 🎨 **Presentation** (`(public)/`): UI pages, components, and user interface
+- 🧪 **Testing** (`rest-client/`, `__tests__/`): Manual API testing and unit tests
+- 🗄️ **Database** (`supabase/`): Schema migrations and database configuration
+
 ## Hexagonal/Ports & Adapters Pattern
 
-This project uses strict hexagonal architecture with clear separation between domain and infrastructure:
+This project implements strict hexagonal architecture with clear separation between domain and infrastructure. See the [complete directory structure](#project-structure-overview) above for the full layout.
 
-```
-src/app/
-├── _domain/           # Pure domain logic (no external dependencies)
-│   ├── ports/
-│   │   ├── in/        # Use case contracts (what the domain offers)
-│   │   │   ├── cast-vote.ts       # Vote casting input/output types
-│   │   │   ├── get-poll-feed.ts   # Poll feed query types
-│   │   │   └── get-poll-results.ts # Poll results query types
-│   │   └── out/       # Data source contracts (what the domain needs)
-│   │       ├── poll-feed-source.ts # Poll feed data access
-│   │       ├── polls-source.ts     # Poll metadata access
-│   │       └── votes-source.ts     # Vote storage and tallying
-│   └── use-cases/     # Domain logic implementation
-│       └── polls/
-│           ├── cast-vote.ts        # Vote validation & idempotency
-│           ├── get-poll-feed.ts    # Paginated poll listing
-│           ├── get-poll-results.ts # Vote tallying & results
-│           ├── __tests__/          # Feature test folder
-│           │   ├── get-poll-feed.test.ts
-│           │   ├── get-poll-results.test.ts
-│           │   └── shared-helpers.ts # Test utilities
-│           └── dto/
-│               └── poll.ts         # Domain transfer objects
-├── _infra/            # Infrastructure concerns (cross-cutting)
-│   └── edge/          # Edge middleware components
-│       ├── compose.ts # Middleware composition utility
-│       ├── auth/      # Authentication middleware
-│       └── rate-limit/ # Rate limiting middleware
-├── (adapters)/
-│   ├── (in)/          # Inbound adapters (API routes, Server Actions)
-│   │   └── api/
-│   │       ├── health/           # Health check endpoint
-│   │       └── polls/
-│   │           ├── feed/
-│   │           │   └── route.ts  # GET /api/polls/feed (poll feed)
-│   │           └── [slug]/
-│   │               ├── results/  # GET /api/polls/:slug/results
-│   │               └── votes/    # POST /api/polls/:slug/votes
-│   └── (out)/         # Outbound adapters (databases, external APIs)
-│       └── supabase/             # Production Supabase adapters
-│           ├── create-poll-feed-source.ts
-│           ├── create-polls-source.ts
-│           ├── create-votes-source.ts
-│           ├── client.ts         # Client-side Supabase
-│           └── server.ts         # Server-side Supabase
-│           └── types.ts          # Supabase Typescript types
-└── (public)/          # UI pages, components and assets
-```
+### Core Architecture Principles
+
+The hexagonal pattern organizes code into distinct layers:
 
 ## Use Cases & Domain Logic
 

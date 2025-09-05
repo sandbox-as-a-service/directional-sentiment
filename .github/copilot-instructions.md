@@ -1,12 +1,21 @@
 # AI Coding Assistant Instructions
 
+# AI Coding Assistant Instructions
+
 This directory contains modular instructions for AI coding assistants working on this project.
 
-## Instruction Files
+## Onboarding & Quick Start
 
-- [`architecture.md`](./architecture.md) - Hexagonal architecture patterns, domain structure, and data flow
+- [`quick-start.md`](./quick-start.md) - **START HERE** - Concise onboarding guide for new developers with setup steps, key commands, and entry-point files
+- [`task-examples.md`](./task-examples.md) - Step-by-step guides for common development tasks (adding use cases, data sources, tests)
+- [`environment-setup.md`](./environment-setup.md) - Complete environment variable and configuration instructions for dev/prod
+- [`troubleshooting.md`](./troubleshooting.md) - Common errors, troubleshooting steps, and known gotchas
+
+## Core Documentation
+
+- [`architecture.md`](./architecture.md) - Hexagonal architecture patterns, domain structure, directory tree, and data flow
 - [`development.md`](./development.md) - Commands, environment setup, and development workflows
-- [`testing.md`](./testing.md) - Unit testing methodology, API testing guidelines, and test conventions
+- [`testing.md`](./testing.md) - Unit testing methodology with practical examples, API testing guidelines, and test conventions
 - [`conventions.md`](./conventions.md) - Code style, naming, and commit message formats
 - [`tech-stack.md`](./tech-stack.md) - Dependencies, frameworks, and tool-specific guidance
 - [`database.md`](./database.md) - Database schema, access patterns, and Supabase usage
