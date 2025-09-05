@@ -1,7 +1,7 @@
+import {POLLS} from "@/app/_domain/config/polls"
 import type {GetPollResultsResult} from "@/app/_domain/ports/in/get-poll-results"
 import type {PollsSource} from "@/app/_domain/ports/out/polls-source"
 import type {VotesSource} from "@/app/_domain/ports/out/votes-source"
-import {POLLS} from "@/app/_domain/config/polls"
 
 /**
  * getPollResults

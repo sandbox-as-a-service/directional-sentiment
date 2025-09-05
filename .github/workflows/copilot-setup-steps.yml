@@ -12,7 +12,7 @@ on:
       - .github/workflows/copilot-setup-steps.yml
 
 env:
-  NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}      
+  NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   # The job MUST be called `copilot-setup-steps` or it will not be picked up by Copilot.
