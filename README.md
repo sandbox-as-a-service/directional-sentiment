@@ -36,7 +36,7 @@ corepack enable
 pnpm install
 
 # Start development server with Turbopack
-pnpm dev
+pnpm dev --turbopack
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to see the application.
@@ -54,13 +54,13 @@ Start exploring the codebase with these key files:
 ### Essential Development Commands
 
 ```bash
-pnpm dev                 # Development server with hot reload
-pnpm build              # Production build (requires network for fonts)
-pnpm test:unit:jest     # Run all unit tests
-pnpm test:unit:jest:watch # Run tests in watch mode
+pnpm dev --turbopack     # Development server with hot reload
+pnpm test:unit:jest     # Run unit tests  
+pnpm build              # Production build
 pnpm lint               # Check code style and errors
-pnpm format             # Format code with Prettier
 ```
+
+For comprehensive command documentation, testing workflows, and advanced development practices, see [Development Workflow](.github/development.md).
 
 ### Next Steps
 
@@ -94,26 +94,6 @@ Detailed API flow documentation:
 - **[Poll Feed Flow](.github/sequence-diagrams/get-poll-feed.md)** - Paginated data retrieval with cursor-based navigation
 - **[Poll Results Flow](.github/sequence-diagrams/get-poll-results.md)** - Real-time vote tallying and percentage calculations
 - **[Vote Casting Flow](.github/sequence-diagrams/cast-vote.md)** - Vote validation with idempotency protection
-
-## Development Commands Reference
-
-```bash
-# Core Development
-pnpm dev                 # Development server with Turbopack (faster builds)
-pnpm build              # Production build with optimizations
-pnpm start              # Start production server (after build)
-
-# Testing & Quality
-pnpm test:unit:jest     # Run Jest unit tests for domain logic
-pnpm test:unit:jest:watch # Run tests in watch mode for TDD
-pnpm test:unit:jest:cov  # Run tests with coverage report
-pnpm lint               # ESLint check for code quality
-pnpm format             # Prettier formatting for consistent style
-
-# Type Generation
-pnpm typegen            # Generate Next.js route types (auto-runs on dev/build)
-pnpm supabase:typegen   # Generate Supabase database types
-```
 
 ## Learn More
 
