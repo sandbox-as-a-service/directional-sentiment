@@ -36,7 +36,7 @@ corepack enable
 pnpm install
 
 # Start development server with Turbopack
-pnpm dev --turbopack
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to see the application.
@@ -54,7 +54,7 @@ Start exploring the codebase with these key files:
 ### Essential Development Commands
 
 ```bash
-pnpm dev --turbopack     # Development server with hot reload
+pnpm dev                # Development server with hot reload
 pnpm test:unit:jest     # Run unit tests  
 pnpm build              # Production build
 pnpm lint               # Check code style and errors

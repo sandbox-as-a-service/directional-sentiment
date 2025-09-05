@@ -3,7 +3,7 @@
 ## Commands
 
 ```bash
-pnpm dev --turbopack        # Development server with Turbopack
+pnpm dev                    # Development server with Turbopack
 pnpm test:unit:jest         # Run Jest unit tests
 pnpm test:unit:jest:watch   # Run Jest unit tests in watch mode
 pnpm test:unit:jest:cov      # Run Jest unit tests with coverage
