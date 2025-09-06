@@ -1,0 +1,23 @@
+meta {
+  name: get-poll-feed-personalized-success
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{URL}}/api/polls/feed/personalized?limit=1
+  body: none
+  auth: inherit
+}
+
+params:query {
+  limit: 1
+}
+
+headers {
+  Cookie: sb-iptrquovmtpwcrymnbtc-auth-token=base64-ey
+}
+
+settings {
+  encodeUrl: true
+}

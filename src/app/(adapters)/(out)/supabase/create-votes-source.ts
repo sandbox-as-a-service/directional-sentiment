@@ -1,6 +1,6 @@
 import type {SupabaseClient} from "@supabase/supabase-js"
 
-import type {VotesSource} from "@/app/_domain/ports/out/votes-source"
+import type {PollPersonalizedCurrent, VotesSource} from "@/app/_domain/ports/out/votes-source"
 
 import type {DatabaseExtended} from "./types-extended"
 
@@ -33,12 +33,7 @@ export function createVotesSource(supabase: SupabaseClient<DatabaseExtended>): V
       }
 
       const hasAny = (count ?? 0) > 0
-
-      if (hasAny) {
-        return true
-      }
-
-      return false
+      return hasAny
     },
 
     async tallyCurrent(pollId) {
@@ -87,6 +82,39 @@ export function createVotesSource(supabase: SupabaseClient<DatabaseExtended>): V
 
       // Convert the Map back to a plain array of { optionId, count }
       return Array.from(counts, ([optionId, count]) => ({optionId, count}))
+    },
+
+    async currentByUserInPolls(pollIds: string[], userId: string) {
+      // Fast-exit: empty input means no rows by definition.
+      if (pollIds.length === 0) {
+        return []
+      }
+
+      const {data, error} = await supabase
+        .from("vote")
+        .select("poll_id, option_id, voted_at, id")
+        .eq("user_id", userId) // scope to caller
+        .in("poll_id", pollIds) // only these polls
+        // Order so the first row per poll is the latest for that poll:
+        .order("voted_at", {ascending: false}) // newest first within block
+        .order("id", {ascending: false}) // deterministic tie-breaker
+
+      if (error) {
+        throw new Error("supabase_query_failed", {cause: error})
+      }
+
+      // First row in each contiguous poll block is the "current" vote.
+      const seen = new Set<string>()
+      const out: Array<PollPersonalizedCurrent> = []
+
+      for (const row of data ?? []) {
+        if (!seen.has(row.poll_id)) {
+          seen.add(row.poll_id) // first time = latest for that poll
+          out.push({pollId: row.poll_id, optionId: row.option_id})
+        }
+      }
+
+      return out
     },
   }
 }

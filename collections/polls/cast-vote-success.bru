@@ -1,23 +1,21 @@
 meta {
   name: cast-vote-success
   type: http
-  seq: 8
+  seq: 7
 }
 
 post {
-  url: {{URL}}/api/polls/best-bj-flavor/votes
+  url: {{URL}}/api/polls/federal-abortion-ban/votes
   body: json
   auth: inherit
 }
 
 headers {
-  Cookie: sb-iptrquovmtpwcrymnbtc-auth-token=<placeholder>
-}
+  Cookie: sb-iptrquovmtpwcrymnbtc-auth-token=base64-ey
 
 body:json {
   {
-    "optionId": "e0e22128-747c-43dc-b3d5-5fc56660ecb1",
-    "idempotencyKey": "123"
+    "optionId": "232c7c9a-f5da-4115-b8f1-3c539b0e3676"
   }
 }
 
