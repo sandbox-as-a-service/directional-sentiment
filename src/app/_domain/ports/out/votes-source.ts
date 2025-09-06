@@ -1,5 +1,3 @@
-import type {PollTallyItem} from "@/app/_domain/use-cases/polls/dto/poll"
-
 export type VotesSourceAppendInput = {
   pollId: string
   optionId: string
@@ -12,6 +10,9 @@ export type VotesSourceWasUsedInput = {
   idempotencyKey: string
 }
 
+export type PollTallyItem = {optionId: string; count: number}
+export type PollPersonalizedCurrent = {pollId: string; optionId: string}
+
 /**
  * VotesSource
  *
@@ -20,6 +21,7 @@ export type VotesSourceWasUsedInput = {
  * - Append-only storage of vote events (never update existing rows).
  * - User-scoped idempotency checks.
  * - Latest-per-user tallying for "current" vote counts.
+ * - User+poll scoped lookup of the caller’s *current* choice (latest-wins).
  *
  * Domain/adapter split:
  * - Domain use cases enforce policy (poll open, option membership, idempotency flow).
@@ -63,4 +65,20 @@ export type VotesSource = {
    * - Errors: Throw "supabase_query_failed" (or similar infra error) if query fails.
    */
   tallyCurrent(pollId: string): Promise<Array<PollTallyItem>>
+
+  /**
+   * currentByUserInPolls
+   * - Purpose: For a given user, return their *current* choice per poll (latest-wins).
+   * - Input: { userId, pollIds }.
+   * - Contract:
+   *   - Latest-wins per poll defined by (voted_at DESC, id DESC).
+   *   - Return at most one row per poll the user has voted in.
+   *   - Omit polls with no votes by the user.
+   * - Output: Array<{ pollId: string; optionId: string }>.
+   * - Errors: Throw "supabase_query_failed" (or similar infra error) if query fails.
+   */
+  currentByUserInPolls(
+    pollIds: string[], // dedup/limit at use-case layer as needed
+    userId: string,
+  ): Promise<Array<PollPersonalizedCurrent>>
 }

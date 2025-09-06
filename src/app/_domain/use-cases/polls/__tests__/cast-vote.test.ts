@@ -15,7 +15,8 @@ function makeVotesSource(options?: {wasUsed?: boolean}): VotesSource {
   const tallyCurrent = jest.fn<VotesSource["tallyCurrent"]>().mockResolvedValue([]) // not used here
   const wasUsed = jest.fn<VotesSource["wasUsed"]>().mockResolvedValue(options?.wasUsed ?? false)
   const append = jest.fn<VotesSource["append"]>().mockResolvedValue(undefined)
-  return {tallyCurrent, wasUsed, append}
+  const currentByUserInPolls = jest.fn<VotesSource["currentByUserInPolls"]>().mockResolvedValue([]) // not used here
+  return {tallyCurrent, wasUsed, append, currentByUserInPolls}
 }
 
 describe("castVote", () => {

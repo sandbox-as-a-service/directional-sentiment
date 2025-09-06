@@ -1,8 +1,8 @@
 import {describe, expect, it, jest} from "@jest/globals"
 
 import type {PollsSource} from "@/app/_domain/ports/out/polls-source"
-import type {VotesSource} from "@/app/_domain/ports/out/votes-source"
-import type {PollMetadata, PollOptionItem, PollTallyItem} from "@/app/_domain/use-cases/polls/dto/poll"
+import type {PollTallyItem, VotesSource} from "@/app/_domain/ports/out/votes-source"
+import type {PollMetadata, PollOptionItem} from "@/app/_domain/use-cases/polls/dto/poll"
 import {getPollResults} from "@/app/_domain/use-cases/polls/get-poll-results"
 
 export function makePollsSource(
@@ -18,7 +18,8 @@ export function makeVotesSource(tallies: Array<PollTallyItem>): VotesSource {
   const tallyCurrent = jest.fn<VotesSource["tallyCurrent"]>().mockResolvedValue(tallies)
   const wasUsed = jest.fn<VotesSource["wasUsed"]>().mockResolvedValue(false)
   const append = jest.fn<VotesSource["append"]>().mockResolvedValue(undefined)
-  return {tallyCurrent, wasUsed, append}
+  const currentByUserInPolls = jest.fn<VotesSource["currentByUserInPolls"]>().mockResolvedValue([]) // not used here
+  return {tallyCurrent, wasUsed, append, currentByUserInPolls}
 }
 
 describe("getPollResults", () => {
