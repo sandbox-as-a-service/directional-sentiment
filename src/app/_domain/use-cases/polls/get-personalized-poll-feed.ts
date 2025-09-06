@@ -7,19 +7,19 @@ import type {PollFeedSource} from "@/app/_domain/ports/out/poll-feed-source"
 import type {VotesSource} from "@/app/_domain/ports/out/votes-source"
 
 /**
- * getPollFeed
+ * getPersonalizedPollFeed
  *
- * Domain use case: keyset-paginate the poll feed with a hard cap.
+ * Domain use case: keyset-paginate the personalized poll feed with a hard cap.
  * - Enforces a max page size.
  * - Enforces a minimum quorum.
- * - Uses the "fetch N+1" trick to learn if there’s another page.
+ * - Uses the "fetch N+1" trick to learn if there's another page.
  * - Emits a `nextCursor` (openedAt of the last returned item) when more pages exist.
  * - The feed source returns DTO-ready items via the DB RPC.
  * - We pass `quorum` through so the adapter/RPC can mark "Warming up".
  *
- * Optional personalization:
- * - If `input.userId` is provided AND a `votes` port is supplied,
- *   enrich each returned item with `current` = the caller’s latest optionId for that poll (or null).
+ * Personalization:
+ * - Enriches each returned item with `current` = the caller's latest optionId for that poll (or null).
+ * - Requires both `votes` port and `userId` for vote lookup.
  *
  * Assumptions (contract of PollFeedSource.page):
  * - Results come sorted by openedAt DESC (newest first) or a stable order compatible with `cursor`.
