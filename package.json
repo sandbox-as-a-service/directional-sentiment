@@ -16,6 +16,7 @@
     "supabase:typegen": "supabase gen types --linked --schema public,auth > \"src/app/(adapters)/(out)/supabase/types.ts\""
   },
   "dependencies": {
+    "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.57.0",
@@ -23,6 +24,7 @@
     "next": "15.5.2",
     "react": "19.1.1",
     "react-dom": "19.1.1",
+    "swr": "^2.3.6",
     "tailwind-merge": "^3.3.1",
     "zod": "^4.1.5"
   },
