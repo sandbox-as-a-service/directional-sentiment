@@ -1,70 +1,98 @@
-import Image from "next/image"
+"use client"
+
+import {Fragment} from "react"
+import useSWR from "swr"
+
+import type {GetPollFeedError, GetPollFeedResult} from "../_domain/ports/in/get-poll-feed"
+import type {PollFeedPageItem} from "../_domain/use-cases/polls/dto/poll"
+import {Button} from "./_components/button/button"
+import {Card, CardContent, CardFooter, CardHeader, CardStack} from "./_components/card/card"
+import {TwoColumnLayout} from "./_components/layout/two-column-layout"
+import {Separator} from "./_components/separator/separator"
+
+const fetcher = async (url: URL) => {
+  const res = await fetch(url)
+  return !res.ok ? Promise.reject(await res.json()) : await res.json()
+}
 
 export default function Home() {
-  return (
-    <div className="grid min-h-screen grid-rows-[20px_1fr_20px] items-center justify-items-center gap-16 p-8 py-2 pb-20 font-sans sm:p-20">
-      <main className="row-start-2 flex flex-col items-center gap-[32px] sm:items-start">
-        <Image className="dark:invert" src="/next.svg" alt="Next.js logo" width={180} height={38} priority />
-        <ol className="list-inside list-decimal text-center font-mono text-sm/6 sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="rounded bg-black/[.05] px-1 py-0.5 font-mono font-semibold dark:bg-white/[.06]">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">Save and see your changes instantly.</li>
-        </ol>
+  const {data, error, mutate} = useSWR<GetPollFeedResult, GetPollFeedError>("/api/polls/feed", fetcher)
 
-        <div className="flex flex-col items-center gap-4 sm:flex-row">
-          <a
-            className="bg-foreground text-background flex h-10 items-center justify-center gap-2 rounded-full border border-solid border-transparent px-4 text-sm font-medium transition-colors hover:bg-[#383838] sm:h-12 sm:w-auto sm:px-5 sm:text-base dark:hover:bg-[#ccc]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image className="dark:invert" src="/vercel.svg" alt="Vercel logomark" width={20} height={20} />
-            Deploy now
-          </a>
-          <a
-            className="flex h-10 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-4 text-sm font-medium transition-colors hover:border-transparent hover:bg-[#f2f2f2] sm:h-12 sm:w-auto sm:px-5 sm:text-base md:w-[158px] dark:border-white/[.145] dark:hover:bg-[#1a1a1a]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex flex-wrap items-center justify-center gap-[24px]">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image aria-hidden src="/file.svg" alt="File icon" width={16} height={16} />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image aria-hidden src="/window.svg" alt="Window icon" width={16} height={16} />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image aria-hidden src="/globe.svg" alt="Globe icon" width={16} height={16} />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+  const content = data?.items?.map((item, index) => (
+    <Fragment key={item.pollId}>
+      <Card className="w-full border-none">
+        <CardHeader>{item.question}</CardHeader>
+        <CardContent>
+          {item.options.map((option) => (
+            <Button
+              key={option.optionId}
+              variant="outline"
+              size="lg"
+              className="rounded-none shadow-none"
+              onClick={async () => {
+                const optimistic: PollFeedPageItem = {
+                  ...item,
+                  results: {...item.results, total: item.results.total + 1},
+                }
+
+                await mutate(
+                  async (prev) => {
+                    const res = await fetch(`/api/polls/${item.pollId}/votes`, {
+                      method: "POST",
+                      headers: {"Content-Type": "application/json"},
+                      body: JSON.stringify({optionId: option.optionId, idempotencyKey: "test"}),
+                    })
+
+                    if (!res.ok) {
+                      const error = await res.json()
+                      throw error
+                    }
+
+                    // 204: nothing to merge; keep the optimistic value in cache
+                    // return the current cache so SWR doesn't change it
+                    return prev
+                  },
+                  {
+                    optimisticData: (prev) => {
+                      if (!prev) return {items: [], nextCursor: undefined}
+                      return {
+                        ...prev,
+                        items: prev.items.map((prevItem) =>
+                          prevItem.pollId === item.pollId ? optimistic : prevItem,
+                        ),
+                      }
+                    },
+                    rollbackOnError: true,
+                  },
+                )
+              }}
+            >
+              {option.label}
+            </Button>
+          ))}
+        </CardContent>
+        <CardFooter>Total: {item.results.total}</CardFooter>
+      </Card>
+      {index < data.items.length - 1 && <Separator />}
+    </Fragment>
+  ))
+
+  const errorContent = error && (
+    <Card className="w-full">
+      <CardHeader>Error</CardHeader>
+      <CardContent>Failed to load polls: {error.error}</CardContent>
+    </Card>
+  )
+
+  return (
+    <TwoColumnLayout className="container mx-auto">
+      <TwoColumnLayout.Main>{errorContent ?? <CardStack>{content}</CardStack>}</TwoColumnLayout.Main>
+      <TwoColumnLayout.Aside stickyOffsetClassName="top-6">
+        <Card className="w-full">
+          <CardHeader>Showing polls</CardHeader>
+          <CardContent>{data?.items?.length ?? 0}</CardContent>
+        </Card>
+      </TwoColumnLayout.Aside>
+    </TwoColumnLayout>
   )
 }
