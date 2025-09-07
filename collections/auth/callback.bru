@@ -1,17 +1,17 @@
 meta {
-  name: sign-in
+  name: callback
   type: http
-  seq: 1
+  seq: 2
 }
 
 get {
-  url: {{URL}}/api/auth/sign-in?provider=github
+  url: {{URL}}/api/auth/callback?code=abc
   body: none
   auth: inherit
 }
 
 params:query {
-  provider: github
+  code: abc
 }
 
 settings {
