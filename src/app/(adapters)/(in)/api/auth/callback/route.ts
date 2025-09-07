@@ -2,11 +2,12 @@ import {type NextRequest, NextResponse} from "next/server"
 import {z} from "zod"
 
 import {createSupabaseServerClient} from "@/app/(adapters)/(out)/supabase/server"
+import {env} from "@/app/_config/env"
 import {logError, toError} from "@/app/_infra/logging/console-error"
 
 const QuerySchema = z.object({
+  code: z.string().min(1),
   next: z.string().default("/"),
-  code: z.string(),
 })
 
 export async function GET(req: NextRequest) {
@@ -32,19 +33,18 @@ export async function GET(req: NextRequest) {
 
     if (error) {
       // return the user to an error page with instructions
-      return NextResponse.redirect(`${req.nextUrl.origin}/error`)
+      return NextResponse.redirect(new URL("/error", req.nextUrl.origin))
     }
 
     const forwardedHost = req.headers.get("x-forwarded-host") // original origin before load balancer
-    const isLocalEnv = process.env.NODE_ENV === "development"
 
-    if (isLocalEnv) {
+    if (env.IS_DEV) {
       // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
-      return NextResponse.redirect(`${req.nextUrl.origin}${next}`)
+      return NextResponse.redirect(new URL(next, req.nextUrl.origin))
     } else if (forwardedHost) {
-      return NextResponse.redirect(`https://${forwardedHost}${next}`)
+      return NextResponse.redirect(new URL(next, `https://${forwardedHost}`))
     } else {
-      return NextResponse.redirect(`${req.nextUrl.origin}${next}`)
+      return NextResponse.redirect(new URL(next, req.nextUrl.origin))
     }
   } catch (e) {
     const error = toError(e)

@@ -21,15 +21,16 @@ export async function GET(req: NextRequest) {
 
     const supabase = await createSupabaseServerClient()
 
+    const redirectToURL = new URL("/api/auth/callback?next=/", req.nextUrl.origin)
     const {data, error} = await supabase.auth.signInWithOAuth({
       provider: parsed.data.provider,
       options: {
-        redirectTo: `${req.nextUrl.origin}/api/auth/callback?next=/`,
+        redirectTo: redirectToURL.toString(),
       },
     })
 
     if (error) {
-      return NextResponse.redirect(`${req.nextUrl.origin}/error`)
+      return NextResponse.redirect(new URL("/error", req.nextUrl.origin))
     }
 
     return NextResponse.redirect(data.url)
