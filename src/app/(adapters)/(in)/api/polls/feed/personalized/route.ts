@@ -8,7 +8,11 @@ import {
   createSupabaseServerServiceClient,
 } from "@/app/(adapters)/(out)/supabase/server"
 import {POLLS} from "@/app/_domain/config/polls"
-import type {GetPersonalizedPollFeedInput} from "@/app/_domain/ports/in/get-personalized-poll-feed"
+import type {
+  GetPersonalizedPollFeedError,
+  GetPersonalizedPollFeedInput,
+  GetPersonalizedPollFeedResult,
+} from "@/app/_domain/ports/in/get-personalized-poll-feed"
 import {getPersonalizedPollFeed} from "@/app/_domain/use-cases/polls/get-personalized-poll-feed"
 import {logError, toError} from "@/app/_infra/logging/console-error"
 
@@ -21,7 +25,9 @@ const QuerySchema = z.object({
   quorum: z.coerce.number().optional(),
 })
 
-export async function GET(req: NextRequest) {
+export async function GET(
+  req: NextRequest,
+): Promise<NextResponse<GetPersonalizedPollFeedError | GetPersonalizedPollFeedResult>> {
   try {
     const queries = Object.fromEntries(req.nextUrl.searchParams.entries())
     const parsed = QuerySchema.safeParse(queries)
