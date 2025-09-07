@@ -42,6 +42,11 @@ src/app/
 ├── (adapters)/
 │   ├── (in)/          # Inbound adapters (API routes, Server Actions)
 │   │   └── api/
+│   │       ├── auth/
+│   │       │   ├── callback/
+│   │       │   │   └── route.ts
+│   │       │   └── sign-in/
+│   │       │       └── route.ts
 │   │       ├── health/
 │   │       └── polls/
 │   │           ├── feed/
@@ -77,19 +82,15 @@ Each use case is responsible for enforcing domain rules, such as pagination limi
 
 ## Port Contracts
 
-All port interfaces are defined in the `_domain/ports/` directory:
+All port interfaces are defined in the `_domain/ports/` directory. These contracts define the boundary between the domain layer and the infrastructure adapters.
 
 ### Inbound Ports (Use Case Interfaces)
 
-- **[`cast-vote.ts`](../src/app/_domain/ports/in/cast-vote.ts)** - Vote casting input/output types
-- **[`get-poll-feed.ts`](../src/app/_domain/ports/in/get-poll-feed.ts)** - Poll feed query input/output types
-- **[`get-poll-results.ts`](../src/app/_domain/ports/in/get-poll-results.ts)** - Poll results query input/output types
+Located in `src/app/_domain/ports/in/`, these define the interfaces for the use cases that the application provides. Each file corresponds to a specific use case's input and output contracts.
 
 ### Outbound Ports (Data Source Interfaces)
 
-- **[`poll-feed-source.ts`](../src/app/_domain/ports/out/poll-feed-source.ts)** - Poll feed pagination contract
-- **[`polls-source.ts`](../src/app/_domain/ports/out/polls-source.ts)** - Poll metadata access contract
-- **[`votes-source.ts`](../src/app/_domain/ports/out/votes-source.ts)** - Vote storage and tallying contract
+Located in `src/app/_domain/ports/out/`, these define the interfaces for the data sources that the domain logic needs to function (e.g., fetching polls, storing votes).
 
 ## Domain Layer Rules
 

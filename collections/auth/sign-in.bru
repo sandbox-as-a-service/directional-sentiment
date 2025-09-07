@@ -1,0 +1,15 @@
+meta {
+  name: sign-in
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{URL}}/api/auth/sign-in
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}
