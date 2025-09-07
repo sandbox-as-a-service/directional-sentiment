@@ -1,0 +1,19 @@
+meta {
+  name: sign-in
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{URL}}/api/auth/sign-in?provider=github
+  body: none
+  auth: inherit
+}
+
+params:query {
+  provider: github
+}
+
+settings {
+  encodeUrl: true
+}

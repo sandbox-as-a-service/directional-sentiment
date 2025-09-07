@@ -9,95 +9,88 @@ src/app/
 ├── _domain/           # Pure domain logic (no external dependencies)
 │   ├── ports/
 │   │   ├── in/        # Use case contracts (what the domain offers)
-│   │   │   ├── cast-vote.ts       # Vote casting input/output types
-│   │   │   ├── get-poll-feed.ts   # Poll feed query types
-│   │   │   └── get-poll-results.ts # Poll results query types
+│   │   │   ├── cast-vote.ts
+│   │   │   ├── get-personalized-poll-feed.ts
+│   │   │   ├── get-poll-feed.ts
+│   │   │   ├── get-poll-results.ts
+│   │   │   └── get-poll-summary.ts
 │   │   └── out/       # Data source contracts (what the domain needs)
-│   │       ├── poll-feed-source.ts # Poll feed data access
-│   │       ├── polls-source.ts     # Poll metadata access
-│   │       └── votes-source.ts     # Vote storage and tallying
+│   │       ├── poll-feed-source.ts
+│   │       ├── polls-source.ts
+│   │       └── votes-source.ts
 │   └── use-cases/     # Domain logic implementation
 │       └── polls/
-│           ├── cast-vote.ts        # Vote validation & idempotency
-│           ├── get-poll-feed.ts    # Paginated poll listing
-│           ├── get-poll-results.ts # Vote tallying & results
-│           ├── __tests__/          # Feature test folder
+│           ├── cast-vote.ts
+│           ├── get-personalized-poll-feed.ts
+│           ├── get-poll-feed.ts
+│           ├── get-poll-results.ts
+│           ├── get-poll-summary.ts
+│           ├── __tests__/
+│           │   ├── cast-vote.test.ts
+│           │   ├── get-personalized-poll-feed.test.ts
 │           │   ├── get-poll-feed.test.ts
 │           │   ├── get-poll-results.test.ts
-│           │   └── shared-helpers.ts # Test utilities
+│           │   ├── get-poll-summary.test.ts
+│           │   └── shared-helpers.ts
 │           └── dto/
-│               └── poll.ts         # Domain transfer objects
+│               └── poll.ts
 ├── _infra/            # Infrastructure concerns (cross-cutting)
 │   └── edge/          # Edge middleware components
-│       ├── compose.ts # Middleware composition utility
-│       ├── auth/      # Authentication middleware
-│       └── rate-limit/ # Rate limiting middleware
+│       ├── compose.ts
+│       ├── auth/
+│       └── rate-limit/
 ├── (adapters)/
 │   ├── (in)/          # Inbound adapters (API routes, Server Actions)
 │   │   └── api/
-│   │       ├── health/           # Health check endpoint
+│   │       ├── auth/
+│   │       │   ├── callback/
+│   │       │   │   └── route.ts
+│   │       │   └── sign-in/
+│   │       │       └── route.ts
+│   │       ├── health/
 │   │       └── polls/
 │   │           ├── feed/
-│   │           │   └── route.ts  # GET /api/polls/feed (poll feed)
+│   │           │   └── route.ts
 │   │           └── [slug]/
-│   │               ├── results/  # GET /api/polls/:slug/results
-│   │               └── votes/    # POST /api/polls/:slug/votes
+│   │               ├── results/
+│   │               ├── summary/
+│   │               └── votes/
 │   └── (out)/         # Outbound adapters (databases, external APIs)
-│       └── supabase/             # Production Supabase adapters
+│       └── supabase/
 │           ├── create-poll-feed-source.ts
 │           ├── create-polls-source.ts
 │           ├── create-votes-source.ts
-│           ├── client.ts         # Client-side Supabase
-│           └── server.ts         # Server-side Supabase
-│           └── types.ts          # Supabase Typescript types
+│           ├── client.ts
+│           ├── server.ts
+│           └── types.ts
 └── (public)/          # UI pages, components and assets
 ```
 
 ## Use Cases & Domain Logic
 
-The domain layer implements three core use cases for the directional sentiment polling system. Each use case includes comprehensive documentation above the function signature with purpose, business logic, source contracts, and error handling details.
+The domain layer implements the core use cases for the directional sentiment polling system. Each use case is a single function that encapsulates a specific piece of domain logic.
 
-### 1. Poll Feed (`get-poll-feed.ts`)
+Key use cases include:
 
-**Domain use case**: keyset-paginate the poll feed with a hard cap.
+- **`getPollFeed`**: Retrieves a paginated feed of polls.
+- **`getPersonalizedPollFeed`**: Retrieves a poll feed tailored to a user's interactions.
+- **`getPollResults`**: Tallies votes and calculates results for a specific poll.
+- **`getPollSummary`**: Fetches a pre-calculated summary for a poll, including vote counts and percentages.
+- **`castVote`**: Validates and records a user's vote, ensuring idempotency.
 
-- **Source Contracts**: See [`poll-feed-source.ts`](../src/app/_domain/ports/out/poll-feed-source.ts) for complete interface definitions
-
-### 2. Cast Vote (`cast-vote.ts`)
-
-**Domain use case**: validate poll & option, ensure idempotency, append-only write.
-
-- **Source Contracts**: See [`polls-source.ts`](../src/app/_domain/ports/out/polls-source.ts) and [`votes-source.ts`](../src/app/_domain/ports/out/votes-source.ts) for complete interface definitions
-
-- **Domain Errors**:
-  - `"not_found"` → poll slug doesn't exist
-  - `"poll_closed"` → poll.status !== "open"
-  - `"option_mismatch"` → optionId not part of the poll's options
-
-### 3. Get Poll Results (`get-poll-results.ts`)
-
-**Domain use case**: snapshot of "current" vote tallies (latest-per-user).
-
-- **Source Contracts**: See [`polls-source.ts`](../src/app/_domain/ports/out/polls-source.ts) and [`votes-source.ts`](../src/app/_domain/ports/out/votes-source.ts) for complete interface definitions
-
-- **Domain Errors**:
-  - `"not_found"` → poll slug doesn't exist
+Each use case is responsible for enforcing domain rules, such as pagination limits, poll status checks, and data validation. They interact with data sources through outbound ports to remain decoupled from infrastructure concerns.
 
 ## Port Contracts
 
-All port interfaces are defined in the `_domain/ports/` directory:
+All port interfaces are defined in the `_domain/ports/` directory. These contracts define the boundary between the domain layer and the infrastructure adapters.
 
 ### Inbound Ports (Use Case Interfaces)
 
-- **[`cast-vote.ts`](../src/app/_domain/ports/in/cast-vote.ts)** - Vote casting input/output types
-- **[`get-poll-feed.ts`](../src/app/_domain/ports/in/get-poll-feed.ts)** - Poll feed query input/output types
-- **[`get-poll-results.ts`](../src/app/_domain/ports/in/get-poll-results.ts)** - Poll results query input/output types
+Located in `src/app/_domain/ports/in/`, these define the interfaces for the use cases that the application provides. Each file corresponds to a specific use case's input and output contracts.
 
 ### Outbound Ports (Data Source Interfaces)
 
-- **[`poll-feed-source.ts`](../src/app/_domain/ports/out/poll-feed-source.ts)** - Poll feed pagination contract
-- **[`polls-source.ts`](../src/app/_domain/ports/out/polls-source.ts)** - Poll metadata access contract
-- **[`votes-source.ts`](../src/app/_domain/ports/out/votes-source.ts)** - Vote storage and tallying contract
+Located in `src/app/_domain/ports/out/`, these define the interfaces for the data sources that the domain logic needs to function (e.g., fetching polls, storing votes).
 
 ## Domain Layer Rules
 

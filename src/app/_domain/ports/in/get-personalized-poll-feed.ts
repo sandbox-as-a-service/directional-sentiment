@@ -5,6 +5,10 @@ export type GetPersonalizedPollFeedResult = {
   nextCursor?: string
 }
 
+export type GetPersonalizedPollFeedError = {
+  error: string
+}
+
 export type GetPersonalizedPollFeedInput = {
   userId: string
   limit?: number
