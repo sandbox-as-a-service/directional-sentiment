@@ -57,23 +57,52 @@ export function Card({className, children, ...props}: ComponentPropsWithRef<"art
     // strict mode: by design, ignore anything that isn’t a slot marker
   })
 
+  const headerClassNameBase = [
+    // layout
+    "flex flex-col",
+    // spacing
+    "gap-2 px-4",
+  ]
+
   const headerNode = headerEl && (
-    <header {...headerEl.props} className={twMerge("flex flex-col gap-2 px-4", headerEl.props.className)} />
+    <header {...headerEl.props} className={twMerge(headerClassNameBase, headerEl.props.className)} />
   )
+
+  const bodyClassNameBase = [
+    // layout
+    "flex flex-col",
+    // spacing
+    "gap-2 px-4",
+  ]
 
   const bodyNode = contentEl && (
-    <div {...contentEl.props} className={twMerge("flex flex-col gap-2 px-4", contentEl.props.className)} />
+    <div {...contentEl.props} className={twMerge(bodyClassNameBase, contentEl.props.className)} />
   )
+
+  const footerClassNameBase = [
+    // layout
+    "flex flex-col",
+    // spacing
+    "gap-2 px-4",
+  ]
 
   const footerNode = footerEl && (
-    <footer {...footerEl.props} className={twMerge("flex flex-col gap-2 px-4", footerEl.props.className)} />
+    <footer {...footerEl.props} className={twMerge(footerClassNameBase, footerEl.props.className)} />
   )
 
+  const articleClassNameBase = [
+    // colors
+    "bg-card text-card-foreground",
+    // layout
+    "flex flex-col",
+    // spacing
+    "py-4 gap-4",
+    // shape
+    "border",
+  ]
+
   return (
-    <article
-      {...props}
-      className={twMerge("bg-card text-card-foreground flex flex-col gap-4 border py-4", className)}
-    >
+    <article {...props} className={twMerge(articleClassNameBase, className)}>
       {headerNode}
       {bodyNode}
       {footerNode}
