@@ -6,22 +6,49 @@ export function CardStack({className, ...props}: ComponentPropsWithRef<"div">) {
 }
 
 export function Card({className, ...props}: ComponentPropsWithRef<"article">) {
-  return (
-    <article
-      className={twMerge("bg-card text-card-foreground flex flex-col gap-4 border py-4", className)}
-      {...props}
-    />
-  )
+  const classNameBase = [
+    // colors
+    "bg-card text-card-foreground",
+    // layout
+    "flex flex-col",
+    // spacing
+    "py-4 gap-4",
+    // shape
+    "border",
+  ]
+
+  return <article className={twMerge(classNameBase, className)} {...props} />
 }
 
 export function CardHeader({className, ...props}: ComponentPropsWithRef<"header">) {
-  return <header className={twMerge("flex flex-col gap-2 px-4", className)} {...props} />
+  const classNameBase = [
+    // layout
+    "flex flex-col",
+    // spacing
+    "gap-2 px-4",
+  ]
+
+  return <header className={twMerge(classNameBase, className)} {...props} />
 }
 
 export function CardContent({className, ...props}: ComponentPropsWithRef<"div">) {
-  return <div className={twMerge("flex flex-col gap-2 px-4", className)} {...props} />
+  const classNameBase = [
+    // layout
+    "flex flex-col",
+    // spacing
+    "gap-2 px-4",
+  ]
+
+  return <div className={twMerge(classNameBase, className)} {...props} />
 }
 
 export function CardFooter({className, ...props}: ComponentPropsWithRef<"footer">) {
-  return <footer className={twMerge("flex flex-col gap-2 px-4", className)} {...props} />
+  const classNameBase = [
+    // layout
+    "flex flex-col",
+    // spacing
+    "gap-2 px-4",
+  ]
+
+  return <footer className={twMerge(classNameBase, className)} {...props} />
 }
