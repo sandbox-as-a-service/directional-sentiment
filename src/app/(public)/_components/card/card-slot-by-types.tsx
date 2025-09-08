@@ -25,9 +25,15 @@ type HeaderEl = ReactElement<ComponentPropsWithRef<"header">>
 type ContentEl = ReactElement<ComponentPropsWithRef<"div">>
 type FooterEl = ReactElement<ComponentPropsWithRef<"footer">>
 
-const isHeader = (n: ReactNode): n is HeaderEl => isValidElement(n) && n.type === CardHeader
-const isContent = (n: ReactNode): n is ContentEl => isValidElement(n) && n.type === CardContent
-const isFooter = (n: ReactNode): n is FooterEl => isValidElement(n) && n.type === CardFooter
+const isHeader = (node: ReactNode): node is HeaderEl => {
+  return isValidElement(node) && node.type === CardHeader
+}
+const isContent = (node: ReactNode): node is ContentEl => {
+  return isValidElement(node) && node.type === CardContent
+}
+const isFooter = (node: ReactNode): node is FooterEl => {
+  return isValidElement(node) && node.type === CardFooter
+}
 
 export function Card({className, children, ...props}: ComponentPropsWithRef<"article">) {
   let headerEl: HeaderEl | undefined
@@ -35,7 +41,7 @@ export function Card({className, children, ...props}: ComponentPropsWithRef<"art
   let footerEl: FooterEl | undefined
 
   Children.forEach(children, (child) => {
-    // First one of each wins; extras are ignored.
+    // First one of each wins. extras are ignored.
     if (!headerEl && isHeader(child)) {
       headerEl = child
       return
