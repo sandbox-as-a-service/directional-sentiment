@@ -118,11 +118,12 @@ The domain layer uses semantic error messages that adapters translate to HTTP st
 ### Domain Error Patterns
 
 ```typescript
-// Semantic domain errors (thrown from use cases)
+// Semantic domain errors (thrown from use cases only)
+// Domain never throws vendor-specific codes; outbound adapters surface those.
 throw new Error("not_found") // → 404
 throw new Error("poll_closed") // → 409
 throw new Error("option_mismatch") // → 422
-throw new Error("supabase_query_failed", {cause: originalError}) // → 503
+// Vendor/infra failures are represented by adapter-specific errors (e.g., "supabase_query_failed")
 ```
 
 ### Error Flow Pattern
