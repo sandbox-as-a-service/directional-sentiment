@@ -1,10 +1,4 @@
-import React, {
-  Children,
-  type ComponentPropsWithRef,
-  type ReactElement,
-  type ReactNode,
-  isValidElement,
-} from "react"
+import {Children, type ComponentPropsWithRef, type ReactElement, type ReactNode, isValidElement} from "react"
 import {twMerge} from "tailwind-merge"
 
 export function CardStack({className, ...props}: ComponentPropsWithRef<"div">) {
