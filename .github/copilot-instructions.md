@@ -4,8 +4,8 @@ This directory contains modular instructions for AI coding assistants working on
 
 ## Instruction Files
 
+- [`README.md`](../README.md) - Quick start, commands, and environment setup
 - [`architecture.md`](./architecture.md) - Hexagonal architecture patterns, domain structure, and data flow
-- [`development.md`](./development.md) - Commands, environment setup, and development workflows
 - [`testing.md`](./testing.md) - Unit testing methodology, API testing guidelines, and test conventions
 - [`conventions.md`](./conventions.md) - Code style, naming, and commit message formats
 - [`tech-stack.md`](./tech-stack.md) - Dependencies, frameworks, and tool-specific guidance

@@ -60,13 +60,13 @@ pnpm build              # Production build
 pnpm lint               # Check code style and errors
 ```
 
-For comprehensive command documentation, testing workflows, and advanced development practices, see [Development Workflow](.github/development.md).
+For testing workflows and conventions, see [.github/testing.md](.github/testing.md) and [.github/conventions.md](.github/conventions.md).
 
 ### Next Steps
 
 For comprehensive development guidance, explore the [`.github`](.github/) documentation:
 
-- **Start with:** [Development Workflow](.github/development.md) for detailed commands and testing
+- **Start with:** [README.md](README.md) for commands and setup
 - **Understanding the code:** [Architecture Guidelines](.github/architecture.md) for hexagonal architecture patterns
 - **Code standards:** [Code Conventions](.github/conventions.md) for style and commit formats
 
@@ -83,7 +83,7 @@ This project follows hexagonal (ports & adapters) architecture with:
 Comprehensive development documentation is available in the [`.github`](.github/) directory:
 
 - **[Architecture Guidelines](.github/architecture.md)** - Hexagonal architecture patterns, domain structure, and data flow
-- **[Development Workflow](.github/development.md)** - Commands, testing workflows, and debugging practices
+- **[Testing Guidelines](.github/testing.md)** - Unit testing methodology and API testing patterns
 - **[Code Conventions](.github/conventions.md)** - Code style, naming, and commit message formats
 - **[Tech Stack Details](.github/tech-stack.md)** - Dependencies, frameworks, and tool-specific guidance
 
