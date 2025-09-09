@@ -55,7 +55,7 @@ Start exploring the codebase with these key files:
 
 ```bash
 pnpm dev                # Development server with hot reload
-pnpm test:unit:jest     # Run unit tests  
+pnpm test:unit:jest     # Run unit tests
 pnpm build              # Production build
 pnpm lint               # Check code style and errors
 ```
