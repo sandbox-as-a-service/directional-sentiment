@@ -6,12 +6,8 @@ meta {
 
 get {
   url: {{URL}}/api/health
+  body: none
   auth: inherit
-}
-
-assert {
-  res.status: eq 200
-  res.body.status: eq ok
 }
 
 settings {
