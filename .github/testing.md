@@ -120,7 +120,3 @@ const poll = makePollFeedSource(data)
 - **Treat domain defaults as authoritative**: Use cases enforce policy, not adapters
 - **Test policy numbers explicitly**: Default page sizes, limits, clamps
 - **Verify business rules**: Pagination logic, validation rules, idempotency
-
-## API Testing with REST Client
-
-API testing is handled manually inside the VS Code editor with the REST Client extension. All REST endpoint definitions are located in the `rest-client/` directory.

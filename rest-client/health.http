@@ -1,3 +1,0 @@
-### Health Check
-# @name health
-GET {{URL}}/api/health

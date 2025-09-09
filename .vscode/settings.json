@@ -5,14 +5,5 @@
   },
   "editor.quickSuggestions": {
     "strings": "on"
-  },
-  "rest-client.environmentVariables": {
-    "$shared": {},
-    "local": {
-      "URL": "http://localhost:3000"
-    },
-    "production": {
-      "URL": "https://directional-sentiment.vercel.app"
-    }
   }
 }
