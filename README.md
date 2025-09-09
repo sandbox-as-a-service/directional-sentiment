@@ -55,20 +55,10 @@ Start exploring the codebase with these key files:
 
 ```bash
 pnpm dev                # Development server with hot reload
-pnpm test:unit:jest     # Run unit tests  
+pnpm test:unit:jest     # Run unit tests
 pnpm build              # Production build
 pnpm lint               # Check code style and errors
 ```
-
-For testing workflows and conventions, see [.github/testing.md](.github/testing.md) and [.github/conventions.md](.github/conventions.md).
-
-### Next Steps
-
-For comprehensive development guidance, explore the [`.github`](.github/) documentation:
-
-- **Start with:** [README.md](README.md) for commands and setup
-- **Understanding the code:** [Architecture Guidelines](.github/architecture.md) for hexagonal architecture patterns
-- **Code standards:** [Code Conventions](.github/conventions.md) for style and commit formats
 
 ## Architecture
 
@@ -86,14 +76,14 @@ Comprehensive development documentation is available in the [`.github`](.github/
 - **[Testing Guidelines](.github/testing.md)** - Unit testing methodology and API testing patterns
 - **[Code Conventions](.github/conventions.md)** - Code style, naming, and commit message formats
 - **[Tech Stack Details](.github/tech-stack.md)** - Dependencies, frameworks, and tool-specific guidance
+- **[Database](.github/database.md)** - Schema notes, access patterns, and Supabase usage
+- **[AI Assistant Instructions](.github/copilot-instructions.md)** - Project-specific guidance for AI coding assistants
+- **[AGENTS.md](AGENTS.md)** - Canonical agent behavior, scope, and precedence
+- **[INSTRUCTION-TIPS.md](INSTRUCTION-TIPS.md)** - General tips for writing effective instructions
 
 ### Sequence Diagrams
 
-Detailed API flow documentation:
-
-- **[Poll Feed Flow](.github/sequence-diagrams/get-poll-feed.md)** - Paginated data retrieval with cursor-based navigation
-- **[Poll Results Flow](.github/sequence-diagrams/get-poll-results.md)** - Real-time vote tallying and percentage calculations
-- **[Vote Casting Flow](.github/sequence-diagrams/cast-vote.md)** - Vote validation with idempotency protection
+All sequence diagrams are located in `.github/sequence-diagrams/`.
 
 ## Learn More
 
