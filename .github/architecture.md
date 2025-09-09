@@ -153,7 +153,38 @@ Each outbound port can have multiple implementations (see [`(adapters)/(out)/`](
 
 ### Middleware
 
-The `_infra/edge/` directory contains composable middleware for cross-cutting concerns that run at the edge (Next.js middleware). Middleware components can be composed together to handle authentication, rate limiting, and other edge concerns before requests reach the application routes.
+The `_infra/edge/` directory contains composable middleware for cross-cutting concerns that run at the edge (Next.js middleware). Middleware components are composed using the `compose` helper and run before application routes.
+
+**Composition:**
+- Entry point: `src/middleware.ts` composes steps with `compose(req, [withRateLimit, withSupabase])`.
+- Helper: `src/app/_infra/edge/compose.ts` orchestrates pass-through vs terminal responses.
+
+**Contract:**
+```ts
+// Every middleware MUST return a NextResponse
+export type Middleware = (
+  req: NextRequest,
+  res: NextResponse
+) => Promise<NextResponse> | NextResponse
+```
+
+**Rules:**
+- Return a `NextResponse` (never `void`).
+- Status 200 = pass-through to next middleware.
+- Non-200 = terminal; immediately return.
+- Preserve context by forwarding the latest `NextResponse`.
+
+**Available Middleware:**
+- `withRateLimit` — Rate limiting (fail-open for resilience)
+- `withSupabase` — Supabase auth session and cookie management
+
+**Execution Flow:**
+1. Start with `NextResponse.next({request: req})`.
+2. Each middleware receives `(req, currentResponse)` and returns a new `NextResponse`.
+3. If status is 200, continue; otherwise, stop and return.
+4. Return the final response after the chain.
+
+See source: `src/app/_infra/edge/compose.ts`, `src/app/_infra/edge/rate-limit/with-rate-limit.ts`, `src/app/_infra/edge/auth/with-supabase.ts`, and `src/middleware.ts`.
 
 ## Architectural Patterns
 
