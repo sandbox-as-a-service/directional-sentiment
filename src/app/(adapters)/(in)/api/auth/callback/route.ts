@@ -5,6 +5,8 @@ import {createSupabaseServerClient} from "@/app/(adapters)/(out)/supabase/server
 import {env} from "@/app/_config/env"
 import {logError, toError} from "@/app/_infra/logging/console-error"
 
+import {checkGitHubAccount} from "./check-github-account"
+
 const QuerySchema = z.object({
   code: z.string().min(1),
   next: z.string().default("/"),
@@ -29,10 +31,20 @@ export async function GET(req: NextRequest) {
     }
 
     const supabase = await createSupabaseServerClient()
-    const {error} = await supabase.auth.exchangeCodeForSession(code)
+    const {error, data} = await supabase.auth.exchangeCodeForSession(code)
 
     if (error) {
       // return the user to an error page with instructions
+      return NextResponse.redirect(new URL("/error", req.nextUrl.origin))
+    }
+
+    // Check account quality BEFORE completing sign-in
+    const isQualityAccount = await checkGitHubAccount(data.user)
+
+    if (!isQualityAccount) {
+      // Sign them out immediately
+      await supabase.auth.signOut()
+      // Redirect to error page with clear message
       return NextResponse.redirect(new URL("/error", req.nextUrl.origin))
     }
 
