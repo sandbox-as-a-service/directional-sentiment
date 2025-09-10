@@ -44,8 +44,8 @@ export async function GET(req: NextRequest) {
     if (!isQualityAccount) {
       // Sign them out immediately
       await supabase.auth.signOut()
-      // Redirect to error page with clear message
-      return NextResponse.redirect(new URL("/error", req.nextUrl.origin))
+      // Redirect to specific GitHub account error page
+      return NextResponse.redirect(new URL("/error/github-account", req.nextUrl.origin))
     }
 
     const forwardedHost = req.headers.get("x-forwarded-host") // original origin before load balancer
