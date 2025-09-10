@@ -10,6 +10,7 @@ This directory contains modular instructions for AI coding assistants working on
 - [`conventions.md`](./conventions.md) - Code style, naming, and commit message formats
 - [`tech-stack.md`](./tech-stack.md) - Dependencies, frameworks, and tool-specific guidance
 - [`database.md`](./database.md) - Database schema, access patterns, and Supabase usage
+- [`prd.md`](./prd.md) - Product Requirements Document outlining features, and acceptance criteria
 
 ## Sequence Diagrams
 
