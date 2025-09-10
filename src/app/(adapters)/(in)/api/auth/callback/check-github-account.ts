@@ -21,8 +21,9 @@ export async function checkGitHubAccount(user: User): Promise<boolean> {
     return false
   }
 
-  const accountAge = Date.now() - new Date(account.created_at).getTime()
-  const minAge = 30 * 24 * 60 * 60 * 1000 // 30 days
+  const accountCreated = new Date(account.created_at)
+  const threeMonthsAgo = new Date()
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
 
-  return accountAge > minAge
+  return accountCreated < threeMonthsAgo
 }
