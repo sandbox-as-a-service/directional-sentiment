@@ -4,7 +4,7 @@ import {cookies} from "next/headers"
 
 import {env} from "@/app/_config/env"
 
-import {DatabaseExtended} from "./types-extended"
+import type {DatabaseExtended} from "./types-extended"
 
 // Use for supabase.auth calls
 export async function createSupabaseServerClient() {
