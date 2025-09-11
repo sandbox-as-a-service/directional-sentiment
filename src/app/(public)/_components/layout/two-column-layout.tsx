@@ -1,24 +1,26 @@
-import type {ComponentPropsWithoutRef, FC} from "react"
+import type {ComponentPropsWithRef} from "react"
 import {twMerge} from "tailwind-merge"
 
-/* ---------- Root ---------- */
-
-export type TwoColumnLayoutProps = ComponentPropsWithoutRef<"div"> & {
+type TwoColumnLayoutProps = ComponentPropsWithRef<"div"> & {
   // when there is NO aside, make main span both tracks @lg (off => keep ~70%)
   expandMainWhenNoAside?: boolean
   // on stacked view, render aside first; reset to natural order @lg
   stackAsideFirst?: boolean
 }
 
-const containerBase = [
-  // stacked by default; 2 cols @lg using 70/30 split
-  "grid grid-cols-1 lg:grid lg:grid-cols-[7fr_3fr]",
-  // design-locked spacing
-  "gap-8 p-6",
-]
-
-const TwoColumnLayout: FC<TwoColumnLayoutProps> = (props) => {
-  const {expandMainWhenNoAside = true, stackAsideFirst = false, className, ...divProps} = props
+export function TwoColumnLayout({
+  expandMainWhenNoAside = true,
+  stackAsideFirst = false,
+  className,
+  ...props
+}: TwoColumnLayoutProps) {
+  const classNameBase = [
+    "container mx-auto", // center in viewport
+    // stacked by default; 2 cols @lg using 70/30 split
+    "grid grid-cols-1 lg:grid lg:grid-cols-[7fr_3fr]",
+    // design-locked spacing
+    "gap-8 p-6",
+  ]
 
   // if NO aside, upgrade main to span both tracks @lg
   const noAsideMakesMainFull =
@@ -29,63 +31,41 @@ const TwoColumnLayout: FC<TwoColumnLayoutProps> = (props) => {
     stackAsideFirst && "[&_[data-slot=aside]]:order-first lg:[&_[data-slot=aside]]:order-none"
 
   return (
-    <div
-      {...divProps}
-      className={twMerge(containerBase, noAsideMakesMainFull, stackedAsideFirst, className)}
-    />
+    <div className={twMerge(classNameBase, noAsideMakesMainFull, stackedAsideFirst, className)} {...props} />
   )
 }
 
-/* ---------- Main ---------- */
+type MainProps = ComponentPropsWithRef<"main">
 
-export type TwoColumnLayoutMainProps = ComponentPropsWithoutRef<"main">
+function Main({className, ...props}: MainProps) {
+  const classNameBase = [
+    // default desktop span = left track (~70%): lock main to left track (~70%)
+    "lg:row-start-1 lg:col-start-1 lg:col-span-1",
+  ]
 
-const mainBase = [
-  // default desktop span = left track (~70%): lock main to left track (~70%)
-  "lg:row-start-1 lg:col-start-1 lg:col-span-1",
-]
-
-const Main: FC<TwoColumnLayoutMainProps> = ({className, ...mainProps}) => {
-  return <main data-slot="main" className={twMerge(mainBase, className)} {...mainProps} />
+  return <main data-slot="main" className={twMerge(classNameBase, className)} {...props} />
 }
 
-/* ---------- Aside ---------- */
-
-export type TwoColumnLayoutAsideProps = ComponentPropsWithoutRef<"aside"> & {
+type AsideProps = ComponentPropsWithRef<"aside"> & {
   // e.g., "top-8" to pin under an offset while page scrolls
   stickyOffsetClassName?: string
 }
 
-const asideBase = [
-  // desktop: lock aside to right track (~30%)
-  "lg:row-start-1 lg:col-start-2 lg:col-span-1",
-  // don't stretch vertically; sticky needs content-sized box
-  "self-start",
-]
+function Aside({stickyOffsetClassName, className, ...props}: AsideProps) {
+  const classNameBase = [
+    // desktop: lock aside to right track (~30%)
+    "lg:row-start-1 lg:col-start-2 lg:col-span-1",
+    // don't stretch vertically; sticky needs content-sized box
+    "self-start",
+  ]
 
-const Aside: FC<TwoColumnLayoutAsideProps> = ({stickyOffsetClassName, className, ...asideProps}) => {
   // sticky keeps the sidebar visible while main scrolls; offset defines pin distance
   const sticky = stickyOffsetClassName && `sticky ${stickyOffsetClassName}`
-  return <aside data-slot="aside" className={twMerge(asideBase, sticky, className)} {...asideProps} />
+  return <aside data-slot="aside" className={twMerge(classNameBase, sticky, className)} {...props} />
 }
 
-/* ---------- Compound export ---------- */
-
-type TwoColumnLayoutCompound = FC<TwoColumnLayoutProps> & {
-  Main: FC<TwoColumnLayoutMainProps>
-  Aside: FC<TwoColumnLayoutAsideProps>
-}
-
-const TwoColumnLayoutCompound: TwoColumnLayoutCompound = Object.assign(TwoColumnLayout, {
-  Main,
-  Aside,
-})
-
-TwoColumnLayoutCompound.displayName = "TwoColumnLayout"
-Main.displayName = "TwoColumnLayout.Main"
-Aside.displayName = "TwoColumnLayout.Aside"
-
-export {TwoColumnLayoutCompound as TwoColumnLayout}
+TwoColumnLayout.Main = Main
+TwoColumnLayout.Aside = Aside
 
 /**
  * Design Decision Analysis: Component Patterns for Layout Components

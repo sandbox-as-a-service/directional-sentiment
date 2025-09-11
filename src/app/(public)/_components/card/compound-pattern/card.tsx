@@ -1,10 +1,6 @@
 import type {ComponentPropsWithRef} from "react"
 import {twMerge} from "tailwind-merge"
 
-export function CardStack({className, ...props}: ComponentPropsWithRef<"div">) {
-  return <div className={twMerge("border", className)} {...props} />
-}
-
 export function Card({className, ...props}: ComponentPropsWithRef<"article">) {
   const classNameBase = [
     // colors
@@ -20,7 +16,7 @@ export function Card({className, ...props}: ComponentPropsWithRef<"article">) {
   return <article className={twMerge(classNameBase, className)} {...props} />
 }
 
-export function CardHeader({className, ...props}: ComponentPropsWithRef<"header">) {
+function CardHeader({className, ...props}: ComponentPropsWithRef<"header">) {
   const classNameBase = [
     // layout
     "flex flex-col",
@@ -31,7 +27,7 @@ export function CardHeader({className, ...props}: ComponentPropsWithRef<"header"
   return <header className={twMerge(classNameBase, className)} {...props} />
 }
 
-export function CardContent({className, ...props}: ComponentPropsWithRef<"div">) {
+function CardContent({className, ...props}: ComponentPropsWithRef<"div">) {
   const classNameBase = [
     // layout
     "flex flex-col",
@@ -42,7 +38,7 @@ export function CardContent({className, ...props}: ComponentPropsWithRef<"div">)
   return <div className={twMerge(classNameBase, className)} {...props} />
 }
 
-export function CardFooter({className, ...props}: ComponentPropsWithRef<"footer">) {
+function CardFooter({className, ...props}: ComponentPropsWithRef<"footer">) {
   const classNameBase = [
     // layout
     "flex flex-col",
@@ -52,3 +48,7 @@ export function CardFooter({className, ...props}: ComponentPropsWithRef<"footer"
 
   return <footer className={twMerge(classNameBase, className)} {...props} />
 }
+
+Card.Header = CardHeader
+Card.Content = CardContent
+Card.Footer = CardFooter

@@ -94,17 +94,13 @@ const buttonVariants = cva(buttonBase, {
   },
 })
 
-export function Button({
-  className,
-  variant,
-  size,
-  asChild = false,
-  ...props
-}: ComponentPropsWithRef<"button"> &
+type ButtonProps = ComponentPropsWithRef<"button"> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
-  }) {
-  const Comp = asChild ? Slot : "button"
+  }
 
-  return <Comp className={twMerge(buttonVariants({variant, size, className}))} {...props} />
+export function Button({className, variant, size, asChild = false, ...props}: ButtonProps) {
+  const Component = asChild ? Slot : "button"
+
+  return <Component className={twMerge(buttonVariants({variant, size, className}))} {...props} />
 }
