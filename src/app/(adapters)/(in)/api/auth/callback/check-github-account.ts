@@ -1,7 +1,7 @@
-import type {User} from "@supabase/supabase-js"
+import type {GitHubUser} from "@/app/(adapters)/(out)/supabase/types-extended"
 
-export async function checkGitHubAccount(user: User): Promise<boolean> {
-  const username = user.user_metadata?.user_name
+export async function checkGitHubAccount(user: GitHubUser): Promise<boolean> {
+  const username = user.user_metadata.user_name
   if (!username) {
     console.warn("no_github_username_found_in_user_metadata")
     return false
