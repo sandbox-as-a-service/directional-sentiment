@@ -5,6 +5,10 @@ export type GetPollFeedResult = {
   nextCursor?: string
 }
 
+export type GetPollErrorResult = {
+  error: string
+}
+
 export type GetPollFeedInput = {
   limit?: number
   cursor?: string
