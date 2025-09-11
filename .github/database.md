@@ -77,7 +77,7 @@ erDiagram
   - Composite FK ensures vote belongs to correct poll
 - **Indexes**: Optimized for real-time tallying queries
 
-## Architectural Patterns
+## Domain Rules & Data Patterns
 
 ### Append-Only Voting
 

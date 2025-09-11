@@ -59,39 +59,13 @@ Avoid vague prefixes like `effective*` on collections. Name by role instead:
 - ✅ `pageItems`, `visibleItems`, `currentPolls`
 - ❌ `effectivePolls`, `effectiveItems`
 
-## Import Organization
-
-```typescript
-// Import order (automatically enforced by @trivago/prettier-plugin-sort-imports)
-import {external} from "external-package"
-
-import {internal} from "@/app/internal"
-
-import type {Type} from "./types"
-```
-
 **Note**: Import ordering is automatically handled by `@trivago/prettier-plugin-sort-imports` - no manual sorting required.
 
 ## Code Structure Patterns
 
-### Factory Function Pattern
-
-```typescript
-// Factory function pattern for creating adapters
-export function createSomethingSource(config: Config): SomethingSource {
-  return {
-    async operation() {
-      // implementation
-    },
-  }
-}
-```
-
 ## TypeScript Patterns
 
 - Use `type` for all type definitions (avoid mixing `interface` and `type` keywords)
-- Prefix interfaces with purpose: `PollFeedSource`, `GetPollFeedInput`
-- Export types from dedicated `dto/` folders in domain layer
 - Use `import type` rather than `import` when importing types and interfaces
 - Prefer functions over classes for implementation
 - Favor functional programming patterns over imperative loops
@@ -107,7 +81,7 @@ export function createSomethingSource(config: Config): SomethingSource {
 ```typescript
 const QuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(20),
-  cursor: z.iso.datetime().optional(), // ISO with timezone
+  cursor: z.iso.datetime().optional(), // ISO with timezone zod v4
 })
 ```
 
@@ -115,7 +89,7 @@ const QuerySchema = z.object({
 
 ```typescript
 // Server-side (request-scoped)
-const client = await createSupabaseServerClient()
+const client = await createSupabaseServerServiceClient()
 
 // Query pattern with error handling
 const {data, error} = await client
@@ -137,26 +111,28 @@ if (error) {
 // In API routes - map domain errors to HTTP responses
 try {
   await useCaseFunction(input)
-  console.info("🎉") // Success indicator
+
   return NextResponse.json(result, {status: 200})
 } catch (e) {
-  const message = e instanceof Error ? e.message : String(e)
-  const cause = e instanceof Error ? e.cause : undefined
-  console.error(message, cause)
+  const error = toError(e)
+  logError(error)
 
-  // Map domain errors to HTTP status codes
-  if (message === "not_found") {
+  if (error.message === "not_found") {
     return NextResponse.json({error: "not_found"}, {status: 404})
   }
-  if (message === "poll_closed") {
+
+  if (error.message === "poll_closed") {
     return NextResponse.json({error: "poll_closed"}, {status: 409})
   }
-  if (message === "option_mismatch") {
+
+  if (error.message === "option_mismatch") {
     return NextResponse.json({error: "option_mismatch"}, {status: 422})
   }
-  if (message.startsWith("supabase")) {
+
+  if (error.message.startsWith("supabase")) {
     return NextResponse.json({error: "service_unavailable"}, {status: 503})
   }
+
   return NextResponse.json({error: "internal_server_error"}, {status: 500})
 }
 ```
@@ -169,7 +145,7 @@ const result = Schema.safeParse(data)
 if (!parsed.success) {
   const message = z.treeifyError(parsed.error).properties
   console.warn(message)
-  return NextResponse.json({error: "bad_request", message}, {status: 400})
+  return NextResponse.json({error: "bad_request"}, {status: 400})
 }
 ```
 
@@ -186,7 +162,8 @@ console.warn(z.treeifyError(paramsParsed.error).properties) // Zod validation er
 console.warn(error.message, error.cause) // Auth/service warnings
 
 // Unhandled exceptions
-console.error(message, cause) // Always include cause when available
+const error = toError(e)
+logError(error)
 ```
 
 ### Log Levels by Use Case

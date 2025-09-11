@@ -40,7 +40,6 @@
 ### TypeScript & Development
 
 - **TypeScript**: v5.9+ with strict type checking
-- **ts-node**: v10.9+ for TypeScript execution in Node.js
 - **Type Definitions**:
   - `@types/node`: v24.3+ for Node.js types
   - `@types/react`: v19.1+ for React types
