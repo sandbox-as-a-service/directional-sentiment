@@ -6,10 +6,10 @@ import {Card} from "../_components/card/compound-pattern/card"
 import {NavLayout} from "../_components/layout/nav-layout"
 import {TwoColumnLayout} from "../_components/layout/two-column-layout"
 import {Separator} from "../_components/separator/separator"
-import {usePublicPollsFeed} from "../_hooks/use-public-polls-feed"
+import {usePollsFeed} from "../_hooks/use-public-polls-feed"
 
 export default function Page() {
-  const {data, isLoading, error} = usePublicPollsFeed()
+  const {data, isLoading, error} = usePollsFeed()
 
   return (
     <div>
