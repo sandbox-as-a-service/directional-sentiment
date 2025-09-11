@@ -1,6 +1,6 @@
 {
   "version": "0.2",
-  "ignorePaths": ["supabase"],
-  "ignoreWords": ["turbopack", "supabase", "treeify", "trivago", "timestamptz"],
+  "ignorePaths": ["supabase", "pnpm-lock.yaml"],
+  "ignoreWords": ["turbopack", "supabase", "treeify", "trivago", "timestamptz", "vercel"],
   "words": ["dedup"]
 }
