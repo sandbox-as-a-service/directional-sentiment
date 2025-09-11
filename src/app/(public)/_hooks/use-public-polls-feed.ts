@@ -5,7 +5,7 @@ import type {GetPollErrorResult, GetPollFeedResult} from "@/app/_domain/ports/in
 import {fetcher} from "../_utils/fetcher"
 
 export function usePublicPollsFeed() {
-  const key = "/api/polls/feed"
+  const key = "/api/polls/feed?limit=5"
   const res = useSWR<GetPollFeedResult, GetPollErrorResult>(key, fetcher)
   return res
 }
