@@ -3,7 +3,7 @@ import {Button} from "../button/button"
 import {Separator} from "../separator/separator"
 
 export function NavLayout() {
-  const {data} = useGetUser()
+  const {data, isLoading} = useGetUser()
 
   async function onSignOut() {
     const res = await fetch("/api/auth/sign-out", {method: "POST"})
@@ -22,11 +22,17 @@ export function NavLayout() {
   return (
     <header className="bg-background sticky top-0">
       <nav className="container mx-auto flex justify-end px-6 py-4">
-        {data ? (
+        {isLoading && (
+          <Button variant="outline" className="rounded-none">
+            Loading
+          </Button>
+        )}
+        {!isLoading && data && (
           <Button variant="outline" className="rounded-none" onClick={onSignOut}>
             Sign Out
           </Button>
-        ) : (
+        )}
+        {!isLoading && !data && (
           <Button className="rounded-none" onClick={onSignIn}>
             Sign In
           </Button>
