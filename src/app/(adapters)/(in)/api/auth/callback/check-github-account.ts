@@ -1,5 +1,9 @@
 import type {GitHubUser} from "@/app/(adapters)/(out)/supabase/types-extended"
 
+type GitHubAccount = {
+  created_at: string
+}
+
 export async function checkGitHubAccount(user: GitHubUser): Promise<boolean> {
   const username = user.user_metadata.user_name
   if (!username) {
@@ -14,7 +18,7 @@ export async function checkGitHubAccount(user: GitHubUser): Promise<boolean> {
     return false
   }
 
-  const account = await res.json()
+  const account: GitHubAccount = await res.json()
 
   if (!account.created_at) {
     console.warn("no_created_at_found_in_github_account")
