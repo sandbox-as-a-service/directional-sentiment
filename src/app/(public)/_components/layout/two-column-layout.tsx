@@ -2,9 +2,9 @@ import type {ComponentPropsWithRef} from "react"
 import {twMerge} from "tailwind-merge"
 
 type TwoColumnLayoutProps = ComponentPropsWithRef<"div"> & {
-  // when there is NO aside, make main span both tracks @lg (off => keep ~70%)
+  // when there is NO aside, make main span both tracks @xl (off => keep ~70%)
   expandMainWhenNoAside?: boolean
-  // on stacked view, render aside first; reset to natural order @lg
+  // on stacked view, render aside first; reset to natural order @xl
   stackAsideFirst?: boolean
 }
 
@@ -16,19 +16,19 @@ export function TwoColumnLayout({
 }: TwoColumnLayoutProps) {
   const classNameBase = [
     "container mx-auto", // center in viewport
-    // stacked by default; 2 cols @lg using 70/30 split
-    "grid grid-cols-1 lg:grid lg:grid-cols-[7fr_3fr]",
+    // stacked by default; 2 cols @xl using 70/30 split
+    "grid grid-cols-1 xl:grid xl:grid-cols-[7fr_3fr]",
     // design-locked spacing
     "gap-8 p-6",
   ]
 
-  // if NO aside, upgrade main to span both tracks @lg
+  // if NO aside, upgrade main to span both tracks @xl
   const noAsideMakesMainFull =
-    expandMainWhenNoAside && "[&:not(:has([data-slot=aside]))_[data-slot=main]]:lg:col-span-2"
+    expandMainWhenNoAside && "[&:not(:has([data-slot=aside]))_[data-slot=main]]:xl:col-span-2"
 
-  // on stacked view, move aside before main; reset @lg
+  // on stacked view, move aside before main; reset @xl
   const stackedAsideFirst =
-    stackAsideFirst && "[&_[data-slot=aside]]:order-first lg:[&_[data-slot=aside]]:order-none"
+    stackAsideFirst && "[&_[data-slot=aside]]:order-first xl:[&_[data-slot=aside]]:order-none"
 
   return (
     <div className={twMerge(classNameBase, noAsideMakesMainFull, stackedAsideFirst, className)} {...props} />
@@ -40,7 +40,7 @@ type MainProps = ComponentPropsWithRef<"main">
 function Main({className, ...props}: MainProps) {
   const classNameBase = [
     // default desktop span = left track (~70%): lock main to left track (~70%)
-    "lg:row-start-1 lg:col-start-1 lg:col-span-1",
+    "xl:row-start-1 xl:col-start-1 xl:col-span-1",
   ]
 
   return <main data-slot="main" className={twMerge(classNameBase, className)} {...props} />
@@ -54,7 +54,7 @@ type AsideProps = ComponentPropsWithRef<"aside"> & {
 function Aside({stickyOffsetClassName, className, ...props}: AsideProps) {
   const classNameBase = [
     // desktop: lock aside to right track (~30%)
-    "lg:row-start-1 lg:col-start-2 lg:col-span-1",
+    "xl:row-start-1 xl:col-start-2 xl:col-span-1",
     // don't stretch vertically; sticky needs content-sized box
     "self-start",
   ]
@@ -76,7 +76,7 @@ TwoColumnLayout.Aside = Aside
  *
  * The root layout owns cross-child behavior like stacked ordering or "expand when no aside."
  * Consumers flip behavior with small, well-named props (e.g., stackAsideFirst, expandMainWhenNoAside).
- * Implementation uses container-scoped selectors and Tailwind utilities (:has, order-first lg:order-none, etc.).
+ * Implementation uses container-scoped selectors and Tailwind utilities (:has, order-first xl:order-none, etc.).
  *
  * Pros
  *
@@ -112,7 +112,7 @@ TwoColumnLayout.Aside = Aside
  *
  * // Or sprinkle classes ad-hoc
  * <TwoColumnLayout>
- *   <TwoColumnLayout.Main className="lg:col-span-2">main</TwoColumnLayout.Main>
+ *   <TwoColumnLayout.Main className="xl:col-span-2">main</TwoColumnLayout.Main>
  * </TwoColumnLayout>
  *
  * Pros
@@ -144,7 +144,7 @@ TwoColumnLayout.Aside = Aside
  * DX / types: Great. Consumers get TwoColumnLayout.Main / .Aside with normal JSX, full TS inference.
  * Nesting: Works fine with wrappers (you used data-slot + container selectors; not brittle).
  * SSR / RSC: Safe. No render-time child walking or effects required.
- * Reordering / rules: Root knobs (stackAsideFirst, expandMainWhenNoAside) are predictable; you already pinned desktop with lg:col-start-* and solved the auto-placement row gap with grid-flow-row-dense.
+ * Reordering / rules: Root knobs (stackAsideFirst, expandMainWhenNoAside) are predictable; you already pinned desktop with xl:col-start-* and solved the auto-placement row gap with grid-flow-row-dense.
  * Verdict: ✅ Keep. It's the simplest, most maintainable match for "main/aside" layouts.
  *
  * 2) "Multiple slot props" (header, footer, etc.)
@@ -185,6 +185,6 @@ TwoColumnLayout.Aside = Aside
  * Bottom line for your layout
 
  * Keep the compound pattern with root knobs (container concerns) and child-local props (e.g., stickyOffsetClassName).
- * Keep the CSS-driven logic (:has for "no aside" upgrade if you want it, grid-flow-row-dense, lg:col-start-* to pin columns). That gave you first-paint correctness without context races.
+ * Keep the CSS-driven logic (:has for "no aside" upgrade if you want it, grid-flow-row-dense, xl:col-start-* to pin columns). That gave you first-paint correctness without context races.
  * Avoid child-type scanning and context-slots; they solve problems you don't have and introduce new ones.
  */
