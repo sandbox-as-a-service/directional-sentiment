@@ -8,7 +8,7 @@ export function Separator({
   decorative = true,
   ...props
 }: ComponentProps<typeof SeparatorPrimitive.Root>) {
-  const baseClassName = [
+  const classNameBase = [
     "bg-border", // Use theme border color
     "shrink-0", // Prevent flexbox shrinking
     "data-[orientation=horizontal]:h-px", // 1px height when horizontal
@@ -22,7 +22,7 @@ export function Separator({
       data-slot="separator"
       decorative={decorative}
       orientation={orientation}
-      className={twMerge(baseClassName, className)}
+      className={twMerge(classNameBase, className)}
       {...props}
     />
   )
