@@ -1,6 +1,6 @@
 import {useGetUser} from "../../_hooks/use-get-user"
 import {getInitials} from "../../_utils/get-initials"
-import {Avatar, AvatarFallback, AvatarImage} from "../avatar/avatar"
+import {Avatar} from "../avatar/avatar"
 import {Button} from "../button/button"
 import {Separator} from "../separator/separator"
 
@@ -35,8 +35,8 @@ export function NavLayout() {
               Sign Out
             </Button>
             <Avatar>
-              <AvatarImage src={data.user_metadata.avatar_url} />
-              <AvatarFallback>{getInitials(data.user_metadata.full_name)}</AvatarFallback>
+              <Avatar.Image src={data.user_metadata.avatar_url} />
+              <Avatar.Fallback>{getInitials(data.user_metadata.full_name)}</Avatar.Fallback>
             </Avatar>
           </div>
         )}

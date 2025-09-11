@@ -35,9 +35,9 @@ export function TwoColumnLayout({
   )
 }
 
-type MainProps = ComponentPropsWithRef<"main">
+type TwoColumnLayoutMainProps = ComponentPropsWithRef<"main">
 
-function Main({className, ...props}: MainProps) {
+function TwoColumnLayoutMain({className, ...props}: TwoColumnLayoutMainProps) {
   const classNameBase = [
     // default desktop span = left track (~70%): lock main to left track (~70%)
     "xl:row-start-1 xl:col-start-1 xl:col-span-1",
@@ -46,12 +46,12 @@ function Main({className, ...props}: MainProps) {
   return <main data-slot="main" className={twMerge(classNameBase, className)} {...props} />
 }
 
-type AsideProps = ComponentPropsWithRef<"aside"> & {
+type TwoColumnLayoutAsideProps = ComponentPropsWithRef<"aside"> & {
   // e.g., "top-8" to pin under an offset while page scrolls
   stickyOffsetClassName?: string
 }
 
-function Aside({stickyOffsetClassName, className, ...props}: AsideProps) {
+function TwoColumnLayoutAside({stickyOffsetClassName, className, ...props}: TwoColumnLayoutAsideProps) {
   const classNameBase = [
     // desktop: lock aside to right track (~30%)
     "xl:row-start-1 xl:col-start-2 xl:col-span-1",
@@ -64,8 +64,8 @@ function Aside({stickyOffsetClassName, className, ...props}: AsideProps) {
   return <aside data-slot="aside" className={twMerge(classNameBase, sticky, className)} {...props} />
 }
 
-TwoColumnLayout.Main = Main
-TwoColumnLayout.Aside = Aside
+TwoColumnLayout.Main = TwoColumnLayoutMain
+TwoColumnLayout.Aside = TwoColumnLayoutAside
 
 /**
  * Design Decision Analysis: Component Patterns for Layout Components
