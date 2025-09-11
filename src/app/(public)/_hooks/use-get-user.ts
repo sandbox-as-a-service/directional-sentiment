@@ -1,11 +1,10 @@
-import type {User} from "@supabase/supabase-js"
 import useSWR from "swr"
 
-import {fetcher} from "../_utils/fetcher"
+import type {GitHubUser} from "@/app/(adapters)/(out)/supabase/types-extended"
 
 export function useGetUser() {
   const key = "/api/auth/user"
-  const res = useSWR<User>(key, fetcher, {
+  const res = useSWR<GitHubUser>(key, {
     shouldRetryOnError: false,
   })
   return res

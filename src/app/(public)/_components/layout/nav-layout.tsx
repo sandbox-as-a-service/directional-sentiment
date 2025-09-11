@@ -1,4 +1,6 @@
 import {useGetUser} from "../../_hooks/use-get-user"
+import {getInitials} from "../../_utils/get-initials"
+import {Avatar, AvatarFallback, AvatarImage} from "../avatar/avatar"
 import {Button} from "../button/button"
 import {Separator} from "../separator/separator"
 
@@ -28,9 +30,15 @@ export function NavLayout() {
           </Button>
         )}
         {!isLoading && data && (
-          <Button variant="outline" className="rounded-none" onClick={onSignOut}>
-            Sign Out
-          </Button>
+          <div className="flex items-center gap-4">
+            <Button variant="outline" className="rounded-none" onClick={onSignOut}>
+              Sign Out
+            </Button>
+            <Avatar>
+              <AvatarImage src={data.user_metadata.avatar_url} />
+              <AvatarFallback>{getInitials(data.user_metadata.full_name)}</AvatarFallback>
+            </Avatar>
+          </div>
         )}
         {!isLoading && !data && (
           <Button className="rounded-none" onClick={onSignIn}>
