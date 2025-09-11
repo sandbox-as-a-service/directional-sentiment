@@ -34,6 +34,7 @@ export async function GET(req: NextRequest) {
     const {error, data} = await supabase.auth.exchangeCodeForSession(code)
 
     if (error) {
+      logError(error)
       // return the user to an error page with instructions
       return NextResponse.redirect(new URL("/error", req.nextUrl.origin))
     }

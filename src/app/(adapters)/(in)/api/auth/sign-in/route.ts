@@ -30,6 +30,7 @@ export async function GET(req: NextRequest) {
     })
 
     if (error) {
+      logError(error)
       return NextResponse.redirect(new URL("/error", req.nextUrl.origin))
     }
 
