@@ -6,6 +6,7 @@ import {logError, toError} from "@/app/_infra/logging/console-error"
 
 const QuerySchema = z.object({
   provider: z.literal("github").default("github"),
+  returnTo: z.string().default("/"),
 })
 
 export async function GET(req: NextRequest) {
@@ -21,7 +22,10 @@ export async function GET(req: NextRequest) {
 
     const supabase = await createSupabaseServerClient()
 
-    const redirectToURL = new URL("/api/auth/callback?next=/", req.nextUrl.origin)
+    const redirectToURL = new URL(
+      `/api/auth/callback?next=${encodeURIComponent(parsed.data.returnTo)}`,
+      req.nextUrl.origin,
+    )
     const {data, error} = await supabase.auth.signInWithOAuth({
       provider: parsed.data.provider,
       options: {
