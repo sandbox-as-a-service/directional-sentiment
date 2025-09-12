@@ -32,7 +32,7 @@ export function HeaderLayout() {
         )}
       </nav>
       <Separator />
-      <div className="h-6" />
+      <div className="h-6.5" />
     </header>
   )
 }
