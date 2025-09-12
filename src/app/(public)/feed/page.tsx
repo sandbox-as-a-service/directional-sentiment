@@ -2,10 +2,10 @@
 
 import {Fragment, useEffect, useRef} from "react"
 
-import {Button} from "../_components/button/button"
 import {Card} from "../_components/card/compound-pattern/card"
 import {HeaderLayout} from "../_components/layout/header-layout"
 import {TwoColumnLayout} from "../_components/layout/two-column-layout"
+import {PollCard} from "../_components/poll-card/poll-card"
 import {Separator} from "../_components/separator/separator"
 import {usePollsFeed} from "../_hooks/use-public-polls-feed"
 
@@ -61,16 +61,7 @@ export default function Page() {
             {!isLoading &&
               items.map((item, index) => (
                 <Fragment key={item.pollId}>
-                  <Card className="border-none">
-                    <Card.Header>{item.question}</Card.Header>
-                    <Card.Content>
-                      {item.options.map((option) => (
-                        <Button key={option.optionId} variant="outline" className="rounded-none" size="lg">
-                          {option.label}
-                        </Button>
-                      ))}
-                    </Card.Content>
-                  </Card>
+                  <PollCard poll={item} />
                   {index < items.length - 1 && <Separator />}
                 </Fragment>
               ))}
@@ -87,10 +78,6 @@ export default function Page() {
 
         <TwoColumnLayout.Aside stickyOffsetClassName="top-24">
           <div className="flex flex-col gap-8">
-            <Card>
-              <Card.Header>Search</Card.Header>
-              <Card.Content>Technology</Card.Content>
-            </Card>
             <Card>
               <Card.Header>Trending</Card.Header>
               <Card.Content>12</Card.Content>
