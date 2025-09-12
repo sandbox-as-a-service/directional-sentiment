@@ -14,7 +14,7 @@ function RawPollCard({poll, onVote}: PollCardProps) {
   // Initialize state based on whether user already voted (from server data)
   const [votingState, setVotingState] = useState<"idle" | "voting" | "voted">(poll.current ? "voted" : "idle")
 
-  const handleVote = async (optionId: string) => {
+  async function handleVote(optionId: string) {
     if (votingState !== "idle") return // Only allow voting when idle
 
     setVotingState("voting")
@@ -27,7 +27,7 @@ function RawPollCard({poll, onVote}: PollCardProps) {
     }
   }
 
-  const handleChangeOpinion = () => {
+  function handleChangeOpinion() {
     setVotingState("idle") // Reset to allow voting again
   }
 
