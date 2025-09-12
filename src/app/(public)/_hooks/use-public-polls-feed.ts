@@ -35,7 +35,7 @@ export function usePollsFeed(limit = 10) {
     return `${base}?${params.toString()}`
   }
 
-  const {data, error, isLoading, size, setSize} = useSWRInfinite<
+  const {data, error, isLoading, size, setSize, mutate} = useSWRInfinite<
     GetPersonalizedPollFeedResult,
     GetPersonalizedPollFeedError
   >(getKey, {
@@ -63,6 +63,86 @@ export function usePollsFeed(limit = 10) {
     }
   }
 
+  // Optimistically update poll data after voting
+  const castVote = async (pollId: string, optionId: string) => {
+    // Find the poll to get its slug
+    const poll = items.find((p) => p.pollId === pollId)
+    if (!poll) throw new Error("Poll not found")
+
+    // Optimistic update: immediately update the UI
+    mutate(
+      (pages) => {
+        if (!pages) return pages
+
+        return pages.map((page) => ({
+          ...page,
+          items: page.items.map((poll) => {
+            if (poll.pollId !== pollId) return poll
+
+            // Update the current vote
+            const updatedPoll = {
+              ...poll,
+              current: optionId,
+            }
+
+            // Optimistically update vote counts (simple increment)
+            const updatedResults = {
+              ...poll.results,
+              total: poll.results.total + 1,
+              items: poll.results.items.map((item) => {
+                if (item.optionId === optionId) {
+                  return {
+                    ...item,
+                    count: item.count + 1,
+                  }
+                }
+                return item
+              }),
+            }
+
+            // Recalculate percentages
+            const total = updatedResults.total
+            updatedResults.items = updatedResults.items.map((item) => ({
+              ...item,
+              pct: total > 0 ? Math.round((item.count / total) * 1000) / 10 : 0,
+            }))
+
+            return {
+              ...updatedPoll,
+              results: updatedResults,
+            }
+          }),
+        }))
+      },
+      {
+        revalidate: false, // Don't revalidate immediately - we want optimistic update first, then manual revalidate after API success
+      },
+    )
+
+    // Make the actual API call
+    try {
+      const res = await fetch(`/api/polls/${poll.slug}/votes`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({optionId, idempotencyKey: crypto.randomUUID()}),
+      })
+
+      if (!res.ok) {
+        throw new Error("cast_vote_failed")
+      }
+
+      // Revalidate to get the real data from server
+      // Since the vote endpoint returns 204 (no content), we need to
+      // fetch fresh data to get the updated vote counts and percentages
+      mutate()
+    } catch (error) {
+      // Revert optimistic update on error
+      console.error(error)
+      mutate()
+      throw error
+    }
+  }
+
   return {
     items, // flat list for rendering
     error,
@@ -70,5 +150,6 @@ export function usePollsFeed(limit = 10) {
     isLoadingMore,
     hasMore,
     loadMore,
+    castVote, // voting helper
   }
 }

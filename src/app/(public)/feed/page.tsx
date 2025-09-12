@@ -12,7 +12,7 @@ import {usePollsFeed} from "../_hooks/use-public-polls-feed"
 
 export default function Page() {
   // Grab flat items + helpers from the infinite hook
-  const {items, isLoading, isLoadingMore, error, hasMore, loadMore} = usePollsFeed()
+  const {items, isLoading, isLoadingMore, error, hasMore, loadMore, castVote} = usePollsFeed()
 
   // This ref points to a tiny div at the end of the list.
   // When it enters the viewport, we fetch the next page.
@@ -64,7 +64,7 @@ export default function Page() {
             {!isLoading &&
               items.map((item, index) => (
                 <Fragment key={item.pollId}>
-                  <PollCard poll={item} />
+                  <PollCard poll={item} onVote={castVote} />
                   {index < items.length - 1 && <Separator />}
                 </Fragment>
               ))}
