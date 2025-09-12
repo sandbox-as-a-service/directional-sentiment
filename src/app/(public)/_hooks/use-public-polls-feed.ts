@@ -1,43 +1,74 @@
-import useSWR from "swr"
+import useSWRInfinite from "swr/infinite"
 
 import type {
   GetPersonalizedPollFeedError,
   GetPersonalizedPollFeedResult,
 } from "@/app/_domain/ports/in/get-personalized-poll-feed"
-import type {GetPollErrorResult, GetPollFeedResult} from "@/app/_domain/ports/in/get-poll-feed"
 
 import {useGetUser} from "./use-get-user"
 
-export function usePersonalizedPollsFeed(shouldFetch = true) {
-  const key = "/api/polls/feed/personalized?limit=10"
-  const res = useSWR<GetPersonalizedPollFeedResult, GetPersonalizedPollFeedError>(shouldFetch ? key : null)
-  return res
-}
+export function usePollsFeed(limit = 10) {
+  const {data: user, isLoading: userLoading} = useGetUser()
+  const usePersonalized = Boolean(user)
 
-export function usePublicPollsFeed(shouldFetch = true) {
-  const key = "/api/polls/feed?limit=10"
-  const res = useSWR<GetPollFeedResult, GetPollErrorResult>(shouldFetch ? key : null)
-  return res
-}
+  // Build the key for each page.
+  // - Return null to stop fetching (SWR rule).
+  // - We wait for user state to resolve so we know the correct base URL.
+  function getKey(pageIndex: number, previousPage: GetPersonalizedPollFeedResult | null) {
+    if (userLoading) {
+      return null // wait until we know if user exists
+    }
 
-export function usePollsFeed() {
-  const {data, isLoading} = useGetUser()
+    if (previousPage && !previousPage.nextCursor) {
+      return null // reached the end
+    }
 
-  const shouldUsePersonalized = Boolean(data)
-  const personalizedFeed = usePersonalizedPollsFeed(!isLoading && shouldUsePersonalized)
-  const publicFeed = usePublicPollsFeed(!isLoading && !shouldUsePersonalized)
+    const base = usePersonalized ? "/api/polls/feed/personalized" : "/api/polls/feed"
 
-  if (shouldUsePersonalized) {
-    return {
-      ...personalizedFeed,
-      data: personalizedFeed.data as GetPersonalizedPollFeedResult,
-      isLoading: isLoading || personalizedFeed.isLoading,
-    } as const
+    const params = new URLSearchParams({limit: String(limit)})
+
+    // First page has no cursor; subsequent pages pass the previous page's nextCursor
+    if (pageIndex > 0 && previousPage?.nextCursor) {
+      params.set("cursor", previousPage.nextCursor)
+    }
+
+    return `${base}?${params.toString()}`
+  }
+
+  const {data, error, isLoading, size, setSize} = useSWRInfinite<
+    GetPersonalizedPollFeedResult,
+    GetPersonalizedPollFeedError
+  >(getKey, {
+    revalidateFirstPage: false, // New polls are not frequent, so don't bother revalidating the first page. default is true
+  })
+
+  // Initial loading = when the first (real) fetch is happening
+  // (If key is null because user is loading, we rely on userLoading)
+  const isLoadingInitial = userLoading || isLoading
+
+  // While SWR is fetching page N, data[N] is temporarily `undefined`
+  // -> this is the canonical "is loading more" signal
+  const isLoadingMore = size > 0 && !!data && typeof data[size - 1] === "undefined"
+
+  // Flatten pages for the UI
+  const items = data ? data.flatMap((p) => p?.items ?? []) : []
+
+  // More pages?
+  const hasMore = Boolean(data?.[data.length - 1]?.nextCursor)
+
+  // Small helpers the page can call.
+  const loadMore = () => {
+    if (hasMore && !isLoadingMore) {
+      setSize(size + 1)
+    }
   }
 
   return {
-    ...publicFeed,
-    data: publicFeed.data as GetPersonalizedPollFeedResult,
-    isLoading: isLoading || publicFeed.isLoading,
-  } as const
+    items, // flat list for rendering
+    error,
+    isLoading: isLoadingInitial,
+    isLoadingMore,
+    hasMore,
+    loadMore,
+  }
 }
