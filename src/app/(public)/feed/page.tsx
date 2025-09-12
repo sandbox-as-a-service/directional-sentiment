@@ -3,6 +3,7 @@
 import {Fragment, useEffect, useRef} from "react"
 
 import {Card} from "../_components/card/compound-pattern/card"
+import {HowItWorksCard} from "../_components/how-it-works-card/how-it-works-card"
 import {HeaderLayout} from "../_components/layout/header-layout"
 import {TwoColumnLayout} from "../_components/layout/two-column-layout"
 import {PollCard} from "../_components/poll-card/poll-card"
@@ -79,17 +80,9 @@ export default function Page() {
             {!isLoading && <div ref={loadMoreRef} aria-hidden />}
           </div>
         </TwoColumnLayout.Main>
-
         <TwoColumnLayout.Aside stickyOffsetClassName="top-24">
           <div className="flex flex-col gap-8">
-            <Card>
-              <Card.Header>Trending</Card.Header>
-              <Card.Content>12</Card.Content>
-            </Card>
-            <Card>
-              <Card.Header>How it works</Card.Header>
-              <Card.Content>lorem</Card.Content>
-            </Card>
+            <HowItWorksCard />
           </div>
         </TwoColumnLayout.Aside>
       </TwoColumnLayout>
