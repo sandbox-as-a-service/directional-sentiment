@@ -6,6 +6,7 @@ import {Card} from "../_components/card/compound-pattern/card"
 import {HeaderLayout} from "../_components/layout/header-layout"
 import {TwoColumnLayout} from "../_components/layout/two-column-layout"
 import {PollCard} from "../_components/poll-card/poll-card"
+import {PollCardSkeleton} from "../_components/poll-card/poll-card-skeleton"
 import {Separator} from "../_components/separator/separator"
 import {usePollsFeed} from "../_hooks/use-public-polls-feed"
 
@@ -43,13 +44,15 @@ export default function Page() {
     <div>
       <HeaderLayout />
       <TwoColumnLayout className="pt-0">
-        <TwoColumnLayout.Main className="pt-1">
+        <TwoColumnLayout.Main>
           <div className="border">
-            {isLoading && (
-              <Card className="border-none">
-                <Card.Header>Loading</Card.Header>
-              </Card>
-            )}
+            {isLoading &&
+              Array.from({length: 10}).map((_, index) => (
+                <Fragment key={index}>
+                  <PollCardSkeleton />
+                  {index < 9 && <Separator />}
+                </Fragment>
+              ))}
 
             {error && (
               <Card className="border-none">
@@ -67,9 +70,10 @@ export default function Page() {
               ))}
 
             {!isLoading && isLoadingMore && (
-              <Card className="border-none">
-                <Card.Header>Loading more…</Card.Header>
-              </Card>
+              <>
+                <Separator />
+                <PollCardSkeleton />
+              </>
             )}
 
             {!isLoading && <div ref={loadMoreRef} aria-hidden />}

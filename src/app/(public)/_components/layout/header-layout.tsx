@@ -11,7 +11,7 @@ export function HeaderLayout() {
   const {signIn, signOut} = useAuthActions()
 
   return (
-    <header className="bg-background sticky top-0">
+    <header className="bg-background sticky top-0 z-10">
       <nav className="container mx-auto flex justify-end px-6 py-4">
         {isLoading && <Skeleton className="h-9 w-34 rounded-none" />}
         {!isLoading && data && (
