@@ -4,12 +4,13 @@ import {getInitials} from "../../_utils/get-initials"
 import {Avatar} from "../avatar/avatar"
 import {Button} from "../button/button"
 import {Separator} from "../separator/separator"
+import {SignInDialog} from "../sign-in-dialog/sign-in-dialog"
 import {Skeleton} from "../skeleton/skeleton"
 import {TypographyH1} from "../typography/typography"
 
 export function HeaderLayout() {
   const {data, isLoading} = useGetUser()
-  const {signIn, signOut} = useAuthActions()
+  const {signOut} = useAuthActions()
 
   return (
     <header className="bg-background sticky top-0 z-10">
@@ -28,9 +29,9 @@ export function HeaderLayout() {
           </div>
         )}
         {!isLoading && !data && (
-          <Button className="rounded-none" onClick={signIn}>
-            Sign In
-          </Button>
+          <SignInDialog>
+            <Button className="rounded-none">Sign In</Button>
+          </SignInDialog>
         )}
       </nav>
       <Separator />
