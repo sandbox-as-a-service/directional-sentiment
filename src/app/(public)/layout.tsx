@@ -1,6 +1,8 @@
 import type {Metadata} from "next"
 import {Geist, Geist_Mono} from "next/font/google"
 
+import {AppSidebar} from "./_components/sidebar/app-sidebar"
+import {SidebarProvider, SidebarTrigger} from "./_components/sidebar/sidebar"
 import {SWRProvider} from "./_providers/swr-provider"
 import "./globals.css"
 
@@ -27,7 +29,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <SWRProvider>{children}</SWRProvider>
+        <SWRProvider>
+          <SidebarProvider>
+            <AppSidebar />
+            <SidebarTrigger className="fixed top-5 left-5 z-50 lg:hidden" />
+            {children}
+          </SidebarProvider>
+        </SWRProvider>
       </body>
     </html>
   )
