@@ -4,6 +4,8 @@ import {twMerge} from "tailwind-merge"
 
 import type {PollPersonalizedPageItem} from "@/app/_domain/use-cases/polls/dto/poll"
 
+import {useAuthActions} from "../../_hooks/use-auth-actions"
+import {useGetUser} from "../../_hooks/use-get-user"
 import {Button} from "../button/button"
 import {Card} from "../card/compound-pattern/card"
 
@@ -15,8 +17,15 @@ type PollCardProps = {
 function RawPollCard({poll, onVote}: PollCardProps) {
   // Initialize state based on whether user already voted (from server data)
   const [votingState, setVotingState] = useState<"idle" | "voting" | "voted">(poll.current ? "voted" : "idle")
+  const {data: user} = useGetUser()
+  const {signIn} = useAuthActions()
 
   async function handleVote(optionId: string) {
+    if (!user) {
+      signIn()
+      return
+    }
+
     if (votingState !== "idle") return // Only allow voting when idle
 
     setVotingState("voting")
