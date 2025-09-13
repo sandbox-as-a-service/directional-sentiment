@@ -1,13 +1,12 @@
-import {Check} from "lucide-react"
 import {memo, useState} from "react"
-import {twMerge} from "tailwind-merge"
 
 import type {PollPersonalizedPageItem} from "@/app/_domain/use-cases/polls/dto/poll"
 
-import {useAuthActions} from "../../_hooks/use-auth-actions"
 import {useGetUser} from "../../_hooks/use-get-user"
 import {Button} from "../button/button"
 import {Card} from "../card/compound-pattern/card"
+import {SignInDialog} from "../sign-in-dialog/sign-in-dialog"
+import {VoteButton} from "../vote-button/vote-button"
 
 type PollCardProps = {
   poll: PollPersonalizedPageItem
@@ -18,14 +17,9 @@ function RawPollCard({poll, onVote}: PollCardProps) {
   // Initialize state based on whether user already voted (from server data)
   const [votingState, setVotingState] = useState<"idle" | "voting" | "voted">(poll.current ? "voted" : "idle")
   const {data: user} = useGetUser()
-  const {signIn} = useAuthActions()
 
   async function handleVote(optionId: string) {
-    if (!user) {
-      signIn()
-      return
-    }
-
+    if (!user) return
     if (votingState !== "idle") return // Only allow voting when idle
 
     setVotingState("voting")
@@ -56,27 +50,27 @@ function RawPollCard({poll, onVote}: PollCardProps) {
 
           return (
             <div key={option.optionId} className="flex items-center justify-between gap-4">
-              <Button
-                key={option.optionId}
-                variant="secondary"
-                className={twMerge(
-                  "relative flex w-3/4 cursor-pointer justify-between gap-2 rounded-none disabled:opacity-100 md:w-3/5",
-                  isVoted && "ring-primary ring-offset-background ring-2 ring-offset-2",
-                )}
-                size="lg"
-                onClick={() => handleVote(option.optionId)}
-                disabled={isDisabled || isVoted}
-              >
-                <span
-                  aria-hidden
-                  className="bg-primary pointer-events-none absolute inset-y-0 left-0"
-                  style={{width: `${pct}%`}}
+              {user ? (
+                <VoteButton
+                  optionId={option.optionId}
+                  label={option.label}
+                  pct={pct}
+                  isVoted={isVoted}
+                  isDisabled={isDisabled}
+                  onVote={handleVote}
                 />
-                <span className="z-5 inline-flex items-center gap-2">
-                  {option.label}
-                  {isVoted && <Check />}
-                </span>
-              </Button>
+              ) : (
+                <SignInDialog>
+                  <VoteButton
+                    optionId={option.optionId}
+                    label={option.label}
+                    pct={pct}
+                    isVoted={isVoted}
+                    isDisabled={false}
+                    onVote={handleVote}
+                  />
+                </SignInDialog>
+              )}
               <span>{pct}%</span>
             </div>
           )
