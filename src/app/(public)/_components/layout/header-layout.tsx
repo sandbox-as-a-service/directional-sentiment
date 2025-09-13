@@ -5,6 +5,7 @@ import {Avatar} from "../avatar/avatar"
 import {Button} from "../button/button"
 import {Separator} from "../separator/separator"
 import {Skeleton} from "../skeleton/skeleton"
+import {TypographyH1} from "../typography/typography"
 
 export function HeaderLayout() {
   const {data, isLoading} = useGetUser()
@@ -12,7 +13,8 @@ export function HeaderLayout() {
 
   return (
     <header className="bg-background sticky top-0 z-10">
-      <nav className="container mx-auto flex justify-end px-6 py-4">
+      <nav className="container mx-auto flex justify-between px-6 py-4">
+        <TypographyH1 className="text-3xl">Opinion Registry</TypographyH1>
         {isLoading && <Skeleton className="h-9 w-34 rounded-none" />}
         {!isLoading && data && (
           <div className="flex items-center gap-4">

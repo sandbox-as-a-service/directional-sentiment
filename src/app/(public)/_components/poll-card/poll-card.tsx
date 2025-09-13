@@ -1,9 +1,9 @@
+import {Check} from "lucide-react"
 import {memo, useState} from "react"
 import {twMerge} from "tailwind-merge"
 
 import type {PollPersonalizedPageItem} from "@/app/_domain/use-cases/polls/dto/poll"
 
-import {Badge} from "../badge/badge"
 import {Button} from "../button/button"
 import {Card} from "../card/compound-pattern/card"
 
@@ -37,12 +37,7 @@ function RawPollCard({poll, onVote}: PollCardProps) {
 
   return (
     <Card className="border-none">
-      <Card.Header className="flex-row items-start justify-between gap-2">
-        <div>{poll.question}</div>
-        <div>
-          <Badge variant="outline">{votingState === "voted" ? "Voted" : "Not Voted"}</Badge>
-        </div>
-      </Card.Header>
+      <Card.Header>{poll.question}</Card.Header>
       <Card.Content className="flex-col gap-2">
         {poll.options.map((option) => {
           const isVoted = poll.current === option.optionId
@@ -56,7 +51,7 @@ function RawPollCard({poll, onVote}: PollCardProps) {
                 key={option.optionId}
                 variant="secondary"
                 className={twMerge(
-                  "relative flex w-3/4 cursor-pointer justify-between gap-2 rounded-none disabled:opacity-70 md:w-3/5",
+                  "relative flex w-3/4 cursor-pointer justify-between gap-2 rounded-none disabled:opacity-100 md:w-3/5",
                   isVoted && "ring-primary ring-offset-background ring-2 ring-offset-2",
                 )}
                 size="lg"
@@ -68,7 +63,10 @@ function RawPollCard({poll, onVote}: PollCardProps) {
                   className="bg-primary pointer-events-none absolute inset-y-0 left-0"
                   style={{width: `${pct}%`}}
                 />
-                <span className="z-5">{option.label}</span>
+                <span className="z-5 inline-flex items-center gap-2">
+                  {option.label}
+                  {isVoted && <Check />}
+                </span>
               </Button>
               <span>{pct}%</span>
             </div>

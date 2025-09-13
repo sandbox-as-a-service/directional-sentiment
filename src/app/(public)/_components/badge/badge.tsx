@@ -1,6 +1,6 @@
 import {Slot} from "@radix-ui/react-slot"
 import {type VariantProps, cva} from "class-variance-authority"
-import {ComponentPropsWithRef} from "react"
+import type {ComponentPropsWithRef} from "react"
 import {twMerge} from "tailwind-merge"
 
 const badgeBase = [
