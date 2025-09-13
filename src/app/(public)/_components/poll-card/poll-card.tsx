@@ -49,7 +49,6 @@ function RawPollCard({poll, onVote}: PollCardProps) {
           const isDisabled = votingState !== "idle"
           const result = poll.results.items.find((item) => item.optionId === option.optionId)
           const pct = result?.pct ?? 0
-          const count = result?.count ?? 0
 
           return (
             <div key={option.optionId} className="flex items-center justify-between gap-4">
@@ -70,7 +69,6 @@ function RawPollCard({poll, onVote}: PollCardProps) {
                   style={{width: `${pct}%`}}
                 />
                 <span className="z-10">{option.label}</span>
-                <span className="z-10">{count.toLocaleString("en-US")}</span>
               </Button>
               <span>{pct}%</span>
             </div>
