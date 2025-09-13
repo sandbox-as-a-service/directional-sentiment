@@ -32,7 +32,7 @@ export default function RootLayout({
         <SWRProvider>
           <SidebarProvider>
             <AppSidebar />
-            <SidebarTrigger className="fixed top-5 left-5 z-50 lg:hidden" />
+            <SidebarTrigger className="fixed top-5 left-2 z-50 lg:hidden" />
             {children}
           </SidebarProvider>
         </SWRProvider>

@@ -2,7 +2,7 @@
 
 import {Slot} from "@radix-ui/react-slot"
 import {VariantProps, cva} from "class-variance-authority"
-import {PanelLeftIcon} from "lucide-react"
+import {Menu} from "lucide-react"
 import * as React from "react"
 import type {ComponentPropsWithRef} from "react"
 import {twMerge} from "tailwind-merge"
@@ -251,7 +251,7 @@ function SidebarTrigger({className, onClick, ...props}: React.ComponentProps<typ
       }}
       {...props}
     >
-      <PanelLeftIcon />
+      <Menu />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )
