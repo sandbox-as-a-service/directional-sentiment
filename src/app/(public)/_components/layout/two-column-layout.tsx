@@ -19,7 +19,7 @@ export function TwoColumnLayout({
     // stacked by default; 2 cols @xl using 70/30 split
     "grid grid-cols-1 xl:grid xl:grid-cols-[7fr_3fr]",
     // design-locked spacing
-    "gap-8 p-6",
+    "gap-8 p-4 xl:p-8",
   ]
 
   // if NO aside, upgrade main to span both tracks @xl

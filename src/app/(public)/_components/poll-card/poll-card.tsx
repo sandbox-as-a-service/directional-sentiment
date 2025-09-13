@@ -68,7 +68,7 @@ function RawPollCard({poll, onVote}: PollCardProps) {
                   className="bg-primary pointer-events-none absolute inset-y-0 left-0"
                   style={{width: `${pct}%`}}
                 />
-                <span className="z-10">{option.label}</span>
+                <span className="z-5">{option.label}</span>
               </Button>
               <span>{pct}%</span>
             </div>

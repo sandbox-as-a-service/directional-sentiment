@@ -42,9 +42,9 @@ export default function Page() {
   }, [hasMore, loadMore])
 
   return (
-    <div>
+    <div className="w-full">
       <HeaderLayout />
-      <TwoColumnLayout className="pt-0">
+      <TwoColumnLayout className="pt-0 xl:pt-0">
         <TwoColumnLayout.Main>
           <div className="border">
             {isLoading &&

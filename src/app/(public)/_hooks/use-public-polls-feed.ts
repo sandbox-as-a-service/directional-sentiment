@@ -39,7 +39,7 @@ export function usePollsFeed(limit = 10) {
     GetPersonalizedPollFeedResult,
     GetPersonalizedPollFeedError
   >(getKey, {
-    revalidateFirstPage: false, // New polls are not frequent, so don't bother revalidating the first page. default is true
+    revalidateFirstPage: true, // New polls are not frequent, so don't bother revalidating the first page. default is true
   })
 
   // Initial loading = when the first (real) fetch is happening
